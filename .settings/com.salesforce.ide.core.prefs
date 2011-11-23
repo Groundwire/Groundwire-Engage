@@ -1,0 +1,13 @@
+#Wed Nov 23 13:29:04 PST 2011
+eclipse.preferences.version=1
+endpointApiVersion=23.0
+endpointEnvironment=Production/Developer Edition
+endpointServer=www.salesforce.com
+httpsProtocol=true
+ideVersion=23.0
+keependpoint=false
+metadataFormatVersion=23.0
+namespacePrefix=gwet
+packageName=unpackaged
+readTimeout=400
+username=davidhabibet@groundwire.org
