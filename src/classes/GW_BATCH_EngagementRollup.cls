@@ -68,7 +68,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	* @description Loads an instance of EngagementTrackerSettings__c, creating one with useful defaults
 	* if one isn't found.
 	*/   
-	public class MyException extends Exception {}
+	//public class MyException extends Exception {}
 	 
     public static EngagementTrackerSettings__c settings {
         get {
@@ -76,21 +76,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 settings = EngagementTrackerSettings__c.getOrgDefaults();  
                 
                 if (settings == null) {
-            	
-            		throw(new MyException('Engagement Tracker requires Engagement Tracker Settings to have been created.  Please create these custom settings.'));
-/*
-                    // create reasonable defaults
-                    settings = new EngagementTrackerSettings__c();
-                    
-                    // set reasonable defaults
-                    settings.Batch_Size__c = 50;
-                    settings.Opp_Rectype_For_Tests_Default__c = 'Donation';
-                    settings.Opp_Rectype_For_Tests_Member__c = 'Membership';
+           			// MatthewS felt that if no settings exist, we should give an error to the user,
+           			// but DaveH found that this was too easily hit in GWBase instances that will always have this ET, even if not being used.
+            		//throw(new MyException('Engagement Tracker requires Engagement Tracker Settings to have been created.  Please create these custom settings.'));
+            		settings = new EngagementTrackerSettings__c();
+            		// set values code assumes exist
                     settings.Timeframe_Medium__c = 18;
                     settings.Timeframe_Recent__c = 12;
-                    insert settings;
-*/
-                }           
+           		}            
             }
             return settings;
         }
@@ -131,15 +124,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         string querySOQL = 'SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,';
         querySOQL +=        'Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,';
         
-        if (GW_Utilities.IsGWBaseInstalled) {
-        	querySOQL += 'OppAmountLastNDays__c,Best_Gift_Year__c,Best_Gift_Year_Total__c,OppAmountLastNDaysHH__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,';
-        	querySOQL += 'ONEN_Household__r.OppsClosedLastNDays__c,ONEN_Household__r.Best_Gift_Year__c,ONEN_Household__r.Best_Gift_Year_Total__c,';
-        	querySOQL += 'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
-        	querySOQL += 'HouseholdMembershipEndDate__c,';
-        }
-
         // add our namespace prefix to fields we own.
         querySOQL = GW_Utilities.StrAllNSPrefix(querySOQL);
+
+        if (GW_Utilities.IsGWBaseInstalled) {
+        	querySOQL += 'GWBase__OppAmountLastNDays__c,GWBase__Best_Gift_Year__c,GWBase__Best_Gift_Year_Total__c,GWBase__OppAmountLastNDaysHH__c,GWBase__LastCloseDate__c,GWBase__LastCloseDateHH__c,GWBase__OppsClosedLastNDays__c,';
+        	querySOQL += 'GWBase__ONEN_Household__r.GWBase__OppsClosedLastNDays__c,GWBase__ONEN_Household__r.GWBase__Best_Gift_Year__c,GWBase__ONEN_Household__r.GWBase__Best_Gift_Year_Total__c,';
+        	querySOQL += 'GWBase__MembershipJoinDate__c,GWBase__MembershipEndDate__c,GWBase__LastMembershipLevel__c,GWBase__LastMembershipOrigin__c,GWBase__LastMembershipDate__c,GWBase__LastMembershipAmount__c,';
+        	querySOQL += 'GWBase__HouseholdMembershipEndDate__c,';
+        }
         
 		if (GW_Utilities.IsNPSPHHInstalled)	{
 			querySOQL += 
@@ -480,10 +473,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		        cw.LastMembershipDate_c = (date)con.get('GWBase__LastMembershipDate__c');
 		        cw.MembershipJoinDate_c = (date)con.get('GWBase__MembershipJoinDate__c');
 		        cw.Best_Gift_Year_Total_c = (decimal)con.get('GWBase__Best_Gift_Year_Total__c');
-		        cw.OppAmountLastNDaysHH_c = (decimal)con.get('GWBase__OppAmountLastNDaysHH__c');		        
-		        cw.OppsClosedLastNDaysHH_c = (decimal)con.get('GWBase__ONEN_Household__r.OppsClosedLastNDays__c');
+		        cw.OppAmountLastNDaysHH_c = (decimal)con.get('GWBase__OppAmountLastNDaysHH__c');
 		        cw.HouseholdMembershipEndDate_c = (date)con.get('GWBase__HouseholdMembershipEndDate__c');
-		        cw.Best_Gift_Year_TotalHH_c = (decimal)con.get('GWBase__ONEN_Household__r.Best_Gift_Year_Total__c');
+		        
+				sObject hh = con.getSObject('GWBase__ONEN_Household__r');  
+				if (hh != null) {
+		        	cw.Best_Gift_Year_TotalHH_c = (decimal)hh.get('GWBase__Best_Gift_Year_Total__c');
+		        	cw.OppsClosedLastNDaysHH_c = (decimal)hh.get('GWBase__OppsClosedLastNDays__c');
+				}
             }            
 		}
 	
@@ -499,7 +496,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		        cw.LastMembershipDate_c = (date)con.get('npo02__LastMembershipDate__c');
 		        cw.MembershipJoinDate_c = (date)con.get('npo02__MembershipJoinDate__c');
 
-		        //DH: estimate this for now.
+		        // estimate this for now.
 		        decimal d1 = (decimal)con.get('npo02__OppAmountThisYear__c');
 		        decimal d2 = (decimal)con.get('npo02__OppAmountLastYear__c');
 		        decimal d3 = (decimal)con.get('npo02__OppAmount2YearsAgo__c');
@@ -513,7 +510,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			        cw.OppsClosedLastNDaysHH_c = (decimal)hh.get('npo02__OppsClosedLastNDays__c');
 			        cw.HouseholdMembershipEndDate_c = (date)hh.get('npo02__LastMembershipDate__c');
 			        
-			        //DH: estimate this for now.
+			        // estimate this for now.
 			        d1 = (decimal)hh.get('npo02__OppAmountThisYear__c');
 			        d2 = (decimal)hh.get('npo02__OppAmountLastYear__c');
 			        d3 = (decimal)hh.get('npo02__OppAmount2YearsAgo__c');
@@ -631,7 +628,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     
     
     static void setSettingsForTests(string txtfield1, string txtfield1FV, double txtfield1lvl) {
-        
+
         settings.Include_Opps__c = GW_Utilities.IsNPSPHHInstalled || GW_Utilities.IsGWBaseInstalled; 
         settings.Timeframe_Recent__c = 12;
         settings.Timeframe_Medium__c = 12;
@@ -773,42 +770,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     
         // create & insert contact(s)
         Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(howMany);
+                
         TestCons[5].Title = 'Board Member'; 
         TestCons[10].Engagement_Level_Numeric__c = 3;  
         TestCons[10].Engagement_Peak_Numeric__c = 3;  
         // TestCons[10].Engagement_Level_Mod_Date__c = system.today().addMonths(-2);
-        TestCons[19].FirstName = '16Spouse';
-        TestCons[20].FirstName = '17Spouse';
         TestCons[21].Email = 'test@test.com';   // this should give lvl 1
         
         insert TestCons;
-
-        // put 4 cons in 2 HH's, have to query to get HH
-		string strSoql = 'SELECT Id, FirstName ';
-		if (GW_Utilities.IsGWBaseInstalled) {
-			strSoql += ', GWBase__ONEN_Household__c ';
-		}
-		if (GW_Utilities.IsNPSPHHInstalled) {
-			strSoql += ', npo02__Household__c ';
-		}  
-		Id[] listId = new Id[]{TestCons[16].Id,TestCons[17].Id,TestCons[19].Id,TestCons[20].Id};          
-		strSoql += 'FROM Contact Where Id IN :listId ORDER BY FirstName';
-		Contact[] SpouseCons = database.query(strSoql);
-            
-        // add HH contacts manually - for now, don't use automatic HH second-contact creator since don't want to require new HH code
-        system.debug (Logginglevel.WARN,'spouseCon:' + SpouseCons[0]);
-        system.AssertEquals('16Spouse' , SpouseCons[0].FirstName);
-        system.AssertEquals('Number17' , SpouseCons[3].FirstName);
-		if (GW_Utilities.IsGWBaseInstalled) {
-        	SpouseCons[0].put('GWBase__ONEN_Household__c', SpouseCons[2].get('GWBase__ONEN_Household__c'));	
-        	SpouseCons[1].put('GWBase__ONEN_Household__c', SpouseCons[3].get('GWBase__ONEN_Household__c'));	
-		}
-        if (GW_Utilities.IsNPSPHHInstalled) {
-        	SpouseCons[0].put('npo02__Household__c', SpouseCons[2].get('npo02__Household__c'));	
-        	SpouseCons[1].put('npo02__Household__c', SpouseCons[3].get('npo02__Household__c'));	
-        }
-        update new Contact[] {SpouseCons[0],SpouseCons[1]};
-                
+        
+        // now add 2 new contacts who are in existing households
+        Contact[] consHH = ONEN_UnitTestData.CreateMultipleTestContactsInHouseholds(new list<Contact> {TestCons[16], TestCons[17]});
+        consHH[0].FirstName = '16Spouse';
+        consHH[1].FirstName = '17Spouse';
+        insert consHH;
+               
         // create a few activist campaigns
         Campaign camp1 = new Campaign (
             Name = 'Camp 1 This Yr Lvl 3',
@@ -855,7 +831,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 isActive = true,
                 Leadership_Level__c = '2 - testLevelLower',
                 Type = 'Online Action'
-                // DH ,Campaign_Sub_Type__c = 'Online Action'
             );
             onlineCamps.add(camp);
             i++;
@@ -947,7 +922,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         );      
         CampaignMember cm19 = new CampaignMember (
             CampaignId = camp3.Id,
-            ContactId = TestCons[20].Id,
+            //ContactId = TestCons[20].Id,
+            ContactId = consHH[1].Id,
             Status = 'Responded'
         );
         CampaignMember[] onlineCMs = new CampaignMember[0]; 
@@ -991,7 +967,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         if (GW_Utilities.IsGWBaseInstalled) {
 	        for (Opportunity opp : mbrOpps) {    
-	        	opp.put('GWBase_Membership_Start_Date__c', opp.CloseDate);
+	        	opp.put('GWBase__Membership_Start_Date__c', opp.CloseDate);
 	        	opp.put('GWBase__Membership_End_Date__c', opp.CloseDate.AddYears(1)); 
 	        }
         }
@@ -1032,11 +1008,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         for (Contact con : TestCons) {
             ConIDs.add(con.Id);
         }
+        for (Contact con : consHH) {
+            ConIDs.add(con.Id);
+        }
         
         // query for all the cons we started with
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c
-            //DH ,ONEN_Household__c,HouseholdName__c
             FROM Contact WHERE Id IN :ConIDs]);
         system.debug (loggingLevel.WARN, 'conP:' + conP);
         
@@ -1125,14 +1103,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             // System.AssertEquals(system.today().addMonths(-2),con10P.Engagement_Level_Mod_Date__c);
             
             // HH mbr w/ no other activity, shouldn't get HH donation credit
-            Contact con19P = conP.get(TestCons[19].Id);
+            Contact con19P = conP.get(consHH[0].Id);
             System.AssertEquals(0,con19P.Engagement_Level_Numeric__c);        
             System.AssertEquals(0,con19P.Engagement_Peak_Numeric__c);
             System.AssertEquals(null,con19P.Last_Leadership_Action_Date__c);
               
             // HH mbr other activity, should get HH donation credit
-            Contact con20P = conP.get(TestCons[20].Id);
-            system.debug (Logginglevel.WARN,'testcon20:' + con20P);
+            Contact con20P = conP.get(consHH[1].Id);
             System.AssertEquals(DONORLVL2,con20P.Engagement_Level_Numeric__c);        
             System.AssertEquals(DONORLVL2,con20P.Engagement_Peak_Numeric__c);
             System.AssertEquals(startDateRecent,con20P.Last_Leadership_Action_Date__c);

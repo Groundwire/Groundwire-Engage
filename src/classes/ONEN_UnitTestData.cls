@@ -71,18 +71,30 @@ public class ONEN_UnitTestData {
 	* @param firstContactList A list of contacts.
 	* @return A list of contacts, with each contact being in a household with the respective contact from firstContactList.
 	*/
-/******************* not used	
 	public static list<Contact> CreateMultipleTestContactsInHouseholds (List<Contact> firstContactList) {
 		
 		list<contact> ContactsToAdd = New list<contact> ();
+		list<contact> SourceContacts = firstContactList;		
+		if (GW_Utilities.IsNPSPHHInstalled) {	
+			SourceContacts = database.query('select Id, npo02__Household__c, npo02__Household__r.Id from contact where Id in :firstContactList');
+		}
 		
-		for (integer i=0;i<firstContactList.size();i++) {
+		for (integer i=0;i<SourceContacts.size();i++) {
 			Contact newCon = New Contact (
 				FirstName = 'Second Number' + i,
 				LastName = 'Doppleganger',
 				OtherCity = 'Seattle'
 				//DH ,ONEN_Household__c = firstContactList[i].ONEN_Household__c
 			);
+			if (GW_Utilities.IsNPSPHHInstalled) {	
+				
+				sObject hh = SourceContacts[i].getSObject('npo02__Household__r');
+				system.assert(hh != null);  
+				if (hh != null) {
+					newCon.put('npo02__Household__c', hh.get('Id'));
+				}
+			}
+			
 			ContactsToAdd.add (newCon);
 		}
 		
@@ -91,7 +103,6 @@ public class ONEN_UnitTestData {
 		
 		return ContactsToAdd;
 	}
-********************/
 
 	/*******************************************************************************************************
 	* @description Method that creates one Opportunity each to a given list of Contacts for use in unit test 
