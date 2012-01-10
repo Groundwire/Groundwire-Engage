@@ -14,6 +14,18 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Donor__c</fullName>
+        <description>yes/no formula for display to profiles without permissions to view Opps</description>
+        <externalId>false</externalId>
+        <formula>IF (   npo02__TotalOppAmount__c  &gt; 0 , &quot;Yes&quot;, &quot;No&quot; )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Displays as Yes or No depending on whether this individual has ever made a donation or sponsorship.</inlineHelpText>
+        <label>Donor?</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Engagement_Level_Numeric_After_Override__c</fullName>
         <externalId>false</externalId>
         <formula>MAX (  Engagement_Level_Override_Numeric__c ,  Engagement_Level_Numeric__c )</formula>

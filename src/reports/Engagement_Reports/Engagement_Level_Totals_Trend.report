@@ -5,7 +5,7 @@
         <backgroundColor2>#FFFFFF</backgroundColor2>
         <backgroundFadeDir>Diagonal</backgroundFadeDir>
         <chartSummaries>
-            <aggregate>Average</aggregate>
+            <aggregate>Sum</aggregate>
             <axisBinding>y</axisBinding>
             <column>Engagement_Totals__c.Number_of_Contacts__c</column>
         </chartSummaries>
@@ -28,7 +28,7 @@
         <titleSize>18</titleSize>
     </chart>
     <columns>
-        <aggregateTypes>Average</aggregateTypes>
+        <aggregateTypes>Sum</aggregateTypes>
         <field>Engagement_Totals__c.Number_of_Contacts__c</field>
     </columns>
     <description>plots total # of people in each engagement level over time; note: starts only from when engagement tracker was installed</description>
