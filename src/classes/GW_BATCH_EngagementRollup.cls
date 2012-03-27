@@ -29,7 +29,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     public integer monthsRecent;
     public integer monthsMedium;
     private date cutoffDateRecent;
-    private date cutoffDateMedium; 
+    // private date cutoffDateMedium;  	// deprecated 
     private integer NewMbrLvl;
     private integer RetMbrLvl;
     
@@ -182,7 +182,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Contact[] consToUpd = new Contact[0]; 
         
         cutoffDateRecent = system.today().addMonths(monthsRecent * -1);
-        cutoffDateMedium = system.today().addMonths(monthsMedium * -1);
+        // cutoffDateMedium = system.today().addMonths(monthsMedium * -1);			// deprecated
         
         // cast sobjects to Contacts, and add to wrappers & maps        
         for (sobject s: SBatch) {

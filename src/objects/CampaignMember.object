@@ -3,10 +3,28 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Effective_Action_Date__c</fullName>
+        <description>If campaign has start &amp; end date &amp; CM created within that span, use CreatedDate of CM.  Otherwise:
+* if campaign has start &amp; End date, use end date
+* if campaign has start date but no end date, and CM created within a month of the start date, use CM date
+* if campaign has only start OR End date, use the one we have
+* else use created date of campaign</description>
         <externalId>false</externalId>
-        <formula>IF (  Campaign.StartDate &lt;=  FirstRespondedDate &amp;&amp; Campaign.EndDate &gt;= FirstRespondedDate &amp;&amp; NOT(ISBLANK(Campaign.StartDate)) &amp;&amp; NOT(ISBLANK(Campaign.EndDate)) &amp;&amp; NOT(ISBLANK(FirstRespondedDate)) , FirstRespondedDate , Campaign.StartDate)</formula>
+        <formula>IF (  
+NOT(ISBLANK(Campaign.StartDate)) ,
+	IF ( NOT(ISBLANK(Campaign.EndDate)),
+		IF (Campaign.StartDate &lt;=  FirstRespondedDate &amp;&amp; Campaign.EndDate &gt;= FirstRespondedDate,
+			FirstRespondedDate,
+			Campaign.EndDate),	
+		IF (FirstRespondedDate &gt; Campaign.StartDate &amp;&amp; FirstRespondedDate - Campaign.StartDate &lt;= 31,
+			FirstRespondedDate ,
+			Campaign.StartDate)),
+	IF ( NOT(ISBLANK(Campaign.EndDate)),
+		Campaign.EndDate,
+		DATEVALUE(Campaign.CreatedDate)
+	)
+)</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <inlineHelpText>if the FirstRespondedDate (the date contact was marked Responded for the campaign) is between campaign start &amp; end dates (meaning it has both), it&apos;ll use the responded date (important for long campaigns).  Otherwise, it&apos;ll just use campaign start date.</inlineHelpText>
+        <inlineHelpText>The date used for Engagement Tracker calculations - the date this action is considered to have taken place.</inlineHelpText>
         <label>Effective Action Date</label>
         <required>false</required>
         <type>Date</type>
