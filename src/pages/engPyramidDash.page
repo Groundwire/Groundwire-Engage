@@ -29,5 +29,9 @@
 				<apex:outputText value="{!row.countCons}" />
 			</apex:column>
 		</apex:dataTable>
+		
+		<apex:outputText rendered="{!noRecentData}">
+			There is no recent data for the engagement pyramid report.  Please contact your Salesforce administrator for assistance.
+		</apex:outputText> 
 
 </apex:page>

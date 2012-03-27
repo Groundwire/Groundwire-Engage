@@ -54,6 +54,17 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>First_of_Month__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF (  DAY(As_of_Date__c ) = 1 , &quot;True&quot; , &quot;False&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>If this record is from the first of the month (i.e. a monthly total) this field will be &quot;True&quot;</inlineHelpText>
+        <label>First of Month</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Number_of_Contacts__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>Number of Contacts</inlineHelpText>
@@ -68,9 +79,10 @@
     <listViews>
         <fullName>All</fullName>
         <columns>NAME</columns>
-        <columns>CREATED_DATE</columns>
-        <columns>Number_of_Contacts__c</columns>
+        <columns>As_of_Date__c</columns>
         <columns>Engagement_Level__c</columns>
+        <columns>Number_of_Contacts__c</columns>
+        <columns>CREATED_DATE</columns>
         <filterScope>Everything</filterScope>
         <label>All</label>
     </listViews>
