@@ -32,6 +32,13 @@
         <field>Engagement_Totals__c.Number_of_Contacts__c</field>
     </columns>
     <description>showing what % of total population each level represents over time; note that report begins from when engagement tracker was installed</description>
+    <filter>
+        <criteriaItems>
+            <column>Engagement_Totals__c.First_of_Month__c</column>
+            <operator>equals</operator>
+            <value>True</value>
+        </criteriaItems>
+    </filter>
     <format>Matrix</format>
     <groupingsAcross>
         <dateGranularity>Month</dateGranularity>
@@ -43,7 +50,7 @@
         <field>Engagement_Totals__c.Engagement_Level__c</field>
         <sortOrder>Desc</sortOrder>
     </groupingsDown>
-    <name>Engagement Level Percentages - Trend</name>
+    <name>Engagement Level Pcts - Monthly Trend</name>
     <params>
         <name>co</name>
         <value>0</value>

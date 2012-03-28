@@ -32,6 +32,13 @@
         <field>Engagement_Totals__c.Number_of_Contacts__c</field>
     </columns>
     <description>plots total # of people in each engagement level over time; note: starts only from when engagement tracker was installed</description>
+    <filter>
+        <criteriaItems>
+            <column>Engagement_Totals__c.First_of_Month__c</column>
+            <operator>equals</operator>
+            <value>True</value>
+        </criteriaItems>
+    </filter>
     <format>Matrix</format>
     <groupingsAcross>
         <dateGranularity>Month</dateGranularity>
@@ -43,7 +50,7 @@
         <field>Engagement_Totals__c.Engagement_Level__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Engagement Level Totals - Trend</name>
+    <name>Engagement Level Totals - Monthly Trend</name>
     <params>
         <name>co</name>
         <value>0</value>
