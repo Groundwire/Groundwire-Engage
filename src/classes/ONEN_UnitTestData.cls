@@ -6,6 +6,7 @@
 * @date 01/01/2007
 * @description ONEN_UnitTestData is a class that handles data for use in unit test code. These methods
 * should not be used by production code.
+* test
 */
 public class ONEN_UnitTestData { 
 
@@ -75,7 +76,7 @@ public class ONEN_UnitTestData {
 		
 		list<contact> ContactsToAdd = New list<contact> ();
 		list<contact> SourceContacts = firstContactList;		
-		if (GW_Utilities.IsNPSPHHInstalled) {	
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {	
 			SourceContacts = database.query('select Id, npo02__Household__c, npo02__Household__r.Id from contact where Id in :firstContactList');
 		}
 		
@@ -86,7 +87,7 @@ public class ONEN_UnitTestData {
 				OtherCity = 'Seattle'
 				//DH ,ONEN_Household__c = firstContactList[i].ONEN_Household__c
 			);
-			if (GW_Utilities.IsNPSPHHInstalled) {	
+			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {	
 				
 				sObject hh = SourceContacts[i].getSObject('npo02__Household__r');
 				system.assert(hh != null);  
@@ -137,7 +138,7 @@ public class ONEN_UnitTestData {
 				type = oppType,
 				RecordTypeId = rtid 
 			);	
-			if (GW_Utilities.IsNPSPHHInstalled) {
+			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 				newOpp.put('npe01__Contact_Id_for_Role__c', thisCon.Id);				
 			}
 			OppsToAdd.add (newOpp);
@@ -259,7 +260,7 @@ public class ONEN_UnitTestData {
 		date dtMbr = system.today().addMonths(-11);
 		list<Opportunity> listOppMbr = OppsForContactList (listCon, null, 'Closed Won', dtMbr, 15, 			
 			ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS, null);
-		if (GW_Utilities.IsNPSPHHInstalled) {
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 			for (Opportunity opp : listOppMbr) {
 	        	opp.put('npe01__Membership_Start_Date__c', opp.CloseDate);
 	        	opp.put('npe01__Membership_End_Date__c', opp.CloseDate.AddYears(1)); 
@@ -268,7 +269,7 @@ public class ONEN_UnitTestData {
 		insert listOppMbr;
 		system.debug(listOppMbr);		
 
-		if (GW_Utilities.IsNPSPHHInstalled) {
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 			list<OpportunityContactRole> listOCR = [SELECT Id, IsPrimary, Role, OpportunityId, ContactId FROM OpportunityContactRole
 				WHERE  OpportunityId in :listOpp or OpportunityId in :listOppMbr];
 			system.assertEquals(listOpp.size() + listOppMbr.size(), listOCR.size());
@@ -279,7 +280,7 @@ public class ONEN_UnitTestData {
 		
 		
 		string strSoql = 'SELECT Id, Name,';
-		if (GW_Utilities.IsNPSPHHInstalled) {
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 			strSoql += 'npo02__OppAmountLastNDays__c, npo02__LastCloseDate__c, npo02__TotalOppAmount__c, npo02__Household__c, ' +
 				'npo02__LastCloseDateHH__c, npo02__OppsClosedLastNDays__c, npo02__Household__r.npo02__OppAmountLastNDays__c, ' +
 				'npo02__Household__r.npo02__OppsClosedLastNDays__c, npo02__Household__r.npo02__LastMembershipDate__c, ' +
@@ -291,7 +292,7 @@ public class ONEN_UnitTestData {
 
         listCon = Database.query(strSoql);
         for (Contact con : listCon) {
-			if (GW_Utilities.IsNPSPHHInstalled) {
+			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 				// we don't know if membership is included in donation rollups or not.
 				system.assert(con.get('npo02__OppAmountLastNDays__c') == 100 ||
 					con.get('npo02__OppAmountLastNDays__c') == 115);
