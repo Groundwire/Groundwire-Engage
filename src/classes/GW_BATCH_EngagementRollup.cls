@@ -1313,7 +1313,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                  
         // and one that has nothing!
         Contact con22P = conP.get(TestCons[22].Id);
-        System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);        
+        System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);     
+        
+        
+        // also test for conversions
+        map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
+        							FROM CampaignMember WHERE Id IN :cms] );
+        for (CampaignMember cm : cms) {
+        	cm = cmsPmap.get(cm.Id);
+        } 
+        
+        // for con0, the old CM shouldn't be a conversion, but the newer one should
+        system.AssertEquals (false , cm02.Engagement_Conversion__c );
+        system.AssertEquals (true , cm0.Engagement_Conversion__c );
+        system.AssertEquals (0 , cm0.Engagement_Conversion_From_Level__c );
+        
     }
     
             

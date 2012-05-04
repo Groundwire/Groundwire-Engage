@@ -2,6 +2,18 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Conversion_Level_Jump__c</fullName>
+        <externalId>false</externalId>
+        <formula>Engagement_Conversion_To_Level__c -  Engagement_Conversion_From_Level__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Conversion Level Jump</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Effective_Action_Date__c</fullName>
         <description>If campaign has start &amp; end date &amp; CM created within that span, use CreatedDate of CM.  Otherwise:
 * if campaign has start &amp; End date, use end date
@@ -28,6 +40,33 @@ NOT(ISBLANK(Campaign.StartDate)) ,
         <label>Effective Action Date</label>
         <required>false</required>
         <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Engagement_Conversion_From_Level__c</fullName>
+        <externalId>false</externalId>
+        <label>Engagement Conversion From Level</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Engagement_Conversion_To_Level__c</fullName>
+        <externalId>false</externalId>
+        <label>Engagement Conversion To Level</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Engagement_Conversion__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <label>Engagement Conversion</label>
+        <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>LeadSource</fullName>
