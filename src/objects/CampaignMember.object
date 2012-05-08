@@ -96,6 +96,26 @@ NOT(ISBLANK(Campaign.StartDate)) ,
         <type>Picklist</type>
     </fields>
     <fields>
+        <fullName>New_Since_Last_Engagement_Chg__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF (  CreatedDate &gt;  Contact.Last_Engagement_Lvl_Chg_Datestamp__c , &quot;True&quot;, &quot;False&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>New Since Last Engagement Chg</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Responded_Since_Last_Engagement_Chg__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF ( FirstRespondedDate &gt;= DATEVALUE (Contact.Last_Engagement_Lvl_Chg_Datestamp__c ), &quot;True&quot;, &quot;False&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Responded Since Last Engagement Chg</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Salutation</fullName>
         <picklist>
             <picklistValues>
@@ -139,6 +159,10 @@ NOT(ISBLANK(Campaign.StartDate)) ,
             </picklistValues>
             <picklistValues>
                 <fullName>Sent</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Volunteered</fullName>
                 <default>false</default>
             </picklistValues>
             <sorted>true</sorted>

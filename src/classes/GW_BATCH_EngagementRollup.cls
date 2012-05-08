@@ -182,12 +182,18 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	*  and then all related Campaigns and Opps for each contact, to determine the correct score to assign.  It only makes a write to the contact if any of the rollup fields need changing.  
 	*/
     global void execute(Database.BatchableContext BC, List<Sobject> SBatch){
-        system.debug (Logginglevel.WARN,'running execute!');
+        // system.debug (Logginglevel.WARN,'running execute!');
+        
         Map<id,Contact> conMap = new Map<id,Contact>();
         Map<id,engTrackConWrapper> conWrapMap = new Map<id,engTrackConWrapper>();
         set<id> conIDs = new set<id>();       
         Contact[] consToUpd = new Contact[0];
+        
+        // collections for conversion analytics
         Contact[] convertedCons = new Contact[0]; 
+        // Contact[] campConversionCandidateCons = new Contact[0];
+        map<integer,list<Contact>> campConvCandidateMap = new map<integer,list<Contact>>();
+        Contact[] oppConversionCandidateCons = new Contact[0];
         
         cutoffDateRecent = system.today().addMonths(monthsRecent * -1);
         // cutoffDateMedium = system.today().addMonths(monthsMedium * -1);			// deprecated
@@ -198,16 +204,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             conIDs.add(con.Id);
             engTrackConWrapper cw = new engTrackConWrapper(con.Id);
             cw.con = con.clone(true,true);
+            if (con.Engagement_Level_Numeric__c != null) cw.OrigLvl = con.Engagement_Level_Numeric__c.intvalue();
             conWrapMap.put (con.Id,cw);
             conMap.put (con.Id,con);
-            
-            /*  //deprecated
-            ONEN_EngagementHistory conHist = new ONEN_EngagementHistory(con.Id);
-            conHist.con = con;
-            conHist.conCheckboxFields = conCheckboxFields;
-            conHist.conCheckboxLevelMap = conCheckboxLevelMap;
-            histMap.put(con.Id,conHist);
-            */
         }
         
         //system.debug (Logginglevel.WARN,'conwrapper map before calcs: ' + conWrapMap);
@@ -248,6 +247,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         cw.CurrLvl = lvl;
                         cw.PeakLvl = lvl;
                         cw.LastActionDate = (date)r.get('LastDate');
+                        cw.LvlFromCampaigns = lvl;		// cache this so we know what their campaign level was even if raised later
                     } else if (r.get('subtCon')==0 && r.get('subtLvl')==0 ) {
                         // this is a detail row (which should come after all of the con summary rows)
                         if ( (double)r.get('MaxLevel')==cw.CurrLvl ) {
@@ -441,18 +441,33 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             // write chgs to contacts, but only if something actually changed
             string lvlStr = lvlNameMap.get(cw.CurrLvl);
             string peakStr = lvlNameMap.get(cw.PeakLvl);
-            if (cw.CurrLvl != con.Engagement_Level_Numeric__c || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
+            if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
                 peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c || cw.FirstActionDateInLvl!=con.First_Action_Date_Curr_Level__c) 
                 {
-	                // first, if curr level changed, log the date and formal level in contact fields (for use in calculating conversion later, etc.)
-                    if (cw.CurrLvl != con.Engagement_Level_Numeric__c) {
+	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
+                    if (cw.CurrLvl != cw.OrigLvl) {
                     	con.Last_Engagement_Lvl_Chg_Datestamp__c = system.now();
                     	con.Former_Engagement_Level_Numeric__c = con.Engagement_Level_Numeric__c;
                     	
                     	// also flag as conversion if level is rising
-                    	if (cw.CurrLvl > con.Engagement_Level_Numeric__c) {
+                    	if (cw.CurrLvl > cw.OrigLvl) {
                     		cw.isConverting = true;
                     		convertedCons.add(con);
+                    		
+                    		// and flag those whose conversions are possibly due to campaigns, opps, or both
+                    		// if (cw.CurrLvl == cw.LvlFromCampaigns) campConversionCandidateCons.add(con);
+                    		if (cw.CurrLvl == cw.LvlFromCampaigns) {
+                    			// first get the right list from the map, or create if necessary, and add this con to it
+                    			Contact[] conList;
+                    			if (campConvCandidateMap.get(cw.CurrLvl) == null ) {
+                    				conList = new Contact[0];
+                    			} else {
+                    				conList = campConvCandidateMap.get(cw.CurrLvl);
+                    			}
+                    			conList.add (con);
+                    			// then put it back in the map
+                    			campConvCandidateMap.put(cw.CurrLvl,conList);
+                    		}
                     	}
                     }
                     
@@ -466,15 +481,76 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     consToUpd.add(con);
                 }
         }
+        system.debug (LoggingLevel.WARN,'convertedCons: ' + convertedCons);
+        system.debug (LoggingLevel.WARN,'convertedCons size: ' + convertedCons.size());
+        system.debug (LoggingLevel.WARN,'campConvCandidateMap: ' + campConvCandidateMap);
 
         //system.debug (Logginglevel.WARN,'consToUpd:' + consToUpd);
         if (consToUpd.size() > 0) {
-/* TBD
+
+			// before updating contacts, figure campaign & opp conversions
+			// need to do this first, b/c relies on the date of last eng change on Contact
 			// first find all CM's that are candidates
-			CampaignMember[] campMbrs = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
-											FROM CampaignMember
-											WHERE HasResponded = true AND (CreatedDate >= Contact.Last_Engagement_Level_Change_Date__c)]
-*/
+			// meaning they belong to one of our candidate cons, have the right engagement level, and dates are right
+			// we will do a series of queries, one for each engagement level that has candidates, so max of 8 queries total here
+			map<Id,CampaignMember> firstCandidateCMmap = new map<Id,CampaignMember>();
+			map<Id,Opportunity> firstCandidateOppMap = new map<Id,Opportunity>();
+			for (integer Lvl : campConvCandidateMap.keyset()) {
+				Contact[] conCandidates = campConvCandidateMap.get(Lvl);
+				CampaignMember[] cmCandidates = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
+												FROM CampaignMember
+												WHERE ContactId IN :conCandidates
+													AND (HasResponded = true AND (New_Since_Last_Engagement_Chg__c = 'True' OR Responded_Since_Last_Engagement_Chg__c = 'True'))
+													AND Campaign.Engagement_Level_Numeric__c = :Lvl AND Effective_Action_Date__c >= :cutoffDateRecent
+													ORDER BY Effective_Action_Date__c];
+				system.debug (LoggingLevel.WARN,'cmCandidates for lvl ' + Lvl + ':' + cmCandidates);
+													
+				// loop thru the results and find the earliest-dated CM for each contact (easy since pre-ordered)
+				for (CampaignMember cm : cmCandidates) {
+					if (firstCandidateCMmap.get(cm.ContactId) == null) {
+						firstCandidateCMmap.put(cm.ContactId,cm);
+					}
+				}
+			}
+			
+			// tbd find candidate opps
+			
+			// now loop thru each con candidate, and find whether opp or cm is earlier, and make that the conversion
+			CampaignMember[] cmConversions = new CampaignMember[0]; 
+			Opportunity[] oppConversions = new Opportunity[0]; 
+			for (Contact con : convertedCons) {
+				if (firstCandidateCMmap.get(con.Id) == null && firstCandidateOppMap.get(con.Id) != null) {
+					oppConversions.add (firstCandidateOppMap.get(con.Id));
+				} else if (firstCandidateCMmap.get(con.Id) != null && firstCandidateOppMap.get(con.Id) == null) {
+					cmConversions.add (firstCandidateCMmap.get(con.Id));
+				} else if (firstCandidateCMmap.get(con.Id) != null && firstCandidateOppMap.get(con.Id) != null) {
+					// campaign wins the tie..
+					CampaignMember cm = firstCandidateCMmap.get(con.Id);
+					Opportunity opp = firstCandidateOppMap.get(con.Id);
+					if (cm.Effective_Action_Date__c <= opp.CloseDate) {
+						cmConversions.add(cm);
+					} else {
+						oppConversions.add(opp);
+					}
+				}
+			}
+			system.debug (LoggingLevel.WARN,'cmConversions list before updates: ' + cmConversions);
+			
+			
+			// now loop through our converted CM's & opps & update
+			if (cmConversions.size() > 0) {
+				for (CampaignMember cm : cmConversions) {
+					cm.Engagement_Conversion__c = true;
+					engTrackConWrapper cw = conWrapMap.get(cm.ContactId);
+					cm.Engagement_Conversion_From_Level__c = cw.OrigLvl;
+					cm.Engagement_Conversion_To_Level__c = cw.CurrLvl;
+				}
+				update cmConversions;
+				system.debug (LoggingLevel.WARN,'cmConversions list after updates: ' + cmConversions);
+			}			
+			
+			// tbd update conversion opps			
+
             update consToUpd;
         }
         
@@ -701,6 +777,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         global date LastActionDate;
         global date FirstActionDateInLvl;
         global boolean isConverting;
+        global integer OrigLvl=0;
+        
+        // cache of campaign-based data
+        global integer LvlFromCampaigns = 0;
         
         // our cache of Opp Rollup data
         global decimal OppAmountLastNDays_c;
@@ -916,7 +996,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     
         // create & insert contact(s)
         Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(howMany);
-                
+        
+        TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[5].Title = 'Board Member'; 
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
@@ -1344,18 +1425,18 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // also test for conversions
         map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
         							FROM CampaignMember WHERE Id IN :cms] );
-        for (CampaignMember cm : cms) {
+        /*for (CampaignMember cm : cms) {
         	cm = cmsPmap.get(cm.Id);
-        } 
+        } */
         
         // for con0, the old CM shouldn't be a conversion, but the newer one should
-        system.AssertEquals (false , cm02.Engagement_Conversion__c );
-        system.AssertEquals (true , cm0.Engagement_Conversion__c );
-        system.AssertEquals (0 , cm0.Engagement_Conversion_From_Level__c );
+        system.AssertEquals (false , cmsPmap.get(cm02.Id).Engagement_Conversion__c );
+        system.AssertEquals (true , cmsPmap.get(cm0.Id).Engagement_Conversion__c );
+        system.AssertEquals (0 , cmsPmap.get(cm0.Id).Engagement_Conversion_From_Level__c );
         
         // for con5, the CM isn't a conversion since he gets level from field value
-        system.AssertEquals (false , cm5.Engagement_Conversion__c );
-        system.AssertEquals (null , cm0.Engagement_Conversion_From_Level__c );
+        system.AssertEquals (false , cmsPmap.get(cm5.Id).Engagement_Conversion__c );
+        system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_From_Level__c );
         
         
     }
