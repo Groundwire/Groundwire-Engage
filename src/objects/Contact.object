@@ -10,6 +10,7 @@
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -22,6 +23,7 @@
         <inlineHelpText>Displays as Yes or No depending on whether this individual has ever made a donation or sponsorship.</inlineHelpText>
         <label>Donor?</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -34,6 +36,7 @@
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -46,6 +49,7 @@
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>true</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -58,6 +62,7 @@
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -94,6 +99,7 @@
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -136,6 +142,7 @@
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -148,6 +155,7 @@
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -158,6 +166,7 @@
         <label>Engagement Override End Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -169,6 +178,7 @@
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -213,6 +223,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -222,7 +233,31 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <label>First Action Date at Engagement Level</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Former_Engagement_Level_Numeric__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>the previous engagement level for this contact, before they changed to their current level</inlineHelpText>
+        <label>Former Engagement Level Numeric</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Last_Engagement_Lvl_Chg_Datestamp__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>date this contact&apos;s engagement level was last changed from one level to another</inlineHelpText>
+        <label>Last Engagement Lvl Chg Datestamp</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>DateTime</type>
     </fields>
     <fields>
         <fullName>Last_Leadership_Action_Date__c</fullName>
@@ -231,6 +266,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <label>Last Engagement Action Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -267,6 +303,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <label>Alternate Email</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -277,6 +314,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <label>Personal Email</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -304,6 +342,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Home&quot;),
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Home Address</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -319,6 +358,7 @@ null
         <inlineHelpText>WARNING - This field may not accurately reflect the donation history. Please use the Last Gift Date field instead.</inlineHelpText>
         <label>Last Transaction Date</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -336,6 +376,7 @@ null
         <precision>18</precision>
         <required>false</required>
         <scale>2</scale>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -346,6 +387,7 @@ null
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Organization Type</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -373,6 +415,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Other Address</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -401,6 +444,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -424,6 +468,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -447,6 +492,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -456,6 +502,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <externalId>false</externalId>
         <label>Private</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -479,6 +526,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -498,6 +546,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -508,6 +557,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <inlineHelpText>This field is no longer used and should not be referenced. It has been replaced by Type_of_Account__c</inlineHelpText>
         <label>_SYSTEM: IsIndividual - DEPRECATED</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -519,6 +569,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <inlineHelpText>Shows the type of Account this Contact is connected to.</inlineHelpText>
         <label>Type of Account</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -529,6 +580,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <label>Work Email</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -539,6 +591,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Other&quot;),
         <label>Work Phone</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Phone</type>
     </fields>
     <fields>
@@ -565,6 +618,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Work Address</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -578,6 +632,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -587,6 +642,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <label>First Gift Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -597,6 +653,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Household Mailing Address</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -608,6 +665,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>Household Phone</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -622,6 +680,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <relationshipName>Contacts</relationshipName>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Lookup</type>
     </fields>
     <fields>
@@ -632,6 +691,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <length>100</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -645,6 +705,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -654,6 +715,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <formula>npo02__Household__r.npo02__LastCloseDate__c</formula>
         <label>Last Household Gift Date</label>
         <required>false</required>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -663,6 +725,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <label>Last Gift Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -675,6 +738,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -684,6 +748,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <label>Last Membership Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -694,6 +759,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -705,6 +771,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -718,6 +785,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -741,6 +809,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -750,6 +819,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <label>Membership End Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -759,6 +829,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <label>Membership Join Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Date</type>
     </fields>
     <fields>
@@ -783,6 +854,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>MultiselectPicklist</type>
         <visibleLines>3</visibleLines>
     </fields>
@@ -796,6 +868,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -809,6 +882,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -822,6 +896,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -834,6 +909,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -846,6 +922,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <precision>18</precision>
         <required>false</required>
         <scale>2</scale>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -858,6 +935,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -870,6 +948,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <precision>18</precision>
         <required>false</required>
         <scale>2</scale>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -882,6 +961,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -894,6 +974,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -907,6 +988,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -920,6 +1002,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -933,6 +1016,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -946,6 +1030,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -970,6 +1055,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -982,6 +1068,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -994,6 +1081,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <required>false</required>
         <scale>2</scale>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <fields>
@@ -1006,6 +1094,7 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <precision>18</precision>
         <required>false</required>
         <scale>2</scale>
+        <trackHistory>false</trackHistory>
         <type>Currency</type>
     </fields>
     <listViews>
@@ -1022,6 +1111,20 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
             <value>THIS_MONTH</value>
         </filters>
         <label>Birthdays This Month</label>
+    </listViews>
+    <listViews>
+        <fullName>Cons_w_Engagement</fullName>
+        <columns>FULL_NAME</columns>
+        <columns>ACCOUNT.NAME</columns>
+        <columns>CONTACT.TITLE</columns>
+        <columns>CONTACT.EMAIL</columns>
+        <columns>Engagement_Level__c</columns>
+        <columns>Engagement_Level_Numeric__c</columns>
+        <columns>Engagement_Level_Override__c</columns>
+        <columns>Engagement_Peak__c</columns>
+        <columns>CORE.USERS.ALIAS</columns>
+        <filterScope>Everything</filterScope>
+        <label>Cons w Engagement</label>
     </listViews>
     <listViews>
         <fullName>MyContacts</fullName>

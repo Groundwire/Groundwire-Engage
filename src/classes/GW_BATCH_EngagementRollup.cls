@@ -186,7 +186,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Map<id,Contact> conMap = new Map<id,Contact>();
         Map<id,engTrackConWrapper> conWrapMap = new Map<id,engTrackConWrapper>();
         set<id> conIDs = new set<id>();       
-        Contact[] consToUpd = new Contact[0]; 
+        Contact[] consToUpd = new Contact[0];
+        Contact[] convertedCons = new Contact[0]; 
         
         cutoffDateRecent = system.today().addMonths(monthsRecent * -1);
         // cutoffDateMedium = system.today().addMonths(monthsMedium * -1);			// deprecated
@@ -445,8 +446,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 {
 	                // first, if curr level changed, log the date and formal level in contact fields (for use in calculating conversion later, etc.)
                     if (cw.CurrLvl != con.Engagement_Level_Numeric__c) {
-                    	con.Last_Engagement_Level_Change_Date__c = system.today();
+                    	con.Last_Engagement_Lvl_Chg_Datestamp__c = system.now();
                     	con.Former_Engagement_Level_Numeric__c = con.Engagement_Level_Numeric__c;
+                    	
+                    	// also flag as conversion if level is rising
+                    	if (cw.CurrLvl > con.Engagement_Level_Numeric__c) {
+                    		cw.isConverting = true;
+                    		convertedCons.add(con);
+                    	}
                     }
                     
                     con.Engagement_Level_Numeric__c = cw.CurrLvl;
@@ -462,15 +469,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
         //system.debug (Logginglevel.WARN,'consToUpd:' + consToUpd);
         if (consToUpd.size() > 0) {
-
-			// before updating contacts, find those that have moved up in level and check for Conversions
-			Contact[] convertedCons = new Contact[0];
-			for (Contact con : consToUpd) {
-				engTrackConWrapper cw = conWrapMap.get(con.Id);
-				// TBD if ()
-			}
-
-
+/* TBD
+			// first find all CM's that are candidates
+			CampaignMember[] campMbrs = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
+											FROM CampaignMember
+											WHERE HasResponded = true AND (CreatedDate >= Contact.Last_Engagement_Level_Change_Date__c)]
+*/
             update consToUpd;
         }
         
@@ -696,6 +700,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         global integer PeakLvl=0;
         global date LastActionDate;
         global date FirstActionDateInLvl;
+        global boolean isConverting;
         
         // our cache of Opp Rollup data
         global decimal OppAmountLastNDays_c;
@@ -1162,7 +1167,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // query for all the cons we started with
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
-            Last_Engagement_Level_Change_Date__c,Former_Engagement_Level_Numeric__c
+			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c
             FROM Contact WHERE Id IN :ConIDs]);
         system.debug (loggingLevel.WARN, 'conP:' + conP);
         
@@ -1180,8 +1185,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(startDateRecent,con0P.First_Action_Date_Curr_Level__c);     
         System.AssertEquals(null,con0P.Engagement_Level_Override__c);       
         System.AssertEquals(null,con0P.Engagement_Override_End_Date__c);
-        System.AssertEquals(null,con0P.Former_Engagement_Level_Numeric__c);        
-        System.AssertEquals(system.today(),con0P.Last_Engagement_Level_Change_Date__c);        
+        System.AssertEquals(null,con0P.Former_Engagement_Level_Numeric__c);
+        System.AssertEquals(system.today(),DateFromDatetime(con0P.Last_Engagement_Lvl_Chg_Datestamp__c));        
 
         // only last yr
         Contact con1P = conP.get(TestCons[1].Id);
@@ -1252,7 +1257,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(lvlNameMapTest.get(DONORLVL1),con10P.Engagement_Peak__c);
             // System.AssertEquals(system.today().addMonths(-2),con10P.Engagement_Level_Mod_Date__c);
             System.AssertEquals(1,con10P.Former_Engagement_Level_Numeric__c);		// we gave him this level on contact insert        
-	        System.AssertEquals(system.today(),con10P.Last_Engagement_Level_Change_Date__c);   
+	        System.AssertEquals(system.today(),DateFromDatetime(con10P.Last_Engagement_Lvl_Chg_Datestamp__c));   
             
             // HH mbr w/ no other activity, shouldn't get HH donation credit
             Contact con19P = conP.get(consHH[0].Id);
@@ -1355,5 +1360,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
     }
     
+    private static date DateFromDatetime (datetime dt) {
+    	Date d = Date.newInstance(dt.year(),dt.Month(),dt.day());
+    	return d;
+    }
             
 }
