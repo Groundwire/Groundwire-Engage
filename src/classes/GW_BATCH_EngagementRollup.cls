@@ -15,14 +15,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     
     public map<integer,string> lvlNameMap = new map<integer,string>();
     map<integer,string> lvlNameSettingMap = new map<integer,string> {
-        1=>GW_Utilities.StrTokenNSPrefix('Level_1_Name__c') , 
-        2=>GW_Utilities.StrTokenNSPrefix('Level_2_Name__c') , 
-        3=>GW_Utilities.StrTokenNSPrefix('Level_3_Name__c') , 
-        4=>GW_Utilities.StrTokenNSPrefix('Level_4_Name__c') , 
-        5=>GW_Utilities.StrTokenNSPrefix('Level_5_Name__c') , 
-        6=>GW_Utilities.StrTokenNSPrefix('Level_6_Name__c') , 
-        7=>GW_Utilities.StrTokenNSPrefix('Level_7_Name__c') , 
-        8=>GW_Utilities.StrTokenNSPrefix('Level_8_Name__c')}; 
+            1 => addNSPrefixET('Level_1_Name__c',true,false) , 
+            2 => addNSPrefixET('Level_2_Name__c',true,false) , 
+            3 => addNSPrefixET('Level_3_Name__c',true,false) , 
+            4 => addNSPrefixET('Level_4_Name__c',true,false) , 
+            5 => addNSPrefixET('Level_5_Name__c',true,false) , 
+            6 => addNSPrefixET('Level_6_Name__c',true,false) , 
+            7 => addNSPrefixET('Level_7_Name__c',true,false) , 
+            8 => addNSPrefixET('Level_8_Name__c',true,false) };
     integer[] lvlsNoNeedResp = new integer[0];
     map<string,EngagementContactFieldSettings__c> fieldSettingsMap = new map<string,EngagementContactFieldSettings__c>(); 
     map<string,EngagementFrequencySettings__c> freqSettingsMap = new map<string,EngagementFrequencySettings__c>(); 
@@ -286,10 +286,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 qstr +=         ' AND (HasResponded=True OR Campaign.Engagement_Level_Numeric__c IN :lvlsNoNeedResp) ';
                 qstr +=         ' AND Effective_Action_Date__c >= :cutoffDateRecent ';
                 // add our namespace prefix to fields we own.
-                qstr = GW_Utilities.StrAllNSPrefix(qstr);
+                qstr = addAllNSPrefixET (qstr,true,false);
                 // fields coming from settings we can't assume should be namespace prefixed.
                 qstr +=         ' AND Campaign.' + fqset.Fieldname_1__c + '= \'' + fqset.Field_Value_1__c + '\' ';
-                qstr +=         GW_Utilities.StrAllNSPrefix(' GROUP BY ROLLUP ( ContactId, Calendar_Year(Effective_Action_Date__c) )');
+                qstr +=         addAllNSPrefixET(' GROUP BY ROLLUP ( ContactId, Calendar_Year(Effective_Action_Date__c) )' , true, false);
                 //system.debug (Logginglevel.WARN,'querystring: ' + qstr);
                 sobject[] results = Database.query(qstr);
                 for (sobject row : results) {
@@ -934,31 +934,22 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     }
 
 
+	/* not used??
     static map<integer,string> getLvlNameMapForTests() {
-        // this stuff basically repeated from the class - need this looked up for the test as well
         map<integer,string> lvlNameMapTest = new map<integer,string>();
         map<integer,string> lvlNameSettingMap = new map<integer,string>{
-            1=>GW_Utilities.StrTokenNSPrefix('Level_1_Name__c') , 
-            2=>GW_Utilities.StrTokenNSPrefix('Level_2_Name__c') , 
-            3=>GW_Utilities.StrTokenNSPrefix('Level_3_Name__c') , 
-            4=>GW_Utilities.StrTokenNSPrefix('Level_4_Name__c') , 
-            5=>GW_Utilities.StrTokenNSPrefix('Level_5_Name__c') , 
-            6=>GW_Utilities.StrTokenNSPrefix('Level_6_Name__c') , 
-            7=>GW_Utilities.StrTokenNSPrefix('Level_7_Name__c') , 
-            8=>GW_Utilities.StrTokenNSPrefix('Level_8_Name__c')};
-        
-        /* TBD
-        for (integer i=1 ; i<=lvlNameSettingMap.keyset().size() ; i++) {
-            string fname = lvlNameSettingMap.get(i);
-            object lname = settings.get(fname);
-            string lnamestr = (string)lname;
-            if (lnamestr!=null) {
-                lvlNameMap.put(i,lnamestr);
-            }
-        } */
+            1 => addNSPrefixET('Level_1_Name__c',true,false) , 
+            2 => addNSPrefixET('Level_2_Name__c',true,false) , 
+            3 => addNSPrefixET('Level_3_Name__c',true,false) , 
+            4 => addNSPrefixET('Level_4_Name__c',true,false) , 
+            5 => addNSPrefixET('Level_5_Name__c',true,false) , 
+            6 => addNSPrefixET('Level_6_Name__c',true,false) , 
+            7 => addNSPrefixET('Level_7_Name__c',true,false) , 
+            8 => addNSPrefixET('Level_8_Name__c',true,false) };
         
         return lvlNameMapTest;
     }
+    */
     
     
     public static testMethod void testLevelAssignment() { 
@@ -1193,29 +1184,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Opportunity[] mbrOpps = new Opportunity[0];
         mbrOpps.addAll(mbrshipsThisYr);
         mbrOpps.addAll(mbrshipsLastYr);
-        
-        
-        
-        
-        // if (GW_Utilities.IsGWBaseInstalled) {
-	        for (Opportunity opp : mbrOpps) {    
-	            opp.put( addNSPrefixET('Membership_Start_Date__c',false,false), opp.CloseDate);
-	            opp.put( addNSPrefixET('Membership_End_Date__c',false,false), opp.CloseDate.AddYears(1)); 
-	        }
-	        // note that we also made sure contact 12 and 13 (those with membership),
-	        // have normal gift opps, to work around a bug in NPSP where they wouldn't
-	        // rollup membership opps if membership was in the excluded set, and the contact
-	        // had no other opps.
-	        
-        // }
-        /*
-        if (GW_Utilities.IsNPSPHHInstalled) {
-	        for (Opportunity opp : mbrOpps) {    
-	        	opp.put('npe01__Membership_Start_Date__c', opp.CloseDate);
-	        	opp.put('npe01__Membership_End_Date__c', opp.CloseDate.AddYears(1)); 
-	        }	        
+    
+        for (Opportunity opp : mbrOpps) {    
+            opp.put( addNSPrefixET('Membership_Start_Date__c',false,false), opp.CloseDate);
+            opp.put( addNSPrefixET('Membership_End_Date__c',false,false), opp.CloseDate.AddYears(1)); 
         }
-        */
+        // note that we also made sure contact 12 and 13 (those with membership),
+        // have normal gift opps, to work around a bug in NPSP where they wouldn't
+        // rollup membership opps if membership was in the excluded set, and the contact
+        // had no other opps.
 
         Opportunity[] allOpps = new Opportunity[0];
         allOpps.addAll(recentSmallOpps);
