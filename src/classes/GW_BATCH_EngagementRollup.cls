@@ -205,6 +205,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             engTrackConWrapper cw = new engTrackConWrapper(con.Id);
             cw.con = con.clone(true,true);
             if (con.Engagement_Level_Numeric__c != null) cw.OrigLvl = con.Engagement_Level_Numeric__c.intvalue();
+            if (con.Engagement_Peak_Numeric__c != null) cw.PeakLvl = con.Engagement_Peak_Numeric__c.intvalue();
             conWrapMap.put (con.Id,cw);
             conMap.put (con.Id,con);
         }
@@ -245,7 +246,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         Double lvldbl = (double)r.get('MaxLevel');
                         Integer lvl = lvldbl.intvalue();
                         cw.CurrLvl = lvl;
-                        cw.PeakLvl = lvl;
+                        if (lvl > cw.PeakLvl) cw.PeakLvl = lvl;
                         cw.LastActionDate = (date)r.get('LastDate');
                         cw.LvlFromCampaigns = lvl;		// cache this so we know what their campaign level was even if raised later
                     } else if (r.get('subtCon')==0 && r.get('subtLvl')==0 ) {
@@ -272,7 +273,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     Double lvldbl = (double)r.get('MaxLevel');
                     Integer lvl = lvldbl.intvalue();
                     engTrackConWrapper cw = conWrapMap.get(conid);
-                    cw.PeakLvl = lvl;
+                    if (lvl > cw.PeakLvl ) cw.PeakLvl = lvl;
                     if (cw.LastActionDate==null) cw.LastActionDate = (date)r.get('LastDate');
         }
         
@@ -317,7 +318,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             }
         }
     
-        // now loop back through our contacts and apply contact-centric level rules & calculate final engagmeent field values
+        // now loop back through our contacts and apply contact-centric level rules, opp-based rules & calculate final engagmeent field values
         for (engTrackConWrapper cw : conWrapMap.values() ) {
             Contact con = cw.con;       
         
@@ -382,7 +383,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     double lvlRecent; 
                     double lvlPeak;
                     for (integer i=0;i<donorBreakpoints.size();i++) {
-                        //system.debug(Logginglevel.WARN, 'i=: ' + i);
                         decimal brkpt = donorBreakpoints[i];
                         integer lvl = donorLvlMap.get(brkpt).intvalue();
                         // award the level if either this contact made it on "personal" gifts (where they were primary contact)...
@@ -791,6 +791,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         global decimal OppsClosedLastNDaysHH_c;
         global decimal Best_Gift_Year_Total_c;
         global decimal Best_Gift_Year_TotalHH_c;
+        global integer LvlFromOpps = 0;
         
         // our cache of membership data
         global date MembershipEndDate_c;
@@ -1001,6 +1002,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[5].Title = 'Board Member'; 
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
+        TestCons[11].Engagement_Peak_Numeric__c = 5;  
         // TestCons[10].Engagement_Level_Mod_Date__c = system.today().addMonths(-2);
         TestCons[21].Email = 'test@test.com';   // this should give lvl 1
         
@@ -1354,11 +1356,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(startDateRecent,con20P.First_Action_Date_Curr_Level__c);
         }
 
-        // in long campaign, but CM date is recent
+        // in long campaign, but CM date is recent - also has pre-existing higher peak
         Contact con11P = conP.get(TestCons[11].Id);
         System.AssertEquals(4,con11P.Engagement_Level_Numeric__c);
         System.AssertEquals(lvlNameMapTest.get(4),con11P.Engagement_Level__c);          
-        System.AssertEquals(4,con11P.Engagement_Peak_Numeric__c);
+        System.AssertEquals(5,con11P.Engagement_Peak_Numeric__c);
         System.AssertEquals(system.today(),con11P.Last_Leadership_Action_Date__c);  
         System.AssertEquals(system.today(),con11P.First_Action_Date_Curr_Level__c);
 
