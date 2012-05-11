@@ -380,41 +380,44 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     // now use opp rollup fields to figure the donor-derived level
                     decimal recentGiftTtl = cw.OppAmountLastNDays_c; 
                     decimal recentGiftTtlHH = cw.OppAmountLastNDaysHH_c;
+                    boolean useHHTotals = settings.Householded_Donor_Levels__c;
+                    decimal bestYrTotal;
+                    date lastCloseDate;
+                    if (useHHTotals) {
+                    	// use HH totals if settings says so
+                    	recentGiftTtl = recentGiftTtlHH;
+                    	bestYrTotal = cw.Best_Gift_Year_TotalHH_c;
+                    	lastCloseDate = cw.LastCloseDateHH_c;
+                    } else {
+                    	bestYrTotal = cw.Best_Gift_Year_Total_c;
+                    	lastCloseDate = cw.LastCloseDate_c;
+                    }		
+                    
                     double lvlRecent; 
                     double lvlPeak;
                     for (integer i=0;i<donorBreakpoints.size();i++) {
                         decimal brkpt = donorBreakpoints[i];
                         integer lvl = donorLvlMap.get(brkpt).intvalue();
-                        // award the level if either this contact made it on "personal" gifts (where they were primary contact)...
+                        if (recentGiftTtl >= brkpt) cw.LvlFromOpps = lvl;	// we want to know which level our opps would have earned us, even if we already have that lvl
                         if (recentGiftTtl >= brkpt && lvl > cw.CurrLvl) {
                             cw.CurrLvl = lvl;
-                            cw.LastActionDate = cw.LastCloseDate_c;
-                            if (cw.OppsClosedLastNDays_c==1) {
-                                cw.FirstActionDateInLvl = cw.LastCloseDate_c;     // if only 1 gift, last is also the first
+                            cw.LastActionDate = lastCloseDate;
+                            decimal oppsCount = (useHHTotals) ? cw.OppsClosedLastNDaysHH_c : cw.OppsClosedLastNDays_c;
+                            if (oppsCount == 1) {
+                                cw.FirstActionDateInLvl = (useHHTotals) ? cw.LastCloseDateHH_c : cw.LastCloseDate_c;     // if only 1 gift, last is also the first
                             } else {
                                 // TBD we could add this con to a list, and then query for the actual first date??
                                 cw.FirstActionDateInLvl = cutoffDateRecent;  // b/c level is awarded for entire year, not one gift
                             }
-                        //  ...or for HH gifts, but only if they have at some point been awarded a level on their own, for any other reason
-                        //      the reasoning being that that makes it more likely the gift is really from the family/couple and not just the primary con 
-                        } else if  (recentGiftTtlHH > brkpt && (cw.CurrLvl > 0 || cw.PeakLvl > 0) && lvl > cw.CurrLvl )  {
-                            cw.CurrLvl = lvl;
-                            cw.LastActionDate = cw.LastCloseDateHH_c;
-                            if (cw.OppsClosedLastNDaysHH_c==1) {
-                                cw.FirstActionDateInLvl = cw.LastCloseDateHH_c;
-                            } else {
-                                cw.FirstActionDateInLvl = cutoffDateRecent;
-                            }
+                            if (lvl > cw.PeakLvl) cw.PeakLvl = lvl;
+
                         // assign lastaction date even if we don't give the level, as long as they already had a date (i.e. level not due to override or chkbox)
                         //  and this date is more recent
-                        } else if (cw.Best_Gift_Year_Total_c > 0 && cw.LastCloseDate_c > cw.LastActionDate && cw.LastActionDate!=null) {
+                        } else if (bestYrTotal > 0 && lastCloseDate > cw.LastActionDate && cw.LastActionDate!=null) {
                             cw.LastActionDate = cw.LastCloseDate_c;
                         }
-                        // for peak level, look at best year calcs
-                        //  as above, we're willing to take it from the HH if this contact has credits from anything else ever
-                        if ( lvl > cw.PeakLvl && 
-                            ( cw.Best_Gift_Year_Total_c >= brkpt || (cw.Best_Gift_Year_TotalHH_c >= brkpt && (cw.CurrLvl > 0 || cw.PeakLvl > 0)) ) 
-                        ) {
+                        // for peak level, look at best year calcs even if we didn't give the curr lvl
+                        if ( lvl > cw.PeakLvl && bestYrTotal >= brkpt ) {
                             cw.PeakLvl = lvl;
                         }
                     }
@@ -869,7 +872,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         settings.Level_3_Name__c = '3 - lvl three';
         settings.Level_4_Name__c = '4 - lvl four';
         settings.Level_5_Name__c = '5 - lvl five';
-        settings.Level_6_Name__c = '6 - lvl six'; 
+        settings.Level_6_Name__c = '6 - lvl six';
+        settings.Householded_Donor_Levels__c = settings.Include_Opps__c; 
         upsert settings;
 
         
@@ -1319,13 +1323,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(1,con10P.Former_Engagement_Level_Numeric__c);		// we gave him this level on contact insert        
 	        System.AssertEquals(system.today(),DateFromDatetime(con10P.Last_Engagement_Lvl_Chg_Datestamp__c));   
             
+            /* deprecated
             // HH mbr w/ no other activity, shouldn't get HH donation credit
             Contact con19P = conP.get(consHH[0].Id);
             System.AssertEquals(0,con19P.Engagement_Level_Numeric__c);        
             System.AssertEquals(0,con19P.Engagement_Peak_Numeric__c);
             System.AssertEquals(null,con19P.Last_Leadership_Action_Date__c);
+            */
               
-            // HH mbr other activity, should get HH donation credit
+            // HH mbr, should get HH donation credit
             Contact con20P = conP.get(consHH[1].Id);
             System.AssertEquals(DONORLVL2,con20P.Engagement_Level_Numeric__c);        
             System.AssertEquals(DONORLVL2,con20P.Engagement_Peak_Numeric__c);
