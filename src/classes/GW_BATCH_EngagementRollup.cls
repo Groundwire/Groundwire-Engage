@@ -205,7 +205,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             engTrackConWrapper cw = new engTrackConWrapper(con.Id);
             cw.con = con.clone(true,true);
             if (con.Engagement_Level_Numeric__c != null) cw.OrigLvl = con.Engagement_Level_Numeric__c.intvalue();
-            if (con.Engagement_Peak_Numeric__c != null) cw.PeakLvl = con.Engagement_Peak_Numeric__c.intvalue();
+            if (con.Engagement_Peak_Numeric__c != null) {
+            	cw.PeakLvl = con.Engagement_Peak_Numeric__c.intvalue();
+            	cw.OrigPeakLvl = cw.PeakLvl;
+            }
             conWrapMap.put (con.Id,cw);
             conMap.put (con.Id,con);
         }
@@ -547,6 +550,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					engTrackConWrapper cw = conWrapMap.get(cm.ContactId);
 					cm.Engagement_Conversion_From_Level__c = cw.OrigLvl;
 					cm.Engagement_Conversion_To_Level__c = cw.CurrLvl;
+					cm.gwet__Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
 				}
 				update cmConversions;
 				system.debug (LoggingLevel.WARN,'cmConversions list after updates: ' + cmConversions);
@@ -775,12 +779,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         private id conId;
         global Contact con;
         
-        global integer CurrLvl=0;
-        global integer PeakLvl=0;
+        global integer CurrLvl = 0;
+        global integer PeakLvl = 0;
         global date LastActionDate;
         global date FirstActionDateInLvl;
         global boolean isConverting;
-        global integer OrigLvl=0;
+        global integer OrigLvl = 0;
+        global integer OrigPeakLvl = 0;
         
         // cache of campaign-based data
         global integer LvlFromCampaigns = 0;
@@ -1408,20 +1413,20 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         
         // also test for conversions
-        map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
+        map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,
+        							Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,gwet__Engagement_Conversion_Type__c
         							FROM CampaignMember WHERE Id IN :cms] );
-        /*for (CampaignMember cm : cms) {
-        	cm = cmsPmap.get(cm.Id);
-        } */
         
         // for con0, the old CM shouldn't be a conversion, but the newer one should
         system.AssertEquals (false , cmsPmap.get(cm02.Id).Engagement_Conversion__c );
         system.AssertEquals (true , cmsPmap.get(cm0.Id).Engagement_Conversion__c );
         system.AssertEquals (0 , cmsPmap.get(cm0.Id).Engagement_Conversion_From_Level__c );
+        system.AssertEquals ('New' , cmsPmap.get(cm0.Id).Engagement_Conversion_Type__c );
         
         // for con5, the CM isn't a conversion since he gets level from field value
         system.AssertEquals (false , cmsPmap.get(cm5.Id).Engagement_Conversion__c );
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_From_Level__c );
+        system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_Type__c );
         
         
     }

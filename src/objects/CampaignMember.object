@@ -62,6 +62,25 @@ NOT(ISBLANK(Campaign.StartDate)) ,
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Conversion_Type__c</fullName>
+        <description>New = First time this high up the pyramid
+Returning = Was at this level or higher in the past, but had since dropped to a lower level</description>
+        <externalId>false</externalId>
+        <label>Engagement Conversion Type</label>
+        <picklist>
+            <picklistValues>
+                <fullName>New</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Returning</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Engagement_Conversion__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
