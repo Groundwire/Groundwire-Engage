@@ -40,6 +40,24 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Conversion_Type__c</fullName>
+        <externalId>false</externalId>
+        <label>Engagement Conversion Type</label>
+        <picklist>
+            <picklistValues>
+                <fullName>New</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Returning</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Engagement_Conversion__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
@@ -183,6 +201,15 @@
             <sorted>false</sorted>
         </picklist>
         <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Won_Since_Last_Engagement_Change__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>will be checked via trigger if this opp was set to won (via insert or update) since the last time this contact&apos;s engagement level was changed</description>
+        <externalId>false</externalId>
+        <label>Won Since Last Engagement Change</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>npe01__Amount_Outstanding__c</fullName>
@@ -530,6 +557,17 @@
         <businessProcess>My First Sales Process</businessProcess>
         <label>Donation</label>
         <picklistValues>
+            <picklist>Engagement_Conversion_Type__c</picklist>
+            <values>
+                <fullName>New</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Returning</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>ForecastCategoryName</picklist>
             <values>
                 <fullName>Best Case</fullName>
@@ -657,6 +695,17 @@
         <businessProcess>My First Sales Process</businessProcess>
         <label>Membership</label>
         <picklistValues>
+            <picklist>Engagement_Conversion_Type__c</picklist>
+            <values>
+                <fullName>New</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Returning</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>ForecastCategoryName</picklist>
             <values>
                 <fullName>Best Case</fullName>
@@ -783,6 +832,17 @@
         <active>true</active>
         <businessProcess>My First Sales Process</businessProcess>
         <label>My First Record Type</label>
+        <picklistValues>
+            <picklist>Engagement_Conversion_Type__c</picklist>
+            <values>
+                <fullName>New</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Returning</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
         <picklistValues>
             <picklist>ForecastCategoryName</picklist>
             <values>

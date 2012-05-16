@@ -366,7 +366,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             }
 
             // if including opps, calc levels based on donor rollup fields (assumes rollups are up to date)
-            // donor calcs should be last so they can see if HH (spouse) donors had levels from anything else besides donations
             if (settings.Include_Opps__c) {
                 // first get settings for donor level tiers
                 decimal[] donorBreakpoints = new decimal[0];
@@ -401,7 +400,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     for (integer i=0;i<donorBreakpoints.size();i++) {
                         decimal brkpt = donorBreakpoints[i];
                         integer lvl = donorLvlMap.get(brkpt).intvalue();
-                        if (recentGiftTtl >= brkpt) cw.LvlFromOpps = lvl;	// we want to know which level our opps would have earned us, even if we already have that lvl
+                        if (recentGiftTtl >= brkpt) {
+                        	cw.LvlFromOpps = lvl;	// we want to know which level our opps would have earned us, even if we already have that lvl
+                        	cw.donorTierBreakpoint = brkpt;
+                        }
                         if (recentGiftTtl >= brkpt && lvl > cw.CurrLvl) {
                             cw.CurrLvl = lvl;
                             cw.LastActionDate = lastCloseDate;
@@ -473,6 +475,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     			conList.add (con);
                     			// then put it back in the map
                     			campConvCandidateMap.put(cw.CurrLvl,conList);
+                    		}
+                    		if (cw.CurrLvl == cw.LvlFromOpps) {
+                    			oppConversionCandidateCons.add (con);
                     		}
                     	}
                     }
@@ -800,6 +805,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         global decimal Best_Gift_Year_Total_c;
         global decimal Best_Gift_Year_TotalHH_c;
         global integer LvlFromOpps = 0;
+        global decimal donorTierBreakpoint;
         
         // our cache of membership data
         global date MembershipEndDate_c;
@@ -969,7 +975,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         string txtfield1FV = 'Board Member';
         setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl);  
         
-        integer howMany = 23;
+        integer howMany = 24;
         Date datClose = System.Today();
         string GiftRectype = ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS;
         string MbrRectype = ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS;
@@ -1155,6 +1161,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             ContactId = consHH[1].Id,
             Status = 'Responded'
         );
+        CampaignMember cm23 = new CampaignMember (
+            CampaignId = camp1.Id,
+            ContactId = TestCons[23].Id,
+            Status = 'Responded'
+        );
         CampaignMember[] onlineCMs = new CampaignMember[0]; 
         for (Campaign c : onlineCamps) {
             CampaignMember cm = new CampaignMember (
@@ -1165,7 +1176,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             onlineCMs.add (cm);      
         }      
 
-        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19};
+        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19,cm23};
         cms.AddAll(onlineCMs); 
         insert cms;
         system.debug ('cms inserted: ' + cms);
@@ -1177,7 +1188,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // create new opps
         double smallAmt = donorBreakpoints[1] - 5; // assumes at least $5 of separation, good assumption I hope!
         double majAmt = donorBreakpoints[2] - 5;   // also assumes at least 3 lvls
-        Contact[] ConsForSmallOpps = new Contact[]{TestCons[6],TestCons[7],TestCons[8],TestCons[9],TestCons[10],TestCons[12],TestCons[13],TestCons[16]};
+        Contact[] ConsForSmallOpps = new Contact[]{TestCons[6],TestCons[7],TestCons[8],TestCons[9],TestCons[10],TestCons[12],TestCons[13],TestCons[16],TestCons[23]};
         Opportunity[] recentSmallOpps = ONEN_UnitTestData.OppsForContactList (ConsForSmallOpps,null,'Closed Won',startDateRecent,smallAmt,GiftRectype,null);
         Contact[] ConsForMajOpps = new Contact[]{TestCons[7],TestCons[17]};
         Opportunity[] recentMajOpps = ONEN_UnitTestData.OppsForContactList (ConsForMajOpps,null,'Closed Won',startDateRecent,majAmt,GiftRectype,null);
@@ -1306,7 +1317,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     
             // historical maj gift, recent small gift & campaign
             Contact con8P = conP.get(TestCons[8].Id);
-            integer lvlnow = (DONORLVL1>3) ? DONORLVL1 : 3;
+            integer lvlnow = (DONORLVL1 > 3) ? DONORLVL1 : 3;
             System.AssertEquals(lvlnow,con8P.Engagement_Level_Numeric__c);
             System.AssertEquals(lvlNameMapTest.get(lvlnow),con8P.Engagement_Level__c);          
             System.AssertEquals(DONORLVL2,con8P.Engagement_Peak_Numeric__c);
@@ -1342,6 +1353,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(DONORLVL2,con20P.Engagement_Peak_Numeric__c);
             System.AssertEquals(startDateRecent,con20P.Last_Leadership_Action_Date__c);
             System.AssertEquals(startDateRecent,con20P.First_Action_Date_Curr_Level__c);
+
+            // gift this yr but higher level from campaign
+            Contact con23P = conP.get(TestCons[23].Id);
+            System.AssertEquals(3,con23P.Engagement_Level_Numeric__c);       
+            System.AssertEquals(3,con23P.Engagement_Peak_Numeric__c);
+
         }
 
         // in long campaign, but CM date is recent - also has pre-existing higher peak
@@ -1428,6 +1445,27 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_From_Level__c );
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_Type__c );
         
+        // and conversions for opps
+        map<id,Opportunity> oppPmap = new map<id,Opportunity>();
+        OpportunityContactRole[] conroles = [SELECT OpportunityId,ContactId,Role,Opportunity.Engagement_Conversion__c,
+        									Opportunity.Engagement_Conversion_To_Level__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_Type__c
+        									FROM OpportunityContactRole WHERE OpportunityId IN :allOpps AND IsPrimary = True];
+        for (OpportunityContactRole conrole : conroles) {
+        	oppPmap.put (conrole.OpportunityId,conrole.Opportunity);
+        }
+
+		// this one is not a conversion, since they got higher level from campaign
+        Id con23oppId = recentSmallOpps[8].Id; 		// first in, first out
+        system.assertEquals (false, oppPmap.get(con23oppId).Engagement_Conversion__c);
+        system.assertEquals (null , oppPmap.get(con23oppId).Engagement_Conversion_From_Level__c);
+        system.assertEquals (null, oppPmap.get(con23oppId).Engagement_Conversion_Type__c);
+		
+        
+        // this one should be a conversion, he started from lvl 0 and has no campaigns
+        Id con6oppId = recentSmallOpps[0].Id; 		// first in, first out
+        system.assertEquals (true , oppPmap.get(con6oppId).Engagement_Conversion__c);
+        system.assertEquals (0 , oppPmap.get(con6oppId).Engagement_Conversion_From_Level__c);
+        system.assertEquals ('New', oppPmap.get(con6oppId).Engagement_Conversion_Type__c);
         
     }
     
