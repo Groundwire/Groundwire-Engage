@@ -33,6 +33,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     private integer NewMbrLvl;
     private integer RetMbrLvl;
     
+    // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
+    set<id> oppRollupRectypesExcluded = new set<id>();
+    set<string> oppRollupTypesExcluded = new set<string>(); 
+    
+    // these are a static vars so they can be accessed by the tests before instantiating the class
+    static decimal[] donorBreakpoints;
+    static map<decimal,double> donorLvlMap;  
+    
     /*******************************************************************************************************
 	* @description This constructor is needed to allow this class to be schedulable.
 	*/
@@ -368,8 +376,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             // if including opps, calc levels based on donor rollup fields (assumes rollups are up to date)
             if (settings.Include_Opps__c) {
                 // first get settings for donor level tiers
-                decimal[] donorBreakpoints = new decimal[0];
-                map<decimal,double> donorLvlMap = new map<decimal,double>();  
+                
+                /* refactored
+                donorBreakpoints = new decimal[0];
+                donorLvlMap = new map<decimal,double>();  
                 List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
                 if (donorLvlDefs.size() > 0) {
                     for (Engagement_Donor_Level_Settings__c s : donorLvlDefs ) {
@@ -377,6 +387,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         donorLvlMap.put (s.Lower_Limit__c,s.Level__c);
                     }
                     donorBreakpoints.sort();
+                */
+                
+                fetchDonorBreakpoints();
+                if (donorBreakpoints.size() > 0) {
                     //system.debug(Logginglevel.WARN, 'donorBreakpoints: ' + donorBreakpoints);
                     
                     // now use opp rollup fields to figure the donor-derived level
@@ -505,7 +519,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			// meaning they belong to one of our candidate cons, have the right engagement level, and dates are right
 			// we will do a series of queries, one for each engagement level that has candidates, so max of 8 queries total here
 			map<Id,CampaignMember> firstCandidateCMmap = new map<Id,CampaignMember>();
-			map<Id,Opportunity> firstCandidateOppMap = new map<Id,Opportunity>();
+			map<Id,OpportunityContactRole> firstCandidateOppMap = new map<Id,OpportunityContactRole>();
 			for (integer Lvl : campConvCandidateMap.keyset()) {
 				Contact[] conCandidates = campConvCandidateMap.get(Lvl);
 				CampaignMember[] cmCandidates = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c
@@ -524,11 +538,46 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				}
 			}
 			
-			// tbd find candidate opps
+			// now find candidate opps for each flagged contact
+			// need to fetch all opps in the timeframe, since the level is assigned based on total
+			
+			// first we fetch (from GWBase or NPSP) lists of rectypes and type values that are being excluded in the opp rollups
+			// since we need to apply the same filters here 
+			setGiftRectypeVars();
+					
+			OpportunityContactRole[] oppCandidates = [SELECT OpportunityId,ContactId,Opportunity.Name,Opportunity.Amount,Opportunity.StageName 
+											FROM OpportunityContactRole
+											WHERE ContactId IN :oppConversionCandidateCons AND IsPrimary = True 
+											AND Opportunity.CloseDate >= :cutoffDateRecent AND Opportunity.IsWon = True
+											AND Opportunity.RecordTypeId NOT IN :oppRollupRectypesExcluded
+											AND Opportunity.Type NOT IN :oppRollupTypesExcluded
+											ORDER BY ContactId, Opportunity.CloseDate];
+
+			// now loop thru the opps and find which opp pushed each contact over the threshhold for their current opp level
+			id conIdCursor;
+			decimal amtTotal;
+			decimal breakpoint;
+			boolean foundCandidate = false;
+			for (OpportunityContactRole cr : oppCandidates) {
+				if (conIdCursor != cr.ContactId) {
+					conIdCursor = cr.ContactId;
+					amtTotal = 0;
+					breakpoint = conWrapMap.get(cr.ContactId).donorTierBreakpoint;
+					foundCandidate = false;
+				}
+				if (!foundCandidate) {
+					amtTotal += cr.Opportunity.Amount;
+					if (amtTotal >= breakpoint) {
+						firstCandidateOppMap.put (cr.ContactId, cr);
+						foundCandidate = true;
+					}
+				}
+			}
+											
 			
 			// now loop thru each con candidate, and find whether opp or cm is earlier, and make that the conversion
 			CampaignMember[] cmConversions = new CampaignMember[0]; 
-			Opportunity[] oppConversions = new Opportunity[0]; 
+			OpportunityContactRole[] oppConversions = new OpportunityContactRole[0]; 
 			for (Contact con : convertedCons) {
 				if (firstCandidateCMmap.get(con.Id) == null && firstCandidateOppMap.get(con.Id) != null) {
 					oppConversions.add (firstCandidateOppMap.get(con.Id));
@@ -537,36 +586,87 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				} else if (firstCandidateCMmap.get(con.Id) != null && firstCandidateOppMap.get(con.Id) != null) {
 					// campaign wins the tie..
 					CampaignMember cm = firstCandidateCMmap.get(con.Id);
-					Opportunity opp = firstCandidateOppMap.get(con.Id);
+					Opportunity opp = firstCandidateOppMap.get(con.Id).Opportunity;
 					if (cm.Effective_Action_Date__c <= opp.CloseDate) {
 						cmConversions.add(cm);
 					} else {
-						oppConversions.add(opp);
+						oppConversions.add(firstCandidateOppMap.get(con.Id));
 					}
 				}
 			}
 			system.debug (LoggingLevel.WARN,'cmConversions list before updates: ' + cmConversions);
 			
 			
-			// now loop through our converted CM's & opps & update
+			// now loop through our conversion CM's & update
 			if (cmConversions.size() > 0) {
 				for (CampaignMember cm : cmConversions) {
 					cm.Engagement_Conversion__c = true;
 					engTrackConWrapper cw = conWrapMap.get(cm.ContactId);
 					cm.Engagement_Conversion_From_Level__c = cw.OrigLvl;
 					cm.Engagement_Conversion_To_Level__c = cw.CurrLvl;
-					cm.gwet__Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
+					cm.Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
 				}
 				update cmConversions;
 				system.debug (LoggingLevel.WARN,'cmConversions list after updates: ' + cmConversions);
 			}			
 			
-			// tbd update conversion opps			
+			// do the same w/ opp conversions
+			if (oppConversions.size() > 0) {
+				Opportunity[] oppConversionsUpd = new Opportunity[0];
+				for (OpportunityContactRole cr : oppConversions) {
+					Opportunity opp = cr.Opportunity;
+					opp.Engagement_Conversion__c = true;
+					engTrackConWrapper cw = conWrapMap.get(cr.ContactId);
+					opp.Engagement_Conversion_From_Level__c = cw.OrigLvl;
+					opp.Engagement_Conversion_To_Level__c = cw.CurrLvl;
+					opp.Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
+					oppConversionsUpd.add (opp);
+				}
+				update oppConversionsUpd;
+				system.debug (LoggingLevel.WARN,'oppConversionsUpd list after updates: ' + oppConversionsUpd);				
+			}			
 
             update consToUpd;
         }
         
     }
+  
+  
+  	private void setGiftRectypeVars() {
+
+  		Id orgid = UserInfo.getOrganizationId();
+  		string rectypesExcludeSetting;
+  		string typesExcludeSetting;
+  		
+  		if (IsGWBaseInstalled) {
+  			string soql = 'SELECT SetupOwnerId,Id,GWBase__Excluded_Contact_Opp_Types__c,GWBase__Excluded_Contact_Opp_Rectypes__c FROM GWBase__OppRollupSettings__c ';
+  			soql += 		'WHERE SetupOwnerId =: orgid';
+  			sobject[] settingRecs = Database.query (soql);
+  			if (settingRecs != null) {
+	  			rectypesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Rectypes__c');
+	  			typesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Types__c');
+  			}
+  		} else if (IsNPSPHHInstalled) {
+  			string soql = 'SELECT SetupOwnerId,Id,npo02__Excluded_Contact_Opp_Types__c,npo02__Excluded_Contact_Opp_Rectypes__c FROM npo02__Households_Settings__c ';
+  			soql += 		'WHERE SetupOwnerId =: orgid';
+  			sobject[] settingRecs = Database.query (soql);
+  			if (settingRecs != null) {
+	  			rectypesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Rectypes__c');
+	  			typesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Types__c');
+  			}
+  		} else {
+  			// if neither package installed, for now do nothing.. might want to throw an err instead
+  		}
+  		
+  		if (rectypesExcludeSetting != null) {
+            set<string> rtNamesToExclude = new set<string>(rectypesExcludeSetting.split(';'));
+            oppRollupRectypesExcluded = GW_RecTypes.GetRecordTypeIdSet('Opportunity', rtNamesToExclude);  			
+  		}
+  		if (typesExcludeSetting != null) {
+  			oppRollupTypesExcluded = new set<string>(typesExcludeSetting.split(';'));
+  		}
+  		
+  	}
   
 
     /*******************************************************************************************************
@@ -625,6 +725,22 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        }
 		}
 	} 
+
+
+	static void fetchDonorBreakpoints() {
+        if (donorBreakpoints == null || donorLvlMap == null) {
+	        donorBreakpoints = new decimal[0];
+	        donorLvlMap = new map<decimal,double>();  
+	        List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
+	        if (donorLvlDefs.size() > 0) {
+	            for (Engagement_Donor_Level_Settings__c s : donorLvlDefs ) {
+	                donorBreakpoints.add (s.Lower_Limit__c);
+	                donorLvlMap.put (s.Lower_Limit__c,s.Level__c);
+	            }
+	            donorBreakpoints.sort();
+	        }
+        }
+	}
     
     /*******************************************************************************************************
 	* @description an empty hook method intended for overriding - this will get called once all of the regular logic has been run and all contacts in the batch have been asssigned
@@ -990,14 +1106,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         map<integer,string> lvlNameMapTest = new map<integer,string>();
         
+        /* refactored
         List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
-        decimal[] donorBreakpoints = new decimal[0];
-        map<decimal,double> donorLvlMap = new map<decimal,double>();          
+        donorBreakpoints = new decimal[0];
+        donorLvlMap = new map<decimal,double>();          
         for (Engagement_Donor_Level_Settings__c s : donorLvlDefs ) {
             donorBreakpoints.add (s.Lower_Limit__c);
             donorLvlMap.put (s.Lower_Limit__c,s.Level__c);
         }
         donorBreakpoints.sort();
+        */
+        fetchDonorBreakpoints();
         integer DONORLVL1 = donorLvlMap.get(donorBreakpoints[0]).intvalue(); 
         integer DONORLVL2 = donorLvlMap.get(donorBreakpoints[1]).intvalue(); 
                     
@@ -1445,6 +1564,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_From_Level__c );
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_Type__c );
         
+        // for con11, the lvl 4 CM is a conversion, but not a "virgin" conversion
+        system.AssertEquals (true , cmsPmap.get(cm11.Id).Engagement_Conversion__c );
+        system.AssertEquals ('Returning' , cmsPmap.get(cm11.Id).Engagement_Conversion_Type__c );
+        
+        // con8 CM is conversion since same date as opp
+        system.AssertEquals (true , cmsPmap.get(cm8.Id).Engagement_Conversion__c );
+        system.AssertEquals ('New' , cmsPmap.get(cm8.Id).Engagement_Conversion_Type__c );
+        
+        
         // and conversions for opps
         map<id,Opportunity> oppPmap = new map<id,Opportunity>();
         OpportunityContactRole[] conroles = [SELECT OpportunityId,ContactId,Role,Opportunity.Engagement_Conversion__c,
@@ -1466,6 +1594,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.assertEquals (true , oppPmap.get(con6oppId).Engagement_Conversion__c);
         system.assertEquals (0 , oppPmap.get(con6oppId).Engagement_Conversion_From_Level__c);
         system.assertEquals ('New', oppPmap.get(con6oppId).Engagement_Conversion_Type__c);
+        
+        // con 8 opp shouold not be conversion since same data as CM, and campaigns win the tie
+        Id con8oppId = recentSmallOpps[2].Id; 		// first in, first out
+        system.assertEquals (false, oppPmap.get(con8oppId).Engagement_Conversion__c);
+        
         
     }
     
