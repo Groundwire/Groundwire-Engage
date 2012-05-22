@@ -1,0 +1,52 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmDonor" >	
+	<apex:form >
+  		<apex:pageMessages />	
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsDonor" >
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="Calculate Engagement Levels based on Gifts" />
+	        			<apex:inputCheckbox value="{!etSettings.Include_Opps__c}" disabled="{!NOT(ctabDonor.isEditingTab)}" />
+	        		</apex:pageBlockSectionItem>
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="Calculate Engagement Levels based on Household Gift Totals" />
+	        			<apex:inputCheckbox value="{!etSettings.Householded_Donor_Levels__c}" disabled="{!NOT(ctabDonor.isEditingTab)}" />
+	        		</apex:pageBlockSectionItem>
+					<p/>
+					<p><b>Donation Engagement Levels</b></p>	        	
+					<apex:pageBlockTable value="{!ctabDonor.listDonorLevelSettings}" var="dls" >
+						<apex:column >
+							<apex:facet name="header">Engagement Level</apex:facet>
+					    	<apex:selectList value="{!dls.Level__c}" size="1" disabled="{!NOT(ctabDonor.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>												
+						<apex:column >
+							<apex:facet name="header">Minimum Donation Threshold</apex:facet>
+							<apex:inputText value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" />
+							<apex:outputText value="{0, number, currency}" rendered="{!NOT(ctabDonor.isEditingTab)}" >
+								<apex:param value="{!dls.Lower_Limit__c}" />
+							</apex:outputText>
+						</apex:column>
+					</apex:pageBlockTable>														
+	        	</apex:pageBlockSection>	        	        	        	        
+	        		        	         	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Donor Settings" escape="false"
+	       			summary="<p><b>Calculate Engagement Levels based on Gifts</b> - specifies whether the Contact's donor history should count toward engagement level.</p>
+	       					<p><b>Calculate Engagement Levels based on Household Gift Totals</b> - assigns Engagement Levels to everyone in the household based on the total donations from the household.
+	       					<p><b>Donation Engagement Levels</b> - specifies the donation amounts that correspond to different levels on your organization's Engagement Pyramid.</p>" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<br/><br/>
+	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

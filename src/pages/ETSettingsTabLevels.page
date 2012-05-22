@@ -1,0 +1,61 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+	
+<apex:outputPanel id="frmLevels" >
+	<apex:form >
+  		<apex:pageMessages />
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" >
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_1_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_2_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_3_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_4_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_5_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_6_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_7_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        		<apex:inputText value="{!ctabLevels.etSettings.Level_8_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        	</apex:pageBlockSection>	        	        	        	        
+	       	</apex:panelGroup>
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Level Settings" escape="false"
+	       			summary="<p>Engagement Tracker relies on the <b>same levels</b> being defined in this settings page, as well as on
+	       				several picklist fields on Contact and Campaign.  <b>These levels must each start with a number that corresponds to their level.</b>
+	       				You can have up to 8 levels.</p>" />
+	        	<apex:outputPanel id="panelLevelMessages" >
+		        	<apex:outputPanel rendered="{!ctabLevels.isMatchingPicklists}" >
+		        		<apex:pageMessage severity="info" strength="1"  
+		        			summary="All Contact and Campaign Engagement Level picklist fields match your level settings." />
+		        	</apex:outputPanel>
+		        	<apex:outputPanel rendered="{!NOT(ctabLevels.isMatchingPicklists)}" >        	
+		        		<apex:pageMessage severity="warning" strength="1" title="Error"
+		        			summary="Your Contact and Campaign Engagement Level picklist fields do not all match your settings.  Please fix them and then click Retest." />
+		        		&nbsp;&nbsp;&nbsp;
+		        		<apex:commandButton value="Retest" action="{!ctabLevels.RetestPicklists}" rerender="panelLevelMessages" />
+			        	<p></p>
+			        	<table width="90%" border="0">
+			        		<tr>
+			        			<td>Contact Engagement Level</td>
+			        			<td>Contact Engagement Level Override</td>
+			        			<td>Contact Engagement Peak Level</td>
+			        			<td>Campaign Engagement Level</td>
+			        		</tr>
+			        		<tr>
+			        			<td><apex:repeat value="{!ctabLevels.listStrCEL}" var="s" >{!s}<br/></apex:repeat></td>
+			        			<td><apex:repeat value="{!ctabLevels.listStrCELO}" var="s" >{!s}<br/></apex:repeat></td>
+			        			<td><apex:repeat value="{!ctabLevels.listStrCEP}" var="s" >{!s}<br/></apex:repeat></td>
+			        			<td><apex:repeat value="{!ctabLevels.listStrCaEL}" var="s" >{!s}<br/></apex:repeat></td>	        			
+			        		</tr>
+			        	</table>	        	
+		        	</apex:outputPanel>
+				</apex:outputPanel>	        		       			
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<br/><br/>
+	       	<apex:commandButton value="Edit" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
+	       	<apex:commandButton value="Save" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
+   		</apex:outputPanel>
+	</apex:form>
+</apex:outputPanel>
+</apex:page>

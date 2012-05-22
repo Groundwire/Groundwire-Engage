@@ -1,0 +1,43 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmGeneral" >	
+	<apex:form >
+  		<apex:pageMessages />	
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsGeneral" >
+		      		<apex:inputText value="{!etSettings.Batch_Size__c}" disabled="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+		      		<apex:inputText value="{!etSettings.Override_Default_Duration__c}" disabled="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+		      		<apex:inputText value="{!etSettings.Timeframe_Recent__c}" disabled="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />	        		
+	        	</apex:pageBlockSection>
+	        	<apex:pageBlockSection columns="1" title="Advanced Settings" collapsible="false">
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="Opportunity Gift Record Type for Unit Tests" />
+			      		<apex:inputText value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" disabled="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+			      	</apex:pageBlockSectionItem>	        		
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="Opportunity Membership Record Type for Unit Tests" />
+			      		<apex:inputText value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" disabled="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+			      	</apex:pageBlockSectionItem>	        		
+	        	</apex:pageBlockSection>	        	        	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="General Settings" escape="false"
+	       			summary="<p>These settings control the internal ENGAGEMENT ENGINE (TM) that is working so hard to help you!</p>
+	       					<p><b>Batch Size</b> - The number of records processed per batch. Defaults to 100. The default should only be lowered if custom code is causing malfunctioning in the batch processing.</p>
+	       					<p><b>Override Default Duration</b> - Default duration in Months that the Engagement level is overridden when the Contact's Engagement Level Override field is set.</p>
+	       					<p><b>Timeframe</b> - The length of time in months that Campaign actions earn an Engagement Level.</p>
+	       					<p><b>Opportunity Gift Record Type for Unit Tests</b> - The Opportunity Record Type for gifts and donations.</p>
+	       					<p><b>Opportunity Membership Record Type for Unit Tests</b> - The Opportunity Record Type for membership.</p>
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<br/><br/>
+	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabGeneral.cancelTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

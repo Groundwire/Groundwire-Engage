@@ -1,0 +1,71 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmFrequency" >	
+	<apex:form >
+  		<apex:pageMessages />	
+        <apex:panelGrid columns="1" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsFrequency" >
+					<apex:pageBlockTable value="{!ctabFrequency.listFreqSettings}" var="fs" >
+						<apex:column >
+							<apex:facet name="header">Campaign<br/>Record Type</apex:facet>
+							<apex:inputText value="{!fs.Campaign_Record_Type__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Campaign<br/>Type</apex:facet>
+							<apex:inputText value="{!fs.Campaign_Type__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Campaign<br/>Sub Type</apex:facet>
+							<apex:inputText value="{!fs.Campaign_Sub_Type__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Campaign<br/>Field</apex:facet>
+							<apex:inputText value="{!fs.Fieldname_1__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Campaign<br/>Field Value</apex:facet>
+							<apex:inputText value="{!fs.Field_Value_1__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Level Required</apex:facet>
+					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>																		
+						<apex:column >
+							<apex:facet name="header">Number of Actions<br/>Required</apex:facet>
+							<apex:inputText value="{!fs.Number_of_Actions_Required__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Level to<br/>Assign</apex:facet>
+					    	<apex:selectList value="{!fs.Level_To_Assign__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>												
+					</apex:pageBlockTable>														
+	        	</apex:pageBlockSection>	        	         	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Repeated Action Settings" escape="false"
+	       			summary="<p><b>{!$ObjectType.EngagementFrequencySettings__c.Label}</b> - allow an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level, optionally only counting Campaigns with a certain field value.</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Fieldname_1__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Fieldname_1__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Field_Value_1__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Field_Value_1__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<br/><br/>
+	       	<apex:commandButton value="Edit" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel>  
+</apex:page>

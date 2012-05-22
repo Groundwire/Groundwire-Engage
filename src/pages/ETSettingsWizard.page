@@ -1,0 +1,83 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" title="Engagement Settings">
+
+<style>
+
+	.pbBody .cssGrayText {
+		color:gray;
+	}
+	
+	.cssGrayText {
+		color:gray;
+	}
+
+	.cssPanelGridColumn1 {
+		width: 400px;
+	}
+	.cssPanelGridColumn2 {
+		width: 1000px;
+	}
+	
+	body .bPageBlock .pbBody .labelCol {
+		width: 100px;
+	}
+	
+	.bPageBlock .detailList .data2Col {
+		width: 80px;
+	}
+	
+	.cssTbx {
+		width: 80px;
+	}
+
+	select:disabled {
+		color: #545454;
+		background-color: #EBEBE4;
+		border-color: #CCC;
+	}	
+		
+</style>
+
+    <apex:sectionHeader title="Engagement Tracker Settings" />    
+  	<apex:pageBlock mode="edit" id="pbWizard" >
+  		<p><b><i>&nbsp;&nbsp;Visit each tab, edit your settings, and click Save.</i></b></p>
+  		<p/>
+	    <apex:tabPanel switchType="client" value="{!strCurrentTab}" id="tabPanel" disabledTabClass="cssGrayText" >
+	    
+			<!-- ******************* LEVELS TAB ************************************************************************************* -->
+	        <apex:tab label="Levels" name="tabLevels" id="tabLevels" disabled="{!inEditMode && strCurrentEditTab != 'tabLevels'}">
+	        	<apex:include pageName="ETSettingsTabLevels" />
+	        </apex:tab>
+	        
+			<!-- ******************* CONTACT TAB ************************************************************************************* -->
+	        <apex:tab label="Contact" name="tabContact" id="tabContact" disabled="{!inEditMode && strCurrentEditTab != 'tabContact'}" >
+	        	<apex:include pageName="ETSettingsTabContact" />
+			</apex:tab>
+	        
+			<!-- ******************* CAMPAIGNS TAB ************************************************************************************* -->
+	        <apex:tab label="Campaigns" name="tabCampaign" id="tabCampaign" disabled="{!inEditMode && strCurrentEditTab != 'tabCampaign'}"  >
+	        	<apex:include pageName="ETSettingsTabCampaign" />
+			</apex:tab>
+        
+			<!-- ******************* DONOR TAB ************************************************************************************* -->
+	        <apex:tab label="Donor Levels" name="tabDonor" id="tabDonor" disabled="{!inEditMode && strCurrentEditTab != 'tabDonor'}">
+	        	<apex:include pageName="ETSettingsTabDonor" />
+			</apex:tab>
+	        
+			<!-- ******************* MEMBERSHIP TAB ************************************************************************************* -->
+	        <apex:tab label="Membership Levels" name="tabMember" id="tabMember" disabled="{!inEditMode && strCurrentEditTab != 'tabMember'}">
+	        	<apex:include pageName="ETSettingsTabMember" />
+			</apex:tab>
+
+			<!-- ******************* FREQUENCY TAB ************************************************************************************* -->
+	        <apex:tab label="Repeated Actions" name="tabFrequency" id="tabFrequency" disabled="{!inEditMode && strCurrentEditTab != 'tabFrequency'}">
+	        	<apex:include pageName="ETSettingsTabFrequency" />
+			</apex:tab>
+	        
+			<!-- ******************* GENERAL TAB ************************************************************************************* -->
+	        <apex:tab label="General" name="tabGeneral" id="tabGeneral" disabled="{!inEditMode && strCurrentEditTab != 'tabGeneral'}">
+	        	<apex:include pageName="ETSettingsTabGeneral" />
+	        </apex:tab>
+	        
+	    </apex:tabPanel>  	    
+    </apex:pageBlock>  
+</apex:page>
