@@ -1,0 +1,36 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmSchedule" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Schedule" action="{!ctabSchedule.ScheduleIt}" immediate="false" rerender="pbWizard" />
+			<hr/>
+   		</apex:outputPanel>  		
+        <apex:panelGrid columns="1" >
+        	<apex:panelGroup >
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Scheduling Engagement Rollup" escape="false"
+	       			summary="<p>The Engagement Tracker requires the regular calculation of donations and campaign membership in order
+	       				to compute engagement levels.  You can use the Engagement Rollup tab to start an immediate calculation.  We
+	       				recommend scheduling Engagement Rollups to run every night, by clicking the Schedule button.  Note that if you 
+	       				have already scheduled Engagement Rollups, you will get an error trying to schedule them again.</p>
+	       				
+	       				<p><i>We strongly recommend that you avoid running Engagement Rollup until you have completely set up your
+	       				engagement settings, and have imported all of your data into Salesforce.  This will ensure that Engagement conversion 
+	       				metrics are calculated accurately.</i></p>
+	       				
+	       				<p><b>{!IF(ctabSchedule.jobId != null, 'Engagement Rollup has been successfully scheduled.', '')}</b></p>
+	       					" />
+	       					
+				<apex:outputLink value="/08e?setupid=ScheduledJobs">Link to Scheduled Jobs page</apex:outputLink>
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Schedule" action="{!ctabSchedule.ScheduleIt}" immediate="false" rerender="pbWizard" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>
