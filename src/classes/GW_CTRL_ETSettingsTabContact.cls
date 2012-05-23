@@ -37,9 +37,17 @@ public with sharing class GW_CTRL_ETSettingsTabContact {
 	public PageReference saveTab() {
 		list<EngagementContactFieldSettings__c> listFStoDel = new list<EngagementContactFieldSettings__c>();
 		  
-		// go thru the field settings, give any new ones names, and delete empty ones
+		// go thru the field settings and delete empty ones
+		// also set the appropriate field type
 		for (integer i = listFieldSettings.size()-1; i >= 0; i--) {
 			EngagementContactFieldSettings__c fs = listFieldSettings[i];
+
+			if (ctrlWizard.setCheckboxFields.contains(fs.Fieldname__c)) {
+				listFieldSettings[i].Field_Type__c = 'checkbox';
+			} else {
+				listFieldSettings[i].Field_Type__c = 'text';
+			}				
+
 			if (fs.Fieldname__c == null || fs.Fieldname__c == '') {
 					if (fs.Id == null) {
 						// it's a new empty fs; just remove it

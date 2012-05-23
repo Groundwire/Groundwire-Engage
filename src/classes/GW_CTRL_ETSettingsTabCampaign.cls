@@ -63,7 +63,7 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 		AddEmptyRows();
 		
 		// deal with etSettings.Levels_Don_t_Require_Responded__c
-		//upsert ctrlWizard.etSettings;
+		upsert ctrlWizard.etSettings;
 		
 		isEditingTab = false;
 		ctrlWizard.strCurrentTab = 'tabCampaign';
@@ -86,4 +86,49 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 	private boolean isnullNum(decimal num) {
 		return (num == null || num == 0);
 	}
+	
+	private string strNoDotZero(string str) {
+		if (str != null) {
+			str = str.replace('.0', '');
+		}
+		return str;
+	}
+
+	// the list of Engagement Levels to put in the checkbox set
+	public list<SelectOption> listSONonRespondedLevels {
+		get {
+			if (listSONonRespondedLevels == null) {
+				listSONonRespondedLevels = new list<SelectOption>();
+				
+				for (SelectOption so : ctrlWizard.listSOLevels) {
+					if (so.getLabel() != '') {
+	    				listSONonRespondedLevels.add(new SelectOption(strNoDotZero(so.getValue()), so.getLabel()));
+					}
+    			}
+			}		
+			return listSONonRespondedLevels;
+		}
+		set;
+	}
+    
+    public list<string> listNonRespondedLevels {
+    	get {
+    		list<string> listLevel = new list<string>();
+    		if (ctrlWizard.etSettings.Levels_Don_t_Require_Responded__c != null) {
+    			listLevel = ctrlWizard.etSettings.Levels_Don_t_Require_Responded__c.split(';');
+    			
+    			for (integer i = 0; i < listLevel.size(); i++) {
+    				listLevel[i] = strNoDotZero(listLevel[i]);
+    			}
+    		}
+    		return listLevel;
+    	}
+    	set { 
+    		string strLevels = '';
+    		for (string str : value) {
+    			strLevels += strNoDotZero(str) + ';';
+    		}
+    		ctrlWizard.etSettings.Levels_Don_t_Require_Responded__c = strLevels;
+    	}
+    }
 }

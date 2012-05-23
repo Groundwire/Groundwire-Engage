@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmDonor" >	
 	<apex:form >
   		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsDonor" >
@@ -35,14 +41,14 @@
 	        		        	         	        	        
 	       	</apex:panelGroup> 
 	       	<apex:panelGroup >
-	       		<apex:pageMessage severity="info" strength="1" title="Donor Settings" escape="false"
-	       			summary="<p><b>Calculate Engagement Levels based on Gifts</b> - specifies whether the Contact's donor history should count toward engagement level.</p>
-	       					<p><b>Calculate Engagement Levels based on Household Gift Totals</b> - assigns Engagement Levels to everyone in the household based on the total donations from the household.
+	       		<apex:pageMessage severity="info" strength="1" title="Donation Settings" escape="false"
+	       			summary="<p><b>Calculate Engagement Levels based on Gifts</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
+	       					<p><b>Calculate Engagement Levels based on Household Gift Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
 	       					<p><b>Donation Engagement Levels</b> - specifies the donation amounts that correspond to different levels on your organization's Engagement Pyramid.</p>" />
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<br/><br/>
+			<hr/>
 	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />

@@ -33,6 +33,11 @@
 		color: #545454;
 		background-color: #EBEBE4;
 		border-color: #CCC;
+	}
+	
+	hr {
+		border-top-style: solid;
+		color: lightgray;
 	}	
 		
 </style>
@@ -48,23 +53,23 @@
 	        	<apex:include pageName="ETSettingsTabLevels" />
 	        </apex:tab>
 	        
-			<!-- ******************* CONTACT TAB ************************************************************************************* -->
-	        <apex:tab label="Contact" name="tabContact" id="tabContact" disabled="{!inEditMode && strCurrentEditTab != 'tabContact'}" >
-	        	<apex:include pageName="ETSettingsTabContact" />
-			</apex:tab>
-	        
 			<!-- ******************* CAMPAIGNS TAB ************************************************************************************* -->
-	        <apex:tab label="Campaigns" name="tabCampaign" id="tabCampaign" disabled="{!inEditMode && strCurrentEditTab != 'tabCampaign'}"  >
+	        <apex:tab label="Campaign Defaults" name="tabCampaign" id="tabCampaign" disabled="{!inEditMode && strCurrentEditTab != 'tabCampaign'}"  >
 	        	<apex:include pageName="ETSettingsTabCampaign" />
 			</apex:tab>
         
+			<!-- ******************* CONTACT TAB ************************************************************************************* -->
+	        <apex:tab label="Contact Fields" name="tabContact" id="tabContact" disabled="{!inEditMode && strCurrentEditTab != 'tabContact'}" >
+	        	<apex:include pageName="ETSettingsTabContact" />
+			</apex:tab>
+	        
 			<!-- ******************* DONOR TAB ************************************************************************************* -->
-	        <apex:tab label="Donor Levels" name="tabDonor" id="tabDonor" disabled="{!inEditMode && strCurrentEditTab != 'tabDonor'}">
+	        <apex:tab label="Donations" name="tabDonor" id="tabDonor" disabled="{!inEditMode && strCurrentEditTab != 'tabDonor'}">
 	        	<apex:include pageName="ETSettingsTabDonor" />
 			</apex:tab>
 	        
 			<!-- ******************* MEMBERSHIP TAB ************************************************************************************* -->
-	        <apex:tab label="Membership Levels" name="tabMember" id="tabMember" disabled="{!inEditMode && strCurrentEditTab != 'tabMember'}">
+	        <apex:tab label="Membership" name="tabMember" id="tabMember" disabled="{!inEditMode && strCurrentEditTab != 'tabMember'}">
 	        	<apex:include pageName="ETSettingsTabMember" />
 			</apex:tab>
 
@@ -78,6 +83,11 @@
 	        	<apex:include pageName="ETSettingsTabGeneral" />
 	        </apex:tab>
 	        
+			<!-- ******************* SCHEDULING TAB ************************************************************************************* -->
+	        <apex:tab label="Schedule" name="tabSchedule" id="tabSchedule" disabled="{!inEditMode && strCurrentEditTab != 'tabSchedule'}">
+	        	<p><i><b>Not Yet Implemented!</b></i></p>
+	        </apex:tab>
+
 	    </apex:tabPanel>  	    
     </apex:pageBlock>  
 </apex:page>

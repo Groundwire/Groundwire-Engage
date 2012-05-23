@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmMember" >	
 	<apex:form >
   		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsMember" >
@@ -11,13 +17,13 @@
 	        			<apex:inputCheckbox value="{!etSettings.Include_Membership__c}" disabled="{!NOT(ctabMember.isEditingTab)}" />
 	        		</apex:pageBlockSectionItem>
 	        		<apex:pageBlockSectionItem >
-	        			<apex:outputLabel value="New Member Level" />
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}" />
 				    	<apex:selectList value="{!etSettings.New_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			
 				    		<apex:selectOptions value="{!listSOLevels}" />
 				    	</apex:selectList>							
 	        		</apex:pageBlockSectionItem>
 	        		<apex:pageBlockSectionItem >
-	        			<apex:outputLabel value="Renewing Member Level" />
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}" />
 				    	<apex:selectList value="{!etSettings.Renewing_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			
 				    		<apex:selectOptions value="{!listSOLevels}" />
 				    	</apex:selectList>							
@@ -26,13 +32,14 @@
 	       	</apex:panelGroup> 
 	       	<apex:panelGroup >
 	       		<apex:pageMessage severity="info" strength="1" title="Membership Settings" escape="false"
-	       			summary="<p><b>Calculate Engagement Levels based on Membership</b> - specifies whether the Contact's membership should count toward engagement level.  Current members are given an engagement level based on New Member Level and Renewing Member Level settings below.</p>
-	       					<p><b>New Member Level</b> - Level to assign to active members with a Last Membership Origin of New, if Include Membership is checked.
-	       					<p><b>Renewing Member Level</b> - Level to assign to active members with Last Membership Origin of Renewal, if Include Membership is checked.</p>" />
+	       			summary="<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
+	       					" />
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<br/><br/>
+			<hr/>
 	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />

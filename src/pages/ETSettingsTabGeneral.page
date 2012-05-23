@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmGeneral" >	
 	<apex:form >
   		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabGeneral.cancelTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>  		
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsGeneral" >
@@ -33,7 +39,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<br/><br/>
+			<hr/>
 	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabGeneral.cancelTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="true" />

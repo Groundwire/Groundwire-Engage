@@ -3,6 +3,12 @@
 <apex:outputPanel id="frmLevels" >
 	<apex:form >
   		<apex:pageMessages />
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
+	       	<apex:commandButton value="Save" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
+			<hr/>
+   		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" >
@@ -20,12 +26,10 @@
 	       		<apex:pageMessage severity="info" strength="1" title="Level Settings" escape="false"
 	       			summary="<p>Engagement Tracker relies on the <b>same levels</b> being defined in this settings page, as well as on
 	       				several picklist fields on Contact and Campaign.  <b>These levels must each start with a number that corresponds to their level.</b>
-	       				You can have up to 8 levels.</p>" />
+	       				You can have up to 8 levels.</p>
+	       				{!IF(ctabLevels.isMatchingPicklists, '<p><i>All Contact and Campaign Engagement Level picklist fields match your level settings.</i></p>', '')}
+	       				" />
 	        	<apex:outputPanel id="panelLevelMessages" >
-		        	<apex:outputPanel rendered="{!ctabLevels.isMatchingPicklists}" >
-		        		<apex:pageMessage severity="info" strength="1"  
-		        			summary="All Contact and Campaign Engagement Level picklist fields match your level settings." />
-		        	</apex:outputPanel>
 		        	<apex:outputPanel rendered="{!NOT(ctabLevels.isMatchingPicklists)}" >        	
 		        		<apex:pageMessage severity="error" strength="1" title="Error"
 		        			summary="Your Contact and Campaign Engagement Level picklist fields do not all match your settings.  Please fix them and then click Retest." />
@@ -51,7 +55,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<br/><br/>
+			<hr/>
 	       	<apex:commandButton value="Edit" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
 	       	<apex:commandButton value="Save" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />

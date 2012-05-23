@@ -9,14 +9,6 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		
 	}
 	
-	public string strCreateTime {
-		get {
-			if (strCreateTime == null) strCreateTime = string.valueOf(datetime.now()) + ' random: ' + string.valueOf(math.random());
-			return strCreateTime;
-		}
-		set;
-	}
-	
 	public boolean inEditMode {
 		get {
 			return 
@@ -112,6 +104,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 
+	// utility to create unique new names for the list of objects that don't have names.
 	public void nameNewSettings(list<SObject> listSobj, string strPrefix) { 
 		if (listSobj == null || strPrefix == null) return;
 		
@@ -153,6 +146,8 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 	
+	public set<string> setCheckboxFields { get; set; }
+	
 	// the list of Contact Fields to put in the dropdowns
 	public list<SelectOption> listSOContactFields {
 		get {
@@ -163,9 +158,13 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 				
 				// create temp list of strings to sort by alpha
 				list<string> listStr = new list<string>();
+				setCheckboxFields = new set<string>();
 				for (Schema.SObjectField sf : mapS.values()) {
 					Schema.DescribeFieldResult f = sf.getDescribe();
 					listStr.add(f.Label + '.' + f.Name);
+					if (f.Type == Schema.DisplayType.Boolean) {
+						setCheckboxFields.add(f.Name);
+					}
 				}				
 				listStr.sort();
 				
@@ -179,6 +178,12 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 			return listSOContactFields;
 		}
 		set;
+	}
+	
+	public boolean hasCampaignRecordTypes {
+		get {
+			return (listSOCampaignRecordTypes.size() > 1);
+		}
 	}
 	
 	// the list of Campaign Record Types to put in the dropdowns
