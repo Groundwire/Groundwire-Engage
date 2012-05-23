@@ -18,6 +18,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 				ctabMember.isEditingTab ||
 				ctabCampaign.isEditingTab ||
 				ctabFrequency.isEditingTab ||
+				ctabSchedule.isEditingTab ||
 				ctabContact.isEditingTab ;
 		}
 		set;
@@ -32,6 +33,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 			if (ctabMember.isEditingTab) return 'tabMember';
 			if (ctabCampaign.isEditingTab) return 'tabCampaign';
 			if (ctabFrequency.isEditingTab) return 'tabFrequency';
+			if (ctabSchedule.isEditingTab) return 'tabSchedule';
 			return null;
 		}
 		set;
@@ -104,6 +106,14 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 
+	public GW_CTRL_ETSettingsTabSchedule ctabSchedule { 
+		get {
+			if (ctabSchedule == null) ctabSchedule = new GW_CTRL_ETSettingsTabSchedule(this); 
+			return ctabSchedule;
+		}
+		set;
+	}
+
 	// utility to create unique new names for the list of objects that don't have names.
 	public void nameNewSettings(list<SObject> listSobj, string strPrefix) { 
 		if (listSobj == null || strPrefix == null) return;
@@ -146,6 +156,8 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 	
+	// set used to keep track of which contact fields are boolean, 
+	// so we can automaticaly mark them as checkbox when saving Contact Field Settings.
 	public set<string> setCheckboxFields { get; set; }
 	
 	// the list of Contact Fields to put in the dropdowns
@@ -180,6 +192,8 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 	
+	// helper to say whether this instance has any campaign record types defined.
+	// used by several tabs to hide a campaign record type column, when not needed.
 	public boolean hasCampaignRecordTypes {
 		get {
 			return (listSOCampaignRecordTypes.size() > 1);
@@ -242,12 +256,14 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		set;
 	}
 	
+	// helper used to hide Campaign Sub Type columns when not running with GWBase.
 	public boolean IsGWBaseInstalled {
 		get {
 			return (GW_BATCH_EngagementRollup.IsGWBaseInstalled);
 		}
 	}
 	
+	//---------------------------------------- TEST CODE -------------------------------------------------
 	static testmethod void TestWizard() {
 		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
 		system.assert(ctrl.ctabGeneral != null);

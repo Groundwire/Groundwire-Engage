@@ -85,7 +85,7 @@
 	        
 			<!-- ******************* SCHEDULING TAB ************************************************************************************* -->
 	        <apex:tab label="Schedule" name="tabSchedule" id="tabSchedule" disabled="{!inEditMode && strCurrentEditTab != 'tabSchedule'}">
-	        	<p><i><b>Not Yet Implemented!</b></i></p>
+	        	<apex:include pageName="ETSettingsTabSchedule" />
 	        </apex:tab>
 
 	    </apex:tabPanel>  	    
