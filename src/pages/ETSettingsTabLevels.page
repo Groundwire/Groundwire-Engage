@@ -27,7 +27,7 @@
 		        			summary="All Contact and Campaign Engagement Level picklist fields match your level settings." />
 		        	</apex:outputPanel>
 		        	<apex:outputPanel rendered="{!NOT(ctabLevels.isMatchingPicklists)}" >        	
-		        		<apex:pageMessage severity="warning" strength="1" title="Error"
+		        		<apex:pageMessage severity="error" strength="1" title="Error"
 		        			summary="Your Contact and Campaign Engagement Level picklist fields do not all match your settings.  Please fix them and then click Retest." />
 		        		&nbsp;&nbsp;&nbsp;
 		        		<apex:commandButton value="Retest" action="{!ctabLevels.RetestPicklists}" rerender="panelLevelMessages" />

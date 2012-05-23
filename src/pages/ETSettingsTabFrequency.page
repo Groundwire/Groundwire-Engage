@@ -1,7 +1,7 @@
 <apex:page controller="GW_CTRL_ETSettingsWizard" >
 
-	<apex:outputPanel id="frmFrequency" >	
 	<apex:form >
+	<apex:pageBlock id="frmFrequency" >	
   		<apex:pageMessages />	
         <apex:panelGrid columns="1" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
@@ -62,10 +62,13 @@
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
 			<br/><br/>
+   		</apex:outputPanel>
+   		<apex:pageBlockButtons >
 	       	<apex:commandButton value="Edit" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" />
-   		</apex:outputPanel>
+   		</apex:pageBlockButtons>
+	</apex:pageBlock>  
 	</apex:form>
-	</apex:outputPanel>  
+	
 </apex:page>

@@ -8,25 +8,25 @@
 	        	<apex:pageBlockSection columns="1" id="pbsCampaign" >
 					<apex:pageBlockTable value="{!ctabCampaign.listCampaignSettings}" var="cs" >
 						<apex:column >
-							<apex:facet name="header">Campaign<br/>Record Type</apex:facet>
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignRecordTypes}" />
 					    	</apex:selectList>							
 					    </apex:column>						
 						<apex:column >
-							<apex:facet name="header">Campaign<br/>Type</apex:facet>
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Campaign_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignTypes}" />
 					    	</apex:selectList>							
 						</apex:column>
 						<apex:column rendered="{!IsGWBaseInstalled}" > 
-							<apex:facet name="header">Campaign<br/>Sub Type</apex:facet>
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Campaign_Sub_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignSubTypes}" />
 					    	</apex:selectList>							
 						</apex:column>
 						<apex:column >
-							<apex:facet name="header">Engagement Level</apex:facet>
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Engagement_Level__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
 					    	</apex:selectList>							

@@ -142,7 +142,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 				for (integer i = 1; i <= 8; i++) {
 					string strLevel = 'Level_' + string.valueOf(i) + '_Name__c';
 					string strLevelName = string.valueOf(etSettings.get(strLevel));
-					if (strLevelName != null) {
+					if (strLevelName != null && strLevelName != '') {
 						listSO.add(new SelectOption(string.valueOf(i) + '.0', strLevelName));
 					}
 				}
