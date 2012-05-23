@@ -43,4 +43,20 @@ public with sharing class GW_CTRL_ETSettingsTabSchedule {
         return null;	
 	}
 
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabSchedule() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabSchedule != null);
+		system.assertEquals(ctrl.ctabSchedule.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabSchedule.isEditingTab, false);
+		system.assert(ctrl.ctabSchedule.ctrlWizard.etSettings != null);
+		ctrl.ctabSchedule.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabSchedule');
+		ctrl.ctabSchedule.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabSchedule.cancelTab() != null);	
+		system.assert(ctrl.ctabSchedule.ScheduleIt() == null);	
+	}
+
+
 }

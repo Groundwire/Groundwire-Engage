@@ -131,4 +131,21 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
     		ctrlWizard.etSettings.Levels_Don_t_Require_Responded__c = strLevels;
     	}
     }
+
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabCampaign() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabCampaign != null);
+		system.assertEquals(ctrl.ctabCampaign.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabCampaign.isEditingTab, false);
+		system.assert(ctrl.ctabCampaign.listCampaignSettings != null);
+		system.assert(ctrl.ctabCampaign.listSONonRespondedLevels != null);
+		system.assert(ctrl.ctabCampaign.listNonRespondedLevels != null);
+		ctrl.ctabCampaign.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabCampaign');
+		ctrl.ctabCampaign.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabCampaign.cancelTab() != null);		
+	}
+
 }

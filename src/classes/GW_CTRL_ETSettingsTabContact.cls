@@ -80,5 +80,20 @@ public with sharing class GW_CTRL_ETSettingsTabContact {
 		return p;
 	}
 
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabContact() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabContact != null);
+		system.assertEquals(ctrl.ctabContact.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabContact.isEditingTab, false);
+		system.assert(ctrl.ctabContact.listFieldSettings != null);
+		system.assert(ctrl.listSOContactFields != null);	// to force setCheckboxFields to get created.
+		ctrl.ctabContact.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabContact');
+		ctrl.ctabContact.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabContact.cancelTab() != null);		
+	}
+
 
 }

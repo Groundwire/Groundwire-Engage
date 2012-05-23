@@ -117,4 +117,28 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 		return p;
 	}
 
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabLevels() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabLevels != null);
+		system.assertEquals(ctrl.ctabLevels.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabLevels.etSettings, ctrl.etSettings);
+		system.assertEquals(ctrl.ctabLevels.isEditingTab, false);
+		system.assert(ctrl.ctabLevels.strCELpicklist != null);
+		system.assert(ctrl.ctabLevels.strCELOpicklist != null);
+		system.assert(ctrl.ctabLevels.strCEPpicklist != null);
+		system.assert(ctrl.ctabLevels.strCaELpicklist != null);
+		system.assert(ctrl.ctabLevels.listStrCEL != null);
+		system.assert(ctrl.ctabLevels.listStrCELO != null);
+		system.assert(ctrl.ctabLevels.listStrCEP != null);
+		system.assert(ctrl.ctabLevels.listStrCaEL != null);
+		system.assert(ctrl.ctabLevels.isMatchingPicklists == ctrl.ctabLevels.isMatchingPicklists);
+		ctrl.ctabLevels.RetestPicklists();
+		ctrl.ctabLevels.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabLevels');
+		ctrl.ctabLevels.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabLevels.cancelTab() != null);
+		
+	}
 }

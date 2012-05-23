@@ -5,7 +5,11 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 
         map<string, string> params = ApexPages.currentPage().getParameters();
         string str = params.get('currentTab');
-        if (str != null && str != '') strCurrentTab = str;
+        if (str != null && str != '') {
+        	strCurrentTab = str;
+        } else {
+        	strCurrentTab = 'tabLevels';
+        }
 		
 	}
 	
@@ -266,10 +270,44 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 	//---------------------------------------- TEST CODE -------------------------------------------------
 	static testmethod void TestWizard() {
 		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
-		system.assert(ctrl.ctabGeneral != null);
+
 		system.assert(ctrl.ctabLevels != null);
-		system.debug(ctrl.ctabGeneral);
-		system.debug(ctrl.ctabLevels);
+		system.assert(ctrl.ctabGeneral != null);
+		system.assert(ctrl.ctabDonor != null);
+		system.assert(ctrl.ctabMember != null);
+		system.assert(ctrl.ctabCampaign != null);
+		system.assert(ctrl.ctabFrequency != null);
+		system.assert(ctrl.ctabSchedule != null);
+		system.assert(ctrl.ctabContact != null);
 		system.assert(ctrl.inEditMode == false);
+		system.assert(ctrl.strCurrentEditTab == null);
+		system.assert(ctrl.strCurrentTab == 'tabLevels');
+		system.assert(ctrl.etSettings != null);		
+		system.assert(ctrl.listSOLevels != null);
+		system.assert(ctrl.listSOContactFields != null);
+		system.assert(ctrl.listSOCampaignRecordTypes != null);
+		system.assert(ctrl.listSOCampaignTypes != null);
+		system.assert(ctrl.listSOCampaignSubTypes != null);
+		system.assert(ctrl.setCheckboxFields != null);
+		system.assert(ctrl.hasCampaignRecordTypes == (ctrl.listSOCampaignRecordTypes.size() > 1));
+		system.assert(ctrl.IsGWBaseInstalled == GW_BATCH_EngagementRollup.IsGWBaseInstalled);
+		
+		ctrl.nameNewSettings(null, null);
+		list<SObject> listSobj = new list<SObject>();
+		EngagementContactFieldSettings__c fs1 = new EngagementContactFieldSettings__c();
+		EngagementContactFieldSettings__c fs2 = new EngagementContactFieldSettings__c();
+		EngagementCampaignSettings__c cs = new EngagementCampaignSettings__c();
+		system.assertEquals(fs1.Name, null);
+		fs2.Name = 'My Test Object1';
+		system.assertEquals(cs.Name, null);
+		listSobj.add(fs1);
+		listSobj.add(fs2);
+		listSobj.add(cs);
+		ctrl.nameNewSettings(listSobj, null);
+		ctrl.nameNewSettings(listSobj, 'My Test Object');
+		system.assertEquals(fs1.Name, 'My Test Object2');
+		system.assertEquals(fs2.Name, 'My Test Object3');
+		system.assertEquals(cs.Name, 'My Test Object4');
+		
 	}
 }

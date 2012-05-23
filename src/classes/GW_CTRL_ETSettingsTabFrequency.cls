@@ -85,4 +85,19 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 	private boolean isnullNum(decimal num) {
 		return (num == null || num == 0);
 	}
+
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabFrequency() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabFrequency != null);
+		system.assertEquals(ctrl.ctabFrequency.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabFrequency.isEditingTab, false);
+		system.assert(ctrl.ctabFrequency.listFreqSettings != null);
+		ctrl.ctabFrequency.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabFrequency');
+		ctrl.ctabFrequency.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabFrequency.cancelTab() != null);		
+	}
+	
 }

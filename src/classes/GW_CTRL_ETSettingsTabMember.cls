@@ -30,5 +30,19 @@ public with sharing class GW_CTRL_ETSettingsTabMember {
 		p.setRedirect(true);
 		return p;
 	}
+	
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabMember() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabMember != null);
+		system.assertEquals(ctrl.ctabMember.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabMember.isEditingTab, false);
+		system.assert(ctrl.ctabMember.ctrlWizard.etSettings != null);
+		ctrl.ctabMember.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabMember');
+		ctrl.ctabMember.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabMember.cancelTab() != null);		
+	}
 
 }

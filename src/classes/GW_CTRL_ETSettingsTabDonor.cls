@@ -102,4 +102,18 @@ public with sharing class GW_CTRL_ETSettingsTabDonor {
 		return p;
 	}
 
+	//---------------------------------------- TEST CODE -------------------------------------------------
+	static testmethod void TestTabDonor() {
+		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();
+		system.assert(ctrl.ctabDonor != null);
+		system.assertEquals(ctrl.ctabDonor.ctrlWizard, ctrl);
+		system.assertEquals(ctrl.ctabDonor.isEditingTab, false);
+		system.assert(ctrl.ctabDonor.listDonorLevelSettings != null);
+		ctrl.ctabDonor.editTab();
+		system.assertEquals(ctrl.strCurrentEditTab, 'tabDonor');
+		ctrl.ctabDonor.saveTab();
+		system.assertEquals(ctrl.strCurrentEditTab, null);
+		system.assert(ctrl.ctabDonor.cancelTab() != null);		
+	}
+
 }
