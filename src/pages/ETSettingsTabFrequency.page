@@ -16,36 +16,36 @@
 						
 						<apex:column rendered="{!hasCampaignRecordTypes}" >
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    	<apex:selectList value="{!fs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignRecordTypes}" />
 					    	</apex:selectList>							
 					    </apex:column>												
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Campaign_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    	<apex:selectList value="{!fs.Campaign_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignTypes}" />
 					    	</apex:selectList>							
 						</apex:column>						
 						<apex:column rendered="{!IsGWBaseInstalled}" > 
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Campaign_Sub_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    	<apex:selectList value="{!fs.Campaign_Sub_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignSubTypes}" />
 					    	</apex:selectList>							
 						</apex:column>						
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
 					    	</apex:selectList>							
 					    </apex:column>																		
 						<apex:column >
 							<apex:facet name="header"><div style="width:80px;white-space:normal;">{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</div></apex:facet>
-				      		<apex:inputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!ctabFrequency.isEditingTab}" required="false" styleClass="cssTbx" />
+				      		<apex:inputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!ctabFrequency.isEditingTab}" styleClass="cssTbx" required="false" />
 				      		<apex:outputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!NOT(ctabFrequency.isEditingTab)}" />							
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Level_To_Assign__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" >			    			
+					    	<apex:selectList value="{!fs.Level_To_Assign__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
 					    	</apex:selectList>							
 					    </apex:column>												

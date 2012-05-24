@@ -267,6 +267,15 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		}
 	}
 	
+	
+	public boolean isnullStr(string str) {
+		return (str == null || str == '');
+	}
+
+	public boolean isnullNum(decimal num) {
+		return (num == null || num == 0);
+	}
+	
 	//---------------------------------------- TEST CODE -------------------------------------------------
 	static testmethod void TestWizard() {
 		GW_CTRL_ETSettingsWizard ctrl = new GW_CTRL_ETSettingsWizard();

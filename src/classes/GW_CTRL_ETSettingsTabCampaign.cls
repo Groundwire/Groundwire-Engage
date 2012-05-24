@@ -40,10 +40,10 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 		// go thru the frequency settings, and delete empty ones
 		for (integer i = listCampaignSettings.size()-1; i >= 0; i--) {
 			EngagementCampaignSettings__c cs = listCampaignSettings[i];
-			if (isnullNum(cs.Engagement_Level__c) && 
-				isnullStr(cs.Campaign_Record_Type__c) &&
-				isnullStr(cs.Campaign_Sub_Type__c) &&
-				isnullStr(cs.Campaign_Type__c)) {
+			if (ctrlWizard.isnullNum(cs.Engagement_Level__c) && 
+				ctrlWizard.isnullStr(cs.Campaign_Record_Type__c) &&
+				ctrlWizard.isnullStr(cs.Campaign_Sub_Type__c) &&
+				ctrlWizard.isnullStr(cs.Campaign_Type__c)) {
 					if (cs.Id == null) {
 						// it's a new empty dls; just remove it
 						listCampaignSettings.remove(i);
@@ -59,11 +59,21 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 		ctrlWizard.nameNewSettings(listCampaignSettings, 'CampaignSetting');
 
 		if (listCStoDel.size() > 0) delete listCStoDel;
-		upsert listCampaignSettings;
+        try {
+			upsert listCampaignSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		AddEmptyRows();
 		
 		// deal with etSettings.Levels_Don_t_Require_Responded__c
-		upsert ctrlWizard.etSettings;
+        try {
+			upsert ctrlWizard.etSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		
 		isEditingTab = false;
 		ctrlWizard.strCurrentTab = 'tabCampaign';
@@ -79,14 +89,6 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 		return p;
 	}
 
-	private boolean isnullStr(string str) {
-		return (str == null || str == '');
-	}
-
-	private boolean isnullNum(decimal num) {
-		return (num == null || num == 0);
-	}
-	
 	private string strNoDotZero(string str) {
 		if (str != null) {
 			str = str.replace('.0', '');

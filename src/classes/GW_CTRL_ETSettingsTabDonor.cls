@@ -68,7 +68,8 @@ public with sharing class GW_CTRL_ETSettingsTabDonor {
 		// go thru the field settings, give any new ones names, and delete empty ones
 		for (integer i = listDonorLevelSettings.size()-1; i >= 0; i--) {
 			Engagement_Donor_Level_Settings__c dls = listDonorLevelSettings[i];
-			if (dls.Level__c == null || dls.Level__c == 0 || dls.Lower_Limit__c == null || dls.Lower_Limit__c == 0) {
+			if (ctrlWizard.isnullNum(dls.Level__c) &&
+				ctrlWizard.isnullNum(dls.Lower_Limit__c)) {
 					if (dls.Id == null) {
 						// it's a new empty dls; just remove it
 						listDonorLevelSettings.remove(i);
@@ -84,11 +85,21 @@ public with sharing class GW_CTRL_ETSettingsTabDonor {
 		ctrlWizard.nameNewSettings(listDonorLevelSettings, 'DonorLevel');
 				
 		if (listDLStoDel.size() > 0) delete listDLStoDel;
-		upsert listDonorLevelSettings;
+        try {
+			upsert listDonorLevelSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		// force list to get reloaded and sorted
 		listDonorLevelSettings = null;
 		
-		upsert ctrlWizard.etSettings;
+        try {
+			upsert ctrlWizard.etSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		isEditingTab = false;
 		ctrlWizard.strCurrentTab = 'tabDonor';
 		return null;

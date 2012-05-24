@@ -48,7 +48,10 @@ public with sharing class GW_CTRL_ETSettingsTabContact {
 				listFieldSettings[i].Field_Type__c = 'text';
 			}				
 
-			if (fs.Fieldname__c == null || fs.Fieldname__c == '') {
+			if (ctrlWizard.isnullStr(fs.Fieldname__c) &&
+				ctrlWizard.isnullStr(fs.Field_Value__c) &&
+				ctrlWizard.isnullNum(fs.Level_Value__c)) {
+				
 					if (fs.Id == null) {
 						// it's a new empty fs; just remove it
 						listFieldSettings.remove(i);
@@ -64,8 +67,12 @@ public with sharing class GW_CTRL_ETSettingsTabContact {
 		ctrlWizard.nameNewSettings(listFieldSettings, 'FieldSetting');
 				
 		if (listFStoDel.size() > 0) delete listFStoDel;
-		system.debug(listFieldSettings);
-		upsert listFieldSettings;
+        try {
+			upsert listFieldSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		AddEmptyRows();
 		isEditingTab = false;
 		ctrlWizard.strCurrentTab = 'tabContact';

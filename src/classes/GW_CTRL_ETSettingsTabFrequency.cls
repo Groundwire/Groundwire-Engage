@@ -40,8 +40,7 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 		// go thru the frequency settings, and delete empty ones
 		for (integer i = listFreqSettings.size()-1; i >= 0; i--) {
 			EngagementFrequencySettings__c fs = listFreqSettings[i];
-			if (isnullStr(fs.Fieldname_1__c) && 
-				isnullStr(fs.Campaign_Record_Type__c) &&
+			if (isnullStr(fs.Campaign_Record_Type__c) &&
 				isnullStr(fs.Campaign_Sub_Type__c) &&
 				isnullStr(fs.Campaign_Type__c) &&
 				isnullStr(fs.Field_Value_1__c) &&
@@ -63,7 +62,13 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 		ctrlWizard.nameNewSettings(listFreqSettings, 'FrequencySetting');
 
 		if (listFStoDel.size() > 0) delete listFStoDel;
-		upsert listFreqSettings;
+		try {
+			system.debug(listFreqSettings);
+			upsert listFreqSettings;
+        } catch (exception ex) {
+        	ApexPages.addMessages(ex);
+        	return null;
+        }		
 		AddEmptyRows();
 		isEditingTab = false;
 		ctrlWizard.strCurrentTab = 'tabFrequency';
