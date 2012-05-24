@@ -11,15 +11,23 @@
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
-	        	<apex:pageBlockSection columns="1" >
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_1_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_2_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_3_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_4_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_5_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_6_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_7_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
-	        		<apex:inputText value="{!ctabLevels.etSettings.Level_8_Name__c}" disabled="{!NOT(ctabLevels.isEditingTab)}" />
+	        	<apex:pageBlockSection columns="1" > 
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_1_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_1_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_2_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_2_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_3_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_3_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_4_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_4_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_5_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_5_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_6_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_6_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_7_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_7_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />
+		      		<apex:inputField value="{!ctabLevels.etSettings.Level_8_Name__c}" rendered="{!ctabLevels.isEditingTab}"  />
+		      		<apex:outputField value="{!ctabLevels.etSettings.Level_8_Name__c}" rendered="{!NOT(ctabLevels.isEditingTab)}"  />	        		
 	        	</apex:pageBlockSection>	        	        	        	        
 	       	</apex:panelGroup>
 	       	<apex:panelGroup >

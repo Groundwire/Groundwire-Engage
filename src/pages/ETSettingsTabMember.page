@@ -12,10 +12,8 @@
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsMember" >
-	        		<apex:pageBlockSectionItem >
-	        			<apex:outputLabel value="Calculate Engagement Levels based on Membership" />
-	        			<apex:inputCheckbox value="{!etSettings.Include_Membership__c}" disabled="{!NOT(ctabMember.isEditingTab)}" />
-	        		</apex:pageBlockSectionItem>
+		      		<apex:inputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!ctabMember.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!NOT(ctabMember.isEditingTab)}" />
 	        		<apex:pageBlockSectionItem >
 	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}" />
 				    	<apex:selectList value="{!etSettings.New_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			

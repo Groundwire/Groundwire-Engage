@@ -12,14 +12,11 @@
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsDonor" >
-	        		<apex:pageBlockSectionItem >
-	        			<apex:outputLabel value="Calculate Engagement Levels based on Donations" />
-	        			<apex:inputCheckbox value="{!etSettings.Include_Opps__c}" disabled="{!NOT(ctabDonor.isEditingTab)}" />
-	        		</apex:pageBlockSectionItem>
-	        		<apex:pageBlockSectionItem >
-	        			<apex:outputLabel value="Calculate Engagement Levels based on Household Donation Totals" />
-	        			<apex:inputCheckbox value="{!etSettings.Householded_Donor_Levels__c}" disabled="{!NOT(ctabDonor.isEditingTab)}" />
-	        		</apex:pageBlockSectionItem>
+		      		<apex:inputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+	        	
+		      		<apex:inputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
 					<p/>
 					<p><b>Donation Engagement Levels</b></p>	        	
 					<apex:pageBlockTable value="{!ctabDonor.listDonorLevelSettings}" var="dls" >
@@ -31,10 +28,8 @@
 					    </apex:column>												
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</apex:facet>
-							<apex:inputText value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" />
-							<apex:outputText value="{0, number, currency}" rendered="{!NOT(ctabDonor.isEditingTab)}" >
-								<apex:param value="{!dls.Lower_Limit__c}" />
-							</apex:outputText>
+							<apex:inputField value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" required="false" />
+							<apex:outputField value="{!dls.Lower_Limit__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
 						</apex:column>
 					</apex:pageBlockTable>														
 	        	</apex:pageBlockSection>	        	        	        	        

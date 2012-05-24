@@ -39,8 +39,9 @@
 					    	</apex:selectList>							
 					    </apex:column>																		
 						<apex:column >
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</apex:facet>
-							<apex:inputText value="{!fs.Number_of_Actions_Required__c}" disabled="{!NOT(ctabFrequency.isEditingTab)}" styleClass="cssTbx" />
+							<apex:facet name="header"><div style="width:80px;white-space:normal;">{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</div></apex:facet>
+				      		<apex:inputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!ctabFrequency.isEditingTab}" required="false" styleClass="cssTbx" />
+				      		<apex:outputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!NOT(ctabFrequency.isEditingTab)}" />							
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</apex:facet>
