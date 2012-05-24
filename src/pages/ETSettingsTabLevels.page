@@ -1,14 +1,14 @@
 <apex:page controller="GW_CTRL_ETSettingsWizard" >
-	
+	 
 <apex:outputPanel id="frmLevels" >
 	<apex:form >
   		<apex:pageMessages />
 		<apex:outputPanel layout="block" style="text-align:center;" >
-	       	<apex:commandButton value="Edit" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
-	       	<apex:commandButton value="Save" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
 			<hr/>
-   		</apex:outputPanel>
+   		</apex:outputPanel> 
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" > 
@@ -64,9 +64,9 @@
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
 			<hr/>
-	       	<apex:commandButton value="Edit" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
-	       	<apex:commandButton value="Save" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
    		</apex:outputPanel>
 	</apex:form>
 </apex:outputPanel>

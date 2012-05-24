@@ -45,10 +45,35 @@
 		color: lightgray;
 	}	
 		
+	.clsLoading {
+		z-index: 99;
+		position: fixed;
+		top: 30%; 
+		left: 30%;
+		background: lightyellow;
+		width: 400px;
+		height: 40px;		
+	}   
+		
 </style>
+
 
     <apex:sectionHeader title="Engagement Tracker Settings" />    
   	<apex:pageBlock mode="maindetail" id="pbWizard" >
+  	
+		<!-- <apex:actionStatus id="statusLoad" onstart="j$('.loading').fadeIn();" onstop="j$('.loading').fadeOut();" /> -->
+		<apex:actionStatus id="statusLoad" onstart="document.getElementById('divLoading').show();" onstop="document.getElementById('divLoading').hide();" />
+		<div class="loading clsLoading" id="divLoading" >
+		  <p style="vertical-align: middle;" >
+			<img src="/img/loading.gif" alt="Processing..." width="16" height="16" title="Processing..." style="vertical-align: middle;"/>
+			<span class="loadingText" style="vertical-align: middle;" >Processing...</span>
+		  </p>
+		</div>        				            					            
+
+<script>
+	document.getElementById('divLoading').hide();
+</script>
+  	
 	    <apex:tabPanel switchType="client" value="{!strCurrentTab}" id="tabPanel" disabledTabClass="cssGrayText" >
 	    
 			<!-- ******************* LEVELS TAB ************************************************************************************* -->
