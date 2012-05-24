@@ -25,13 +25,18 @@
 		width: 80px;
 	}
 	
+	.rich-tabpanel-content {
+		font-size: 100%;
+		FOObackground-color: #F1F1F1;
+		background-color: whitesmoke;	
+	}
+
 	.cssTbx {
 		width: 80px;
 	}
-
+	
 	select:disabled {
 		color: #545454;
-		background-color: #EBEBE4;
 		border-color: #CCC;
 	}
 	
@@ -43,9 +48,7 @@
 </style>
 
     <apex:sectionHeader title="Engagement Tracker Settings" />    
-  	<apex:pageBlock mode="edit" id="pbWizard" >
-  		<p><b><i>&nbsp;&nbsp;Visit each tab, edit your settings, and click Save.</i></b></p>
-  		<p/>
+  	<apex:pageBlock mode="maindetail" id="pbWizard" >
 	    <apex:tabPanel switchType="client" value="{!strCurrentTab}" id="tabPanel" disabledTabClass="cssGrayText" >
 	    
 			<!-- ******************* LEVELS TAB ************************************************************************************* -->
