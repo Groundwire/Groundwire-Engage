@@ -48,7 +48,7 @@ public with sharing class GW_CTRL_ETSettingsTabDonor {
     }
 		
 	public PageReference AddEmptyRows() {
-		for (integer i = 0; i < 5; i++) {
+		for (integer i = listDonorLevelSettings.size(); i < 8; i++) {
 			listDonorLevelSettings.add(new Engagement_Donor_Level_Settings__c());
 		}
 		return null;
