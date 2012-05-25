@@ -1,0 +1,47 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmMember" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsMember" >
+		      		<apex:inputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!ctabMember.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!NOT(ctabMember.isEditingTab)}" />
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}" />
+				    	<apex:selectList value="{!etSettings.New_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			
+				    		<apex:selectOptions value="{!listSOLevels}" />
+				    	</apex:selectList>							
+	        		</apex:pageBlockSectionItem>
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}" />
+				    	<apex:selectList value="{!etSettings.Renewing_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			
+				    		<apex:selectOptions value="{!listSOLevels}" />
+				    	</apex:selectList>							
+	        		</apex:pageBlockSectionItem>        			
+	        	</apex:pageBlockSection>	        	         	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Membership Settings" escape="false"
+	       			summary="<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

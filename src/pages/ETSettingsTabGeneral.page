@@ -1,0 +1,50 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmGeneral" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabGeneral.cancelTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>  		
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsGeneral" >
+		      		<apex:inputField value="{!etSettings.Timeframe_Recent__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Timeframe_Recent__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+		      			        		
+		      		<apex:inputField value="{!etSettings.Override_Default_Duration__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Override_Default_Duration__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+
+		      		<apex:inputField value="{!etSettings.Batch_Size__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Batch_Size__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+		      		
+		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+
+		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
+	        	</apex:pageBlockSection>
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="General Settings" escape="false"
+	       			summary="<p>Various settings that effect Engagement Level calculations.</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.InlineHelpText}</p>
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabGeneral.cancelTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

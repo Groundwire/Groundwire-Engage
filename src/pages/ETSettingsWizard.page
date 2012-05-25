@@ -1,0 +1,121 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" title="Engagement Settings">
+
+<style>
+
+	.pbBody .cssGrayText {
+		color:gray;
+	}
+	
+	.cssGrayText {
+		color:gray;
+	}
+
+	.cssPanelGridColumn1 {
+		width: 400px;
+	}
+	.cssPanelGridColumn2 {
+		width: 1000px;
+	}
+	
+	body .bPageBlock .pbBody .labelCol {
+		width: 100px;
+	}
+	
+	.bPageBlock .detailList .data2Col {
+		width: 80px;
+	}
+	
+	.rich-tabpanel-content {
+		font-size: 100%;
+		FOObackground-color: #F1F1F1;
+		background-color: whitesmoke;	
+	}
+
+	.cssTbx {
+		width: 80px;
+	}
+	
+	select:disabled {
+		color: #545454;
+		border-color: #CCC;
+	}
+	
+	hr {
+		border-top-style: solid;
+		color: lightgray;
+	}	
+		
+	.clsLoading {
+		z-index: 99;
+		position: fixed;
+		top: 30%; 
+		left: 30%;
+		background: lightyellow;
+		width: 400px;
+		height: 40px;		
+	}   
+		
+</style>
+
+
+    <apex:sectionHeader title="Engagement Tracker Settings" />    
+  	<apex:pageBlock mode="maindetail" id="pbWizard" >
+  	
+		<!-- <apex:actionStatus id="statusLoad" onstart="j$('.loading').fadeIn();" onstop="j$('.loading').fadeOut();" /> -->
+		<apex:actionStatus id="statusLoad" onstart="document.getElementById('divLoading').show();" onstop="document.getElementById('divLoading').hide();" />
+		<div class="loading clsLoading" id="divLoading" >
+		  <p style="vertical-align: middle;" >
+			<img src="/img/loading.gif" alt="Processing..." width="16" height="16" title="Processing..." style="vertical-align: middle;"/>
+			<span class="loadingText" style="vertical-align: middle;" >Processing...</span>
+		  </p>
+		</div>        				            					            
+
+<script>
+	document.getElementById('divLoading').hide();
+</script>
+  	
+	    <apex:tabPanel switchType="client" value="{!strCurrentTab}" id="tabPanel" disabledTabClass="cssGrayText" >
+	    
+			<!-- ******************* LEVELS TAB ************************************************************************************* -->
+	        <apex:tab label="Levels" name="tabLevels" id="tabLevels" disabled="{!inEditMode && strCurrentEditTab != 'tabLevels'}">
+	        	<apex:include pageName="ETSettingsTabLevels" />
+	        </apex:tab>
+	        
+			<!-- ******************* CAMPAIGNS TAB ************************************************************************************* -->
+	        <apex:tab label="Campaign Defaults" name="tabCampaign" id="tabCampaign" disabled="{!inEditMode && strCurrentEditTab != 'tabCampaign'}"  >
+	        	<apex:include pageName="ETSettingsTabCampaign" />
+			</apex:tab>
+        
+			<!-- ******************* CONTACT TAB ************************************************************************************* -->
+	        <apex:tab label="Contact Fields" name="tabContact" id="tabContact" disabled="{!inEditMode && strCurrentEditTab != 'tabContact'}" >
+	        	<apex:include pageName="ETSettingsTabContact" />
+			</apex:tab>
+	        
+			<!-- ******************* DONOR TAB ************************************************************************************* -->
+	        <apex:tab label="Donations" name="tabDonor" id="tabDonor" disabled="{!inEditMode && strCurrentEditTab != 'tabDonor'}">
+	        	<apex:include pageName="ETSettingsTabDonor" />
+			</apex:tab>
+	        
+			<!-- ******************* MEMBERSHIP TAB ************************************************************************************* -->
+	        <apex:tab label="Membership" name="tabMember" id="tabMember" disabled="{!inEditMode && strCurrentEditTab != 'tabMember'}">
+	        	<apex:include pageName="ETSettingsTabMember" />
+			</apex:tab>
+
+			<!-- ******************* FREQUENCY TAB ************************************************************************************* -->
+	        <apex:tab label="Repeated Actions" name="tabFrequency" id="tabFrequency" disabled="{!inEditMode && strCurrentEditTab != 'tabFrequency'}">
+	        	<apex:include pageName="ETSettingsTabFrequency" />
+			</apex:tab>
+	        
+			<!-- ******************* GENERAL TAB ************************************************************************************* -->
+	        <apex:tab label="General" name="tabGeneral" id="tabGeneral" disabled="{!inEditMode && strCurrentEditTab != 'tabGeneral'}">
+	        	<apex:include pageName="ETSettingsTabGeneral" />
+	        </apex:tab>
+	        
+			<!-- ******************* SCHEDULING TAB ************************************************************************************* -->
+	        <apex:tab label="Schedule" name="tabSchedule" id="tabSchedule" disabled="{!inEditMode && strCurrentEditTab != 'tabSchedule'}">
+	        	<apex:include pageName="ETSettingsTabSchedule" />
+	        </apex:tab>
+
+	    </apex:tabPanel>  	    
+    </apex:pageBlock>  
+</apex:page>

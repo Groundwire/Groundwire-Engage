@@ -1,0 +1,55 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmDonor" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsDonor" >
+		      		<apex:inputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+	        	
+		      		<apex:inputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+					<p/>
+					<p><b>Donation Engagement Levels</b></p>	        	
+					<apex:pageBlockTable value="{!ctabDonor.listDonorLevelSettings}" var="dls" >
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</apex:facet>
+					    	<apex:selectList value="{!dls.Level__c}" size="1" disabled="{!NOT(ctabDonor.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>												
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</apex:facet>
+							<apex:inputField value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" required="false" />
+							<apex:outputField value="{!dls.Lower_Limit__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+						</apex:column>
+					</apex:pageBlockTable>														
+	        	</apex:pageBlockSection>	        	        	        	        
+	        		        	         	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="Donation Settings" escape="false"
+	       			summary="<p><b>Calculate Engagement Levels based on Donations</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
+	       					<p><b>Calculate Engagement Levels based on Household Donation Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.InlineHelpText}</p>
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

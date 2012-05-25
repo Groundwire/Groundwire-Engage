@@ -1,0 +1,53 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmContact" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabContact.editTab}" rendered="{!NOT(ctabContact.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabContact.saveTab}" rendered="{!ctabContact.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabContact.cancelTab}" rendered="{!ctabContact.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>  		
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsGeneral" >
+					<apex:pageBlockTable value="{!ctabContact.listFieldSettings}" var="fs" >
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.Label}</apex:facet>
+					    	<apex:selectList value="{!fs.Fieldname__c}" size="1" disabled="{!NOT(ctabContact.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOContactFields}" />
+					    	</apex:selectList>							
+					    </apex:column>
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.Label}&nbsp;</apex:facet>
+				      		<apex:inputField value="{!fs.Field_Value__c}" rendered="{!ctabContact.isEditingTab}" styleClass="cssTbx" />
+				      		<apex:outputField value="{!fs.Field_Value__c}" rendered="{!NOT(ctabContact.isEditingTab)}" />							
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.Label}</apex:facet>
+					    	<apex:selectList value="{!fs.Level_Value__c}" size="1" disabled="{!NOT(ctabContact.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>
+					</apex:pageBlockTable>														
+	        	</apex:pageBlockSection>	        	        	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="{!$ObjectType.EngagementContactFieldSettings__c.Label}" escape="false"
+	       			summary="<p>Allows you to assign an Engagement Level to a contact based on the value of a field on a Contact record.</p>
+	       					<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.InlineHelpText}</p>
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Edit" action="{!ctabContact.editTab}" rendered="{!NOT(ctabContact.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabContact.saveTab}" rendered="{!ctabContact.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabContact.cancelTab}" rendered="{!ctabContact.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>

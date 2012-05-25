@@ -1,0 +1,77 @@
+<apex:page controller="GW_CTRL_ETSettingsWizard" >
+
+	<apex:outputPanel id="frmCampaign" >	
+	<apex:form >
+  		<apex:pageMessages />	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
+			<hr/>
+   		</apex:outputPanel>
+        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
+        	<apex:panelGroup >
+	        	<apex:pageBlockSection columns="1" id="pbsCampaign" >
+					<apex:pageBlockTable value="{!ctabCampaign.listCampaignSettings}" var="cs" >
+						<apex:column rendered="{!hasCampaignRecordTypes}" >
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</apex:facet>
+					    	<apex:selectList value="{!cs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOCampaignRecordTypes}" />
+					    	</apex:selectList>							
+					    </apex:column>						
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.Label}</apex:facet>
+					    	<apex:selectList value="{!cs.Campaign_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOCampaignTypes}" />
+					    	</apex:selectList>							
+						</apex:column>
+						<apex:column rendered="{!IsGWBaseInstalled}" > 
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label}</apex:facet>
+					    	<apex:selectList value="{!cs.Campaign_Sub_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOCampaignSubTypes}" />
+					    	</apex:selectList>							
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</apex:facet>
+					    	<apex:selectList value="{!cs.Engagement_Level__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>						
+					</apex:pageBlockTable>														
+	        	
+	        		<apex:pageBlockSectionItem >
+	        		</apex:pageBlockSectionItem>
+	        		
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}" />
+				    	<apex:selectCheckboxes value="{!ctabCampaign.listNonRespondedLevels}" layout="pageDirection" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
+				    		<apex:selectOptions value="{!ctabCampaign.listSONonRespondedLevels}" />
+				    	</apex:selectCheckboxes>							
+	        		</apex:pageBlockSectionItem>
+	        		
+	        	</apex:pageBlockSection>	        	         	        	        
+	       	</apex:panelGroup> 
+	       	<apex:panelGroup >
+	       		<apex:pageMessage severity="info" strength="1" title="{!$ObjectType.EngagementCampaignSettings__c.Label}" escape="false"
+	       			summary="<p>Specify a default Engagement Level to be set for Campaigns of various types.</p>
+	       				{!IF(hasCampaignRecordTypes, 
+	       					'<p><b>' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label + '</b> - ' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText + '</p>'
+	       					, '')}
+	       					<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
+						{!IF(IsGWBaseInstalled,	       					
+	       					'<p><b>' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label + '</b> - ' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText + '</p>'
+	       					, '')}
+	       					<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>	       			
+	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
+	       					" />
+	       	</apex:panelGroup>
+        </apex:panelGrid>	
+		<apex:outputPanel layout="block" style="text-align:center;" >
+			<hr/>
+	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
+   		</apex:outputPanel>
+	</apex:form>
+	</apex:outputPanel> 
+</apex:page>
