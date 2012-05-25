@@ -1123,15 +1123,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // create & insert contact(s)
         Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(howMany);
         
-        TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[5].Title = 'Board Member'; 
+        TestCons[21].Email = 'test@test.com';   // this should give lvl 1
+        insert TestCons;
+
+		// have to update some field after insert in order to spoof existing history of engagement changes
+		// in order to get around trigger the blanks these out on insert (to avoid probs w/ cloning contacts)
+        TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
-        TestCons[11].Engagement_Peak_Numeric__c = 5;  
-        // TestCons[10].Engagement_Level_Mod_Date__c = system.today().addMonths(-2);
-        TestCons[21].Email = 'test@test.com';   // this should give lvl 1
-        
-        insert TestCons;
+        TestCons[11].Engagement_Peak_Numeric__c = 5;
+        update TestCons;  
         
         // now add 2 new contacts who are in existing households
         Contact[] consHH = ONEN_UnitTestData.CreateMultipleTestContactsInHouseholds(new list<Contact> {TestCons[16], TestCons[17]});
