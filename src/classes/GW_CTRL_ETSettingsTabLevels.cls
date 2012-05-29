@@ -66,7 +66,6 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 		}		
 	}
 	
-
 	public boolean isMatchingPicklists {
 		get {
 			string strLevels = 
@@ -85,6 +84,28 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 		}
 	}
 	
+	private boolean isValidLevelNames() {
+		return (
+			(ctrlWizard.isnullStr(etSettings.Level_1_Name__c) || startsWithNumber(etSettings.Level_1_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_2_Name__c) || startsWithNumber(etSettings.Level_2_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_3_Name__c) || startsWithNumber(etSettings.Level_3_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_4_Name__c) || startsWithNumber(etSettings.Level_4_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_5_Name__c) || startsWithNumber(etSettings.Level_5_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_6_Name__c) || startsWithNumber(etSettings.Level_6_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_7_Name__c) || startsWithNumber(etSettings.Level_7_Name__c)) &&
+			(ctrlWizard.isnullStr(etSettings.Level_8_Name__c) || startsWithNumber(etSettings.Level_8_Name__c)) );		
+	}
+	
+	private boolean startsWithNumber(string str) {
+		if (str == null || str == '') return false;
+		try {
+			integer i = integer.valueOf(str.substring(0,1));
+			return true;
+		} catch(exception ex) {
+			return false;
+		}
+	} 
+	
 	private string StrNullSemi(string str) {
 		if (str == null || str == '') return '';
 		return str + ';';
@@ -102,6 +123,10 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 	}
 	
 	public PageReference saveTab() {
+		if (!isValidLevelNames()) {
+        	ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.FATAL, 'Engagement Level Names must start with a number from 1 to 8.'));
+        	return null;			
+		}
 		upsert etSettings;
 		ctrlWizard.listSOLevels = null; // force them to reload
 		isEditingTab = false;
@@ -112,7 +137,7 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 	public PageReference cancelTab() {
 		isEditingTab = false;
 		etSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tablevels');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tablevels' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}
