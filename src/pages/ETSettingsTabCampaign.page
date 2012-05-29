@@ -4,10 +4,11 @@
 	<apex:form >
   		<apex:pageMessages />	
 		<apex:outputPanel layout="block" style="text-align:center;" >
+			<apex:outputLabel value="{!$ObjectType.EngagementCampaignSettings__c.Label}" styleClass="cssTabTitle" />
 	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
-			<hr/>
+			<p/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
@@ -35,10 +36,12 @@
 							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Engagement_Level__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
-					    	</apex:selectList>							
+					    	</apex:selectList>
 					    </apex:column>						
 					</apex:pageBlockTable>														
 	        	
+	        		<apex:pageBlockSectionItem >
+	        		</apex:pageBlockSectionItem>
 	        		<apex:pageBlockSectionItem >
 	        		</apex:pageBlockSectionItem>
 	        		
@@ -52,7 +55,7 @@
 	        	</apex:pageBlockSection>	        	         	        	        
 	       	</apex:panelGroup> 
 	       	<apex:panelGroup >
-	       		<apex:pageMessage severity="info" strength="1" title="{!$ObjectType.EngagementCampaignSettings__c.Label}" escape="false"
+	       		<apex:pageMessage severity="info" strength="1"  escape="false"
 	       			summary="<p>Specify a default Engagement Level to be set for Campaigns of various types.</p>
 	       				{!IF(hasCampaignRecordTypes, 
 	       					'<p><b>' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label + '</b> - ' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText + '</p>'
@@ -67,7 +70,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<hr/>
+			<p/>
 	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />

@@ -7,7 +7,7 @@
 	       	<apex:commandButton value="Edit" action="{!ctabContact.editTab}" rendered="{!NOT(ctabContact.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabContact.saveTab}" rendered="{!ctabContact.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabContact.cancelTab}" rendered="{!ctabContact.isEditingTab}" immediate="true" />
-			<hr/>
+			<p/>
    		</apex:outputPanel>  		
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
@@ -43,7 +43,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<hr/>
+			<p/>
 	       	<apex:commandButton value="Edit" action="{!ctabContact.editTab}" rendered="{!NOT(ctabContact.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabContact.saveTab}" rendered="{!ctabContact.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabContact.cancelTab}" rendered="{!ctabContact.isEditingTab}" immediate="true" />

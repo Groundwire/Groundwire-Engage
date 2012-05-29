@@ -15,10 +15,11 @@
 	}
 	.cssPanelGridColumn2 {
 		width: 1000px;
+		padding-left: 10px;
 	}
 	
 	body .bPageBlock .pbBody .labelCol {
-		width: 100px;
+		width: 85px;
 	}
 	
 	.bPageBlock .detailList .data2Col {
@@ -27,7 +28,6 @@
 	
 	.rich-tabpanel-content {
 		font-size: 100%;
-		FOObackground-color: #F1F1F1;
 		background-color: whitesmoke;	
 	}
 
@@ -48,13 +48,29 @@
 	.clsLoading {
 		z-index: 99;
 		position: fixed;
-		top: 30%; 
+		top: 30%;
 		left: 30%;
 		background: lightyellow;
 		width: 400px;
 		height: 40px;		
 	}   
 		
+	.message .messageText a {
+		margin: 0 0px;
+		color: black;
+		font-size: 100%;
+	}
+	
+	.rich-tab-header {
+		font-size: 100%;
+	}
+	
+	.cssTabTitle {
+		font-size: 150%;
+		position: absolute;
+		left: 10px;		
+	}
+	
 </style>
 
 

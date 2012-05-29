@@ -7,7 +7,7 @@
 	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />
-			<hr/>
+			<p/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
@@ -17,20 +17,22 @@
 	        	
 		      		<apex:inputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!ctabDonor.isEditingTab}"  />
 		      		<apex:outputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
-					<p/>
+
+					<apex:pageBlockSectionItem />
+					
 					<p><b>Donation Engagement Levels</b></p>	        	
 					<apex:pageBlockTable value="{!ctabDonor.listDonorLevelSettings}" var="dls" >
+						<apex:column >
+							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</apex:facet>
+							<apex:inputField value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" required="false" />
+							<apex:outputField value="{!dls.Lower_Limit__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+						</apex:column>
 						<apex:column >
 							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</apex:facet>
 					    	<apex:selectList value="{!dls.Level__c}" size="1" disabled="{!NOT(ctabDonor.isEditingTab)}" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
 					    	</apex:selectList>							
 					    </apex:column>												
-						<apex:column >
-							<apex:facet name="header">{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</apex:facet>
-							<apex:inputField value="{!dls.Lower_Limit__c}" rendered="{!(ctabDonor.isEditingTab)}" required="false" />
-							<apex:outputField value="{!dls.Lower_Limit__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
-						</apex:column>
 					</apex:pageBlockTable>														
 	        	</apex:pageBlockSection>	        	        	        	        
 	        		        	         	        	        
@@ -45,7 +47,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<hr/>
+			<p/>
 	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabDonor.cancelTab}" rendered="{!ctabDonor.isEditingTab}" immediate="true" />

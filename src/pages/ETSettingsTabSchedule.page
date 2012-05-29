@@ -5,30 +5,29 @@
   		<apex:pageMessages />	
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Schedule" action="{!ctabSchedule.ScheduleIt}" immediate="false" rerender="pbWizard" />
-			<hr/>
+			<p/>
    		</apex:outputPanel>  		
         <apex:panelGrid columns="1" >
         	<apex:panelGroup >
 	       	</apex:panelGroup> 
 	       	<apex:panelGroup >
 	       		<apex:pageMessage severity="info" strength="1" title="Scheduling Engagement Rollup" escape="false"
-	       			summary="<p>The Engagement Tracker requires the regular calculation of donations and campaign membership in order
-	       				to compute engagement levels.  You can use the Engagement Rollup tab to start an immediate calculation.  We
-	       				recommend scheduling Engagement Rollups to run every night, by clicking the Schedule button.  Note that if you 
-	       				have already scheduled Engagement Rollups, you will get an error trying to schedule them again.</p>
+	       			summary="<p>Engagement Rollup is the recalculation of every contact's engagement level based on current donation, 
+	       				campaign and custom contact field information.  Use the Engagement Rollup tab above to start the process manually 
+	       				at any time.  We recommend scheduling Engagement Rollup to run nightly by clicking the Schedule button.   
+	       				If it is already scheduled you will receive an error message, telling you so. &nbsp;Click 
+	       				<a  href='/08e?setupid=ScheduledJobs'>Scheduled Jobs page</a> to view all scheduled jobs.</p>
 	       				
-	       				<p><i>We strongly recommend that you avoid running Engagement Rollup until you have completely set up your
-	       				engagement settings, and have imported all of your data into Salesforce.  This will ensure that Engagement conversion 
-	       				metrics are calculated accurately.</i></p>
+	       				<p><i>We strongly recommend that you avoid running Engagement Rollup manually or scheduling it to run until you 
+	       				have completely set up your engagement settings and have imported all of your data into Salesforce.   
+	       				This will ensure engagement metrics are calculated accurately.</i></p>
 	       				
 	       				<p><b>{!IF(ctabSchedule.jobId != null, 'Engagement Rollup has been successfully scheduled.', '')}</b></p>
-	       					" />
-	       					
-				<apex:outputLink value="/08e?setupid=ScheduledJobs">Link to Scheduled Jobs page</apex:outputLink>
+	       					" />	       					
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<hr/>
+			<p/>
 	       	<apex:commandButton value="Schedule" action="{!ctabSchedule.ScheduleIt}" immediate="false" rerender="pbWizard" />
    		</apex:outputPanel>
 	</apex:form>

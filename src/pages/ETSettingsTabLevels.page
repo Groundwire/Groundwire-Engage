@@ -7,7 +7,7 @@
 	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
 	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />
-			<hr/>
+			<p/>
    		</apex:outputPanel> 
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
@@ -63,7 +63,7 @@
 	       	</apex:panelGroup>
         </apex:panelGrid>	
 		<apex:outputPanel layout="block" style="text-align:center;" >
-			<hr/>
+			<p/>
 	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
 	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabLevels.cancelTab}" rendered="{!ctabLevels.isEditingTab}" immediate="true" rerender="frmLevels,tabPanel"  />

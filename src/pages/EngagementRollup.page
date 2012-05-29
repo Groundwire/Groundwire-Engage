@@ -22,9 +22,13 @@ ul.err li {
 			</apex:pageBlockButtons>
 			<apex:messages styleClass="err" />
 			<apex:outputText rendered="{!batching}">
-				Use this page to roll up Engagement Tracker levels, saving the results in
-				contact records. The process may take some time; you can
-				close this page and the process will continue in the background.
+				<p>Engagement Rollup is the recalculation of every contact's engagement level based on current donation, 
+				campaign and custom contact field information. The process may take some time; you can close this page 
+				and the process will continue in the background.</p>			
+			
+				<p><i>We strongly recommend that you avoid running Engagement Rollup until you have completely set up 
+				your engagement settings and have imported all of your data into Salesforce. This will ensure 
+				engagement metrics are calculated accurately.</i></p>
 			</apex:outputText>
 		</apex:pageBlock>
 		<apex:outputPanel rendered="{!batchRunning}">
