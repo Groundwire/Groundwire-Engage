@@ -28,6 +28,19 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Change_from_Last_Quarter__c</fullName>
+        <externalId>false</externalId>
+        <formula>Engagement_Level_Numeric__c -  Engagement_Level_Numeric_Last_Quarter__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Engagement Change from Last Quarter</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Engagement_Level_Numeric_After_Override__c</fullName>
         <externalId>false</externalId>
         <formula>MAX (  Engagement_Level_Override_Numeric__c ,  Engagement_Level_Numeric__c )</formula>
@@ -36,6 +49,19 @@
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Engagement_Level_Numeric_Last_Quarter__c</fullName>
+        <description>testing prototype of &quot;where are they now&quot; metric</description>
+        <externalId>false</externalId>
+        <label>Engagement Level Last Quarter</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
@@ -73,27 +99,27 @@
         <label>Engagement Level Override</label>
         <picklist>
             <picklistValues>
-                <fullName>1 - Follower</fullName>
+                <fullName>1 - Observing</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>2 - Bridge Supporter</fullName>
+                <fullName>2 - Following</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>3 - Core Supporter</fullName>
+                <fullName>3 - Endorsing</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>4 - Super-Supporter</fullName>
+                <fullName>4 - Contributing</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>5 - Organizer</fullName>
+                <fullName>5 - Owning</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>6 - Leader</fullName>
+                <fullName>6 - Leading</fullName>
                 <default>false</default>
             </picklistValues>
             <sorted>false</sorted>
@@ -101,6 +127,19 @@
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Engagement_Level_This_Quarter__c</fullName>
+        <description>testing &quot;where are they now&quot; report - level at start of current quarter</description>
+        <externalId>false</externalId>
+        <label>Engagement Level This Quarter</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
@@ -229,8 +268,8 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     <fields>
         <fullName>First_Action_Date_Curr_Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>The date of the first action for this contact at their current Engagement Level.   i.e. the date the contact first &quot;graduated&quot; to the this level of engagement.</inlineHelpText>
-        <label>First Action Date at Engagement Level</label>
+        <inlineHelpText>The date this contact moved into their current engagement level (whether up or down)</inlineHelpText>
+        <label>In Engagement Level Since</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
@@ -1118,6 +1157,8 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         <columns>ACCOUNT.NAME</columns>
         <columns>CONTACT.TITLE</columns>
         <columns>CONTACT.EMAIL</columns>
+        <columns>Engagement_Level_Numeric_Last_Quarter__c</columns>
+        <columns>Engagement_Level_This_Quarter__c</columns>
         <columns>Engagement_Level__c</columns>
         <columns>Engagement_Level_Numeric__c</columns>
         <columns>Engagement_Level_Override__c</columns>
