@@ -108,7 +108,7 @@ public with sharing class GW_CTRL_ETSettingsTabDonor {
 	public PageReference cancelTab() {
 		isEditingTab = false;
 		ctrlWizard.etSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabDonor');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabDonor' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}

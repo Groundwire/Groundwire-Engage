@@ -10,7 +10,12 @@ public with sharing class GW_CTRL_ETSettingsWizard {
         } else {
         	strCurrentTab = 'tabLevels';
         }
-		
+        str = params.get('sfdc.tabName');
+        if (str != null && str != '') {
+        	strSalesforceTabNameParam = '&sfdc.tabName=' + str;
+        } else {
+        	strSalesforceTabNameParam = '';
+        }		
 	}
 	
 	public boolean inEditMode {
@@ -27,6 +32,8 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		}
 		set;
 	}
+	
+	public string strSalesforceTabNameParam { get; set; }
 	
 	public string strCurrentEditTab {
 		get {

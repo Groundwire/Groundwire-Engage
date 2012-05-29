@@ -84,7 +84,7 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
 		isEditingTab = false;
 		listCampaignSettings = null;
 		ctrlWizard.etSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabCampaign');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabCampaign' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}

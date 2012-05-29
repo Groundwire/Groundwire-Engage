@@ -78,7 +78,7 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 	public PageReference cancelTab() {
 		isEditingTab = false;
 		listFreqSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabFrequency');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabFrequency' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}

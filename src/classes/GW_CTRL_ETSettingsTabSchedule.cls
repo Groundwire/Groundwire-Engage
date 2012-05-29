@@ -24,7 +24,7 @@ public with sharing class GW_CTRL_ETSettingsTabSchedule {
 	
 	public PageReference cancelTab() {
 		isEditingTab = false;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabSchedule');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabSchedule' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}

@@ -26,7 +26,7 @@ public with sharing class GW_CTRL_ETSettingsTabGeneral {
 	public PageReference cancelTab() {
 		isEditingTab = false;
 		ctrlWizard.etSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabGeneral');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabGeneral' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}

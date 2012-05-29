@@ -82,7 +82,7 @@ public with sharing class GW_CTRL_ETSettingsTabContact {
 	public PageReference cancelTab() {
 		isEditingTab = false;
 		listFieldSettings = null;
-		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabContact');
+		PageReference p = new PageReference('/apex/ETSettingsWizard?currentTab=tabContact' + ctrlWizard.strSalesforceTabNameParam);
 		p.setRedirect(true);
 		return p;
 	}
