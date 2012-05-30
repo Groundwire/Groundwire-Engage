@@ -14,7 +14,7 @@
 		width: 400px;
 	}
 	.cssPanelGridColumn2 {
-		width: 1000px;
+		width: 550px;
 		padding-left: 10px;
 	}
 	
@@ -36,8 +36,13 @@
 	}
 	
 	select:disabled {
-		color: #545454;
+		color: gray;
+		// transparent doesn't work on Chrome!  
+		// white doesn't work on Firefox!
+		background-color: white;
 		border-color: #CCC;
+		border-style: solid;
+		border-width: 1px;
 	}
 	
 	hr {
@@ -59,6 +64,10 @@
 		margin: 0 0px;
 		color: black;
 		font-size: 100%;
+	}
+	
+	.message {
+		width: 500px;
 	}
 	
 	.rich-tab-header {
