@@ -131,13 +131,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     protected void constructQuery() {
     	
     	// first ET fields
-        string querySOQL = 'SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,' +
-        			        'Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,';
+        string querySOQL = 'SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
+        			        'Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,Award_Engagement_Levels_for_Org_Giving__c,';
         querySOQL = addAllNSPrefixET(querySOQL,true,false);
         
         // then fields w/ same name in gwbase & NPSP
         string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,' +
-        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,' +
+        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,Account.Name,Account.OppAmountLastNDays__c,Account.LastCloseDate__c,' +
 	        					'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
         querySOQLmore = addAllNSPrefixET(querySOQLmore,false,true);
         querySOQL += ',' + querySOQLmore; 
@@ -221,7 +221,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             conMap.put (con.Id,con);
         }
         
-        //system.debug (Logginglevel.WARN,'conwrapper map before calcs: ' + conWrapMap);
+        system.debug (Logginglevel.WARN,'conwrapper map before calcs: ' + conWrapMap);
         
         // grab opp rollup data and store data on the contact wrapper object
         if (settings.Include_Opps__c || settings.Include_Membership__c) {
@@ -376,19 +376,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             // if including opps, calc levels based on donor rollup fields (assumes rollups are up to date)
             if (settings.Include_Opps__c) {
                 // first get settings for donor level tiers
-                
-                /* refactored
-                donorBreakpoints = new decimal[0];
-                donorLvlMap = new map<decimal,double>();  
-                List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
-                if (donorLvlDefs.size() > 0) {
-                    for (Engagement_Donor_Level_Settings__c s : donorLvlDefs ) {
-                        donorBreakpoints.add (s.Lower_Limit__c);
-                        donorLvlMap.put (s.Lower_Limit__c,s.Level__c);
-                    }
-                    donorBreakpoints.sort();
-                */
-                
                 fetchDonorBreakpoints();
                 if (donorBreakpoints.size() > 0) {
                     //system.debug(Logginglevel.WARN, 'donorBreakpoints: ' + donorBreakpoints);
@@ -407,6 +394,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     } else {
                     	bestYrTotal = cw.Best_Gift_Year_Total_c;
                     	lastCloseDate = cw.LastCloseDate_c;
+                    }
+                    
+                    // if indicated, give credit for org's gifts too
+                    if (con.Award_Engagement_Levels_for_Org_Giving__c == true) {
+                    	Account acct = con.Account;
+                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
+                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
+                    	recentGiftTtl += acctGiftTtl;
+                    	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
                     }		
                     
                     double lvlRecent; 
@@ -1103,7 +1099,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         string txtfield1FV = 'Board Member';
         setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl);  
         
-        integer howMany = 24;
+        integer howMany = 25;
         Date datClose = System.Today();
         string GiftRectype = ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS;
         string MbrRectype = ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS;
@@ -1118,29 +1114,32 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         map<integer,string> lvlNameMapTest = new map<integer,string>();
         
-        /* refactored
-        List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
-        donorBreakpoints = new decimal[0];
-        donorLvlMap = new map<decimal,double>();          
-        for (Engagement_Donor_Level_Settings__c s : donorLvlDefs ) {
-            donorBreakpoints.add (s.Lower_Limit__c);
-            donorLvlMap.put (s.Lower_Limit__c,s.Level__c);
-        }
-        donorBreakpoints.sort();
-        */
         fetchDonorBreakpoints();
         integer DONORLVL1 = donorLvlMap.get(donorBreakpoints[0]).intvalue(); 
         integer DONORLVL2 = donorLvlMap.get(donorBreakpoints[1]).intvalue(); 
-                    
+		
+		// create one account, and spoof some donations this yr
+		Account ac1 = new Account(Name='Doppleganger and Sons');
+		ac1.put( addNSPrefixET('OppAmountLastNDays__c',false,true) , donorBreakpoints[1] - 5);
+		ac1.put( addNSPrefixET('LastCloseDate__c',false,true) , startDateRecent);
+		insert ac1;
+		string ac1Id = ac1.Id;
+		string fieldlist = addAllNSPrefixET('Id,Name,LastCloseDate__c,OppAmountLastNDays__c' , false, true);
+		string soql = 'SELECT ' + fieldlist + ' FROM Account WHERE Id=:ac1Id LIMIT 1';
+		Sobject[] ac1p = database.query(soql);
+		system.debug(LOGGINGLEVEL.Warn,'ac1p: ' + ac1p);
+		                    
         // create & insert contact(s)
         Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(howMany);
         
         TestCons[5].Title = 'Board Member'; 
         TestCons[21].Email = 'test@test.com';   // this should give lvl 1
+        TestCons[24].AccountId = ac1.Id;		// put one con in the account, and flag to inherit account's gifts
+        TestCons[24].Award_Engagement_Levels_for_Org_Giving__c = true;
         insert TestCons;
 
-		// have to update some field after insert in order to spoof existing history of engagement changes
-		// in order to get around trigger the blanks these out on insert (to avoid probs w/ cloning contacts)
+		// have to update some fields after insert in order to spoof existing history of engagement changes
+		// in order to get around trigger that blanks these out on insert (to avoid probs w/ cloning contacts)
         TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
@@ -1491,6 +1490,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             Contact con23P = conP.get(TestCons[23].Id);
             System.AssertEquals(3,con23P.Engagement_Level_Numeric__c);       
             System.AssertEquals(3,con23P.Engagement_Peak_Numeric__c);
+
+            // inherits level from account opps!
+            Contact con24P = conP.get(TestCons[24].Id);
+            System.AssertEquals(DONORLVL1,con24P.Engagement_Level_Numeric__c);       
+            System.AssertEquals(DONORLVL1,con24P.Engagement_Peak_Numeric__c);
 
         }
 

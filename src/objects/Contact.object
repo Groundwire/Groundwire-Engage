@@ -2,6 +2,16 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableFeeds>true</enableFeeds>
     <fields>
+        <fullName>Award_Engagement_Levels_for_Org_Giving__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Check this box if this contact should receive engagement &quot;credit&quot; for gifts made by their organizations.  Generally this is used for owners of small businesses who give via their business.</inlineHelpText>
+        <label>Award Engagement Levels for Org&apos;s Giving</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Days_Since_First_Action_at_Level__c</fullName>
         <externalId>false</externalId>
         <formula>TODAY() -  First_Action_Date_Curr_Level__c</formula>
