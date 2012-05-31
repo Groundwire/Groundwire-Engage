@@ -1016,6 +1016,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         ONEN_UnitTestData.DeleteListCustomSettingRecs ('EngagementContactFieldSettings__c');
         ONEN_UnitTestData.DeleteListCustomSettingRecs ('EngagementFrequencySettings__c');
         ONEN_UnitTestData.DeleteListCustomSettingRecs ('Engagement_Donor_Level_Settings__c');
+        ONEN_UnitTestData.DeleteListCustomSettingRecs ('EngagementCampaignSettings__c');        
         
         // now add list settings back in
             // first fields
@@ -1065,6 +1066,19 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         );
         Engagement_Donor_Level_Settings__c[] dsets = new Engagement_Donor_Level_Settings__c[] {dset1,dset2,dset3};
         insert dsets;
+        
+        // next Campaign defaults
+        EngagementCampaignSettings__c cs1 = new EngagementCampaignSettings__c (
+        	Name = 'cs1',
+        	Campaign_Type__c = 'CampaignType1',
+        	Engagement_Level__c = 1
+        );
+        EngagementCampaignSettings__c cs2 = new EngagementCampaignSettings__c (
+        	Name = 'cs2',
+        	Campaign_Type__c = 'CampaignType2',
+        	Engagement_Level__c = 2
+        );
+        insert new EngagementCampaignSettings__c[] {cs1, cs2};        
         
         INCOPPS = settings.Include_Opps__c;
         INCMBR = settings.Include_Membership__c;
@@ -1620,6 +1634,42 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.assertEquals (false, oppPmap.get(con8oppId).Engagement_Conversion__c);
         
         
+    }
+    
+
+    public static testMethod void testCampaignDefaults() { 
+
+        // this test relies on the GW_CampaignTriggerBefore trigger
+        string txtfield1 = 'Title';
+        double txtfield1lvl = 6;
+        string txtfield1FV = 'Board Member';
+        setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl); 
+        
+		Campaign cmp1 = new Campaign (
+		    Name = 'Campaign 1',
+		    Type = 'CampaignType1'
+		);
+		Campaign cmp2 = new Campaign (
+		    Name = 'Campaign 2',
+		    Type = 'CampaignType2'
+		);
+		Campaign cmp3 = new Campaign (
+		    Name = 'Campaign 3',
+		    Type = 'CampaignType3'
+		);
+		Campaign cmp4 = new Campaign (
+		    Name = 'Campaign 4'
+		);
+		list<Campaign> listCmp = new list<Campaign>{cmp1, cmp2, cmp3, cmp4};
+        insert listCmp;
+        
+        listCmp = [select Id, Engagement_Level_Numeric__c from Campaign where Id in :listCmp order by Name];
+        system.assert(listCmp.size() == 4);
+        system.assertEquals(1, listCmp[0].Engagement_Level_Numeric__c);
+        system.assertEquals(2, listCmp[1].Engagement_Level_Numeric__c);
+        system.assertEquals(null, listCmp[2].Engagement_Level_Numeric__c);
+        system.assertEquals(null, listCmp[3].Engagement_Level_Numeric__c);
+                 
     }
     
     private static date DateFromDatetime (datetime dt) {
