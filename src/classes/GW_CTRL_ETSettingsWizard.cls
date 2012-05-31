@@ -254,7 +254,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 				
 				if (GW_BATCH_EngagementRollup.IsGWBaseInstalled) {
 					Map<String, Schema.SObjectField> M = Schema.SObjectType.Account.fields.getMap();									
-					Schema.DescribeFieldResult F = M.get('GWBase__Campaign_Sub_Type__c').getDescribe();
+					Schema.DescribeFieldResult F = M.get(GW_BATCH_EngagementRollup.addNSPrefixET('Campaign_Sub_Type__c', false, false)).getDescribe();
 					for (Schema.PicklistEntry pe : F.getPicklistValues()) {
 						listSO.add(new SelectOption(pe.Value, pe.Label));
 					}
