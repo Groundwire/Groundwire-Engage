@@ -7,7 +7,7 @@
     <fields>
         <fullName>Field_Type__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>only &quot;checkbox&quot; or &quot;text&quot; is supported.  &quot;text&quot; handles picklists, email, address, etc.</inlineHelpText>
+        <inlineHelpText>The datatype of the Contact field.  Only &quot;checkbox&quot; or &quot;text&quot; is supported.  &quot;text&quot; handles picklists, email, address, etc.</inlineHelpText>
         <label>Field Type</label>
         <length>50</length>
         <required>false</required>
@@ -17,7 +17,7 @@
     <fields>
         <fullName>Field_Value__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>for non-checkbox, fields the value that the field must have to qualify.  Note, enter an asterisk (*) to require any non-empty value</inlineHelpText>
+        <inlineHelpText>For non-checkbox fields, the value that the field must have to qualify for the level.  Enter an asterisk (*) to match any non-empty value.</inlineHelpText>
         <label>Field Value</label>
         <length>255</length>
         <required>false</required>
@@ -27,6 +27,7 @@
     <fields>
         <fullName>Fieldname__c</fullName>
         <externalId>false</externalId>
+        <inlineHelpText>The name of a Contact field you want to base an engagement level on.</inlineHelpText>
         <label>Fieldname</label>
         <length>150</length>
         <required>true</required>
@@ -36,8 +37,8 @@
     <fields>
         <fullName>Level_Value__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>the level earned by this field - for checkboxes, the level earned if it&apos;s checked</inlineHelpText>
-        <label>Level Value</label>
+        <inlineHelpText>The Engagement Level earned by this field.  For checkboxes, the level is earned if it&apos;s checked.</inlineHelpText>
+        <label>Engagement Level</label>
         <precision>2</precision>
         <required>true</required>
         <scale>0</scale>

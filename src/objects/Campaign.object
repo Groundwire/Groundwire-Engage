@@ -2,6 +2,19 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Engagement_Conversions__c</fullName>
+        <externalId>false</externalId>
+        <label>Engagement Conversions</label>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_Conversion__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </summaryFilterItems>
+        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
         <fullName>Engagement_Level_Numeric__c</fullName>
         <externalId>false</externalId>
         <formula>VALUE(LEFT(TEXT( Leadership_Level__c ),1))</formula>
@@ -48,13 +61,18 @@
         <type>Picklist</type>
     </fields>
     <fields>
-        <fullName>Number_of_Engagement_Conversions__c</fullName>
+        <fullName>New_Engagement_Conversions__c</fullName>
         <externalId>false</externalId>
-        <label>Number of Engagement Conversions</label>
+        <label>New Engagement Conversions</label>
         <summaryFilterItems>
             <field>CampaignMember.Engagement_Conversion__c</field>
             <operation>equals</operation>
             <value>True</value>
+        </summaryFilterItems>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_Conversion_Type__c</field>
+            <operation>equals</operation>
+            <value>New</value>
         </summaryFilterItems>
         <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
@@ -69,6 +87,58 @@
         <scale>0</scale>
         <type>Number</type>
         <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Response_Conversion_Percentage__c</fullName>
+        <externalId>false</externalId>
+        <formula>Engagement_Conversions__c /  NumberOfResponses</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Among responses, what percentage of them were engagement conversions (i.e. participation in this campaign meant the participant moved up in engagement level)</inlineHelpText>
+        <label>Response Conversion Percentage</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Percent</type>
+    </fields>
+    <fields>
+        <fullName>Response_Rate__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF ( (NumberOfContacts +  NumberOfLeads ) &gt; 0 ,  NumberOfResponses /  (NumberOfContacts +  NumberOfLeads ) , 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Response Rate</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>1</scale>
+        <type>Percent</type>
+    </fields>
+    <fields>
+        <fullName>Response_Rate_for_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF ( ( HierarchyNumberOfContacts + HierarchyNumberOfLeads ) &gt; 0 , HierarchyNumberOfResponses / (HierarchyNumberOfContacts + HierarchyNumberOfLeads ) , 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Response Rate for Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>1</scale>
+        <type>Percent</type>
+    </fields>
+    <fields>
+        <fullName>Returning_Engagement_Conversions__c</fullName>
+        <externalId>false</externalId>
+        <label>Returning Engagement Conversions</label>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_Conversion__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </summaryFilterItems>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_Conversion_Type__c</field>
+            <operation>equals</operation>
+            <value>Returning</value>
+        </summaryFilterItems>
+        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <type>Summary</type>
     </fields>
     <fields>
         <fullName>Status</fullName>
@@ -166,6 +236,11 @@
     </fields>
     <listViews>
         <fullName>AllActiveCampaigns</fullName>
+        <columns>CAMPAIGN.NAME</columns>
+        <columns>CAMPAIGN.START_DATE</columns>
+        <columns>CAMPAIGN.CAMPAIGN_TYPE</columns>
+        <columns>CAMPAIGN.STATUS</columns>
+        <columns>Leadership_Level__c</columns>
         <filterScope>Everything</filterScope>
         <filters>
             <field>CAMPAIGN.ACTIVE</field>

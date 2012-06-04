@@ -6,6 +6,36 @@
     <enableEnhancedLookup>false</enableEnhancedLookup>
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Campaign_Record_Type__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The Record Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <label>Campaign Record Type</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Campaign_Sub_Type__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The Sub Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <label>Campaign Sub Type</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Campaign_Type__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <label>Campaign Type</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Field_Value_1__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>if this and Fieldname 1 are populated, requires that all actions for this rule have the specified value in specified field.  For checkboxes, enter &quot;True&quot; for checked.</inlineHelpText>
@@ -39,7 +69,8 @@
     <fields>
         <fullName>Level_To_Assign__c</fullName>
         <externalId>false</externalId>
-        <label>Level To Assign</label>
+        <inlineHelpText>The Engagement Level to set.</inlineHelpText>
+        <label>Engagement Level</label>
         <precision>2</precision>
         <required>true</required>
         <scale>0</scale>

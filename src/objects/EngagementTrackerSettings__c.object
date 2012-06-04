@@ -8,6 +8,7 @@
         <fullName>Batch_Size__c</fullName>
         <defaultValue>50</defaultValue>
         <externalId>false</externalId>
+        <inlineHelpText>The number of records processed per batch. Defaults to 50. The default should only be lowered if custom code is causing malfunctioning in the batch processing.</inlineHelpText>
         <label>Batch Size</label>
         <precision>3</precision>
         <required>true</required>
@@ -16,9 +17,18 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Householded_Donor_Levels__c</fullName>
+        <defaultValue>true</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>If checked, assigns engagement levels to everyone in the household based on the total donations from the household.</inlineHelpText>
+        <label>Householded Donor Levels</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Include_Membership__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
+        <inlineHelpText>Specifies whether the Contact&apos;s membership should count toward engagement level. Current members are given an engagement level based on New Member Level and Renewing Member Level settings below.</inlineHelpText>
         <label>Include Membership</label>
         <type>Checkbox</type>
     </fields>
@@ -26,8 +36,8 @@
         <fullName>Include_Opps__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
-        <inlineHelpText>if checked, will consider opportunities as part of engagement rating</inlineHelpText>
-        <label>Include Opps</label>
+        <inlineHelpText>If checked, will consider Donation history as part of engagement rating.</inlineHelpText>
+        <label>Include Donations</label>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -106,7 +116,7 @@
         <fullName>Levels_Don_t_Require_Responded__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>If any apply, enter as numbers separated by semi-colons,  (Most of the time, campaign mbrship will only count toward level if the mbrship is flagged as Responded.  However, for some (receiving newsletter) etc we want it to count even if not responded.)</inlineHelpText>
-        <label>Levels Don&apos;t Require Responded</label>
+        <label>Levels That Don&apos;t Require Responded</label>
         <length>50</length>
         <required>false</required>
         <type>Text</type>
@@ -115,8 +125,8 @@
     <fields>
         <fullName>New_Member_Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>level assigned to new members</inlineHelpText>
-        <label>New Member Level</label>
+        <inlineHelpText>Level to assign to active members with a Last Membership Origin of New, if Membership is checked.</inlineHelpText>
+        <label>New Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
         <scale>0</scale>
@@ -127,7 +137,7 @@
         <fullName>Opp_Rectype_For_Tests_Default__c</fullName>
         <defaultValue>&quot;Donation&quot;</defaultValue>
         <externalId>false</externalId>
-        <inlineHelpText>The default Opportunity Record Type for Apex tests.</inlineHelpText>
+        <inlineHelpText>The default Opportunity Record Type for donations to be used in unit tests.</inlineHelpText>
         <label>Opp Rectype For Tests Default</label>
         <length>255</length>
         <required>true</required>
@@ -138,7 +148,7 @@
         <fullName>Opp_Rectype_For_Tests_Member__c</fullName>
         <defaultValue>&quot;Membership&quot;</defaultValue>
         <externalId>false</externalId>
-        <inlineHelpText>Opportunity Record Type for tests that involve membership.</inlineHelpText>
+        <inlineHelpText>Opportunity Record Type for membership to be used in unit tests.</inlineHelpText>
         <label>Opp Rectype For Tests Member</label>
         <length>255</length>
         <required>true</required>
@@ -147,9 +157,10 @@
     </fields>
     <fields>
         <fullName>Override_Default_Duration__c</fullName>
+        <defaultValue>12</defaultValue>
         <externalId>false</externalId>
-        <inlineHelpText>in months</inlineHelpText>
-        <label>Override Default Duration</label>
+        <inlineHelpText>Default duration in Months that the Engagement level is overridden when the Contact&apos;s Engagement Level Override field is set.</inlineHelpText>
+        <label>Contact Override Default Time (Months)</label>
         <precision>2</precision>
         <required>false</required>
         <scale>0</scale>
@@ -159,8 +170,8 @@
     <fields>
         <fullName>Renewing_Member_Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>Level assigned to renewing or returning members</inlineHelpText>
-        <label>Renewing Member Level</label>
+        <inlineHelpText>Level to assign to active members with Last Membership Origin of Renewal, if Membership is checked.</inlineHelpText>
+        <label>Renewing Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
         <scale>0</scale>
@@ -180,7 +191,7 @@
         <defaultValue>18</defaultValue>
         <externalId>false</externalId>
         <inlineHelpText>number of months to go back for moderately-recent activity</inlineHelpText>
-        <label>Timeframe Medium</label>
+        <label>DEPRECATED Timeframe Medium</label>
         <precision>3</precision>
         <required>true</required>
         <scale>0</scale>
@@ -191,8 +202,8 @@
         <fullName>Timeframe_Recent__c</fullName>
         <defaultValue>12</defaultValue>
         <externalId>false</externalId>
-        <inlineHelpText>number of months to go back for recent activity</inlineHelpText>
-        <label>Timeframe Recent</label>
+        <inlineHelpText>The length of time in months that Campaign actions earn an Engagement Level.</inlineHelpText>
+        <label>Engagement Timeframe (Months)</label>
         <precision>3</precision>
         <required>true</required>
         <scale>0</scale>
