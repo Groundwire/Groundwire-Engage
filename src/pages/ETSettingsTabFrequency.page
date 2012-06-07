@@ -13,38 +13,38 @@
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsFrequency" >
 					<apex:pageBlockTable value="{!ctabFrequency.listFreqSettings}" var="fs" >
+						<apex:column >
+							<apex:facet name="header">When Campaign<br/>Engagement Level is</apex:facet>
+					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
+					    		<apex:selectOptions value="{!listSOLevels}" />
+					    	</apex:selectList>							
+					    </apex:column>																		
 						
 						<apex:column rendered="{!hasCampaignRecordTypes}" >
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label}</apex:facet>
+							<apex:facet name="header">and Campaign<br/>Record Type is</apex:facet>
 					    	<apex:selectList value="{!fs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignRecordTypes}" />
 					    	</apex:selectList>							
 					    </apex:column>												
 						<apex:column >
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</apex:facet>
+							<apex:facet name="header">and Campaign<br/>Type is</apex:facet>
 					    	<apex:selectList value="{!fs.Campaign_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignTypes}" />
 					    	</apex:selectList>							
 						</apex:column>						
 						<apex:column rendered="{!IsGWBaseInstalled}" > 
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label}</apex:facet>
+							<apex:facet name="header">and Campaign<br/>Sub-Type is</apex:facet>
 					    	<apex:selectList value="{!fs.Campaign_Sub_Type__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOCampaignSubTypes}" />
 					    	</apex:selectList>							
 						</apex:column>						
 						<apex:column >
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</apex:facet>
-					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
-					    		<apex:selectOptions value="{!listSOLevels}" />
-					    	</apex:selectList>							
-					    </apex:column>																		
-						<apex:column >
-							<apex:facet name="header"><div style="width:80px;white-space:normal;">{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</div></apex:facet>
+							<apex:facet name="header"><div style="width:80px;white-space:normal;">and Contact Participates<br/>___ Times</div></apex:facet>
 				      		<apex:inputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!ctabFrequency.isEditingTab}" styleClass="cssTbx" required="false" />
 				      		<apex:outputField value="{!fs.Number_of_Actions_Required__c}" rendered="{!NOT(ctabFrequency.isEditingTab)}" />							
 						</apex:column>
 						<apex:column >
-							<apex:facet name="header">{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</apex:facet>
+							<apex:facet name="header">Set Contact's <br/>Engagement Level to</apex:facet>
 					    	<apex:selectList value="{!fs.Level_To_Assign__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
 					    		<apex:selectOptions value="{!listSOLevels}" />
 					    	</apex:selectList>							
@@ -55,6 +55,7 @@
 	       	<apex:panelGroup >
 	       		<apex:pageMessage severity="info" strength="1" title="{!$ObjectType.EngagementFrequencySettings__c.Label}" escape="false"
 	       			summary="<p>Specify an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level.</p>
+	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
 	       				{!IF(hasCampaignRecordTypes, 
 	       					'<p><b>' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label + '</b> - ' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText + '</p>'
 	       					, '')}	       					
@@ -63,7 +64,6 @@
 	       					'<p><b>' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label + '</b> - ' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText + '</p>'
 	       					, '')}	       					
 	       			
-	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
 	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
 	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
 	       					" />

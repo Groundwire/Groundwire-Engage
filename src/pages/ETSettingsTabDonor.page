@@ -41,8 +41,8 @@
 	       		<apex:pageMessage severity="info" strength="1" title="Donation Settings" escape="false"
 	       			summary="<p><b>Calculate Engagement Levels based on Donations</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
 	       					<p><b>Calculate Engagement Levels based on Household Donation Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
-	       					<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.InlineHelpText}</p>
 	       					<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.InlineHelpText}</p>
+	       					<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.InlineHelpText}</p>
 	       					" />
 	       	</apex:panelGroup>
         </apex:panelGrid>	
