@@ -33,11 +33,18 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     private integer NewMbrLvl;
     private integer RetMbrLvl;
     
+    // these fieldlists are static so that static methods called from triggers can access them
+    // all of these fields will be blanked out on insert (clone)
+    static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
+									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
+									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,';
+	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,'; 								    
+    
     // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
     set<id> oppRollupRectypesExcluded = new set<id>();
     set<string> oppRollupTypesExcluded = new set<string>(); 
     
-    // these are a static vars so they can be accessed by the tests before instantiating the class
+    // these are static vars so they can be accessed by the tests before instantiating the class
     static decimal[] donorBreakpoints;
     static map<decimal,double> donorLvlMap;  
     
@@ -89,7 +96,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             		//throw(new MyException('Engagement Tracker requires Engagement Tracker Settings to have been created.  Please create these custom settings.'));
             		settings = new EngagementTrackerSettings__c();
             		// set values code assumes exist
-                    settings.Timeframe_Medium__c = 18;
+                    // deprecated: settings.Timeframe_Medium__c = 18;
                     settings.Timeframe_Recent__c = 12;
            		}            
             }
@@ -131,8 +138,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     protected void constructQuery() {
     	
     	// first ET fields
-        string querySOQL = 'SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
-        			        'Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,Award_Engagement_Levels_for_Org_Giving__c,';
+        string querySOQL = 'SELECT Id,Name,Award_Engagement_Levels_for_Org_Giving__c,' + CON_FIELDS_ET_EDITABLE + CON_FIELDS_ET_READONLY;
         querySOQL = addAllNSPrefixET(querySOQL,true,false);
         
         // then fields w/ same name in gwbase & NPSP
@@ -896,6 +902,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	}
 	
 	
+	public static void BlankETConFields (list<Contact> cons) {
+		// called from before insert trigger
+		// blank out all ET fields on contact on insert
+		// this is done to prevent problems when contact is cloned, since some fields are semi-persistent
+		// e.g. peak level won't drop once it's set
+		// and as long as we're nulling some it's less confusing for user if we null them all
+		string fieldList = addAllNSPrefixET(CON_FIELDS_ET_EDITABLE,true,false);
+		string[] fieldnames = fieldList.split(',');
+		for (Contact con : cons) {
+			for (string fieldname : fieldnames) {
+				con.put(fieldname , null);
+			}
+		}
+	}
+	
 	
     /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
@@ -1391,7 +1412,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         }
         
         // query for all the cons we started with
-        map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
+        map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
 			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c
             FROM Contact WHERE Id IN :ConIDs]);
@@ -1633,7 +1654,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Id con8oppId = recentSmallOpps[2].Id; 		// first in, first out
         system.assertEquals (false, oppPmap.get(con8oppId).Engagement_Conversion__c);
         
-        
+        // finally test that engagement fields are blanked out on clone
+        Contact cloneCon = con0P.clone(false,true);	// deep clone not including ID
+        insert CloneCon;
+        Contact cloneConP = [SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
+            Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
+			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c
+            FROM Contact WHERE Id = :cloneCon.Id LIMIT 1];
+        system.assertEquals (null,CloneConP.Engagement_Peak__c);
+        system.assertEquals (null,CloneConP.Engagement_Level__c);
+        system.assertEquals (null,CloneConP.Last_Engagement_Lvl_Chg_Datestamp__c);
+        system.assertEquals (null,CloneConP.First_Action_Date_Curr_Level__c);
     }
     
 
