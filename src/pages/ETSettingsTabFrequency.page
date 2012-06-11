@@ -3,6 +3,12 @@
 	<apex:form >
 	<apex:outputPanel id="frmFrequency" >	
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Repeated Actions</div>
+   			<div class="cssTabSubTitle">Specify an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;

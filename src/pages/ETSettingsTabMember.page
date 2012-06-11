@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmMember" >	
 	<apex:form >
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Membership Settings</div>
+   			<div class="cssTabSubTitle">rules for assigning engagement levels based off memberships</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;

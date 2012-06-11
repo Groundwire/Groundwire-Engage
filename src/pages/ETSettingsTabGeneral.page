@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmGeneral" >	
 	<apex:form >
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >General Settings</div>
+   			<div class="cssTabSubTitle">various settings that effect Engagement Level calculations</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" action="{!ctabGeneral.editTab}" rendered="{!NOT(ctabGeneral.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabGeneral.saveTab}" rendered="{!ctabGeneral.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;

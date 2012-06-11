@@ -3,18 +3,18 @@
 	<apex:outputPanel id="frmCampaign" >	
 	<apex:form >
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Campaign Defaults</div>
+   			<div class="cssTabSubTitle">default engagement levels for campaign types, passive engagement levels</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 			<!-- <apex:outputLabel value="{!$ObjectType.EngagementCampaignSettings__c.Label}" styleClass="cssTabTitle" />  -->
 	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
 	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
 			<p/>
-   		</apex:outputPanel>
-   		<apex:outputPanel layout="block" style="margin-left:22px">
-   			<h2 style="font-size:17px">Campaign Defaults</h2>
-   			<br/>
-   			<div style="font-size:14px">default engagement levels for campaign types, passive engagement levels</div>
-   			<br/><br/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >

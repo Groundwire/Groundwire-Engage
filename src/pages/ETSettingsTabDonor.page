@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmDonor" >	
 	<apex:form >
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Donation Settings</div>
+   			<div class="cssTabSubTitle">rules for assigning engagement levels based off donations</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" action="{!ctabDonor.editTab}" rendered="{!NOT(ctabDonor.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabDonor.saveTab}" rendered="{!ctabDonor.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;

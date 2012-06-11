@@ -3,6 +3,12 @@
 	<apex:outputPanel id="frmContact" >	
 	<apex:form >
   		<apex:pageMessages />	
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Contact Field Settings</div>
+   			<div class="cssTabSubTitle">assign an Engagement Level to a contact based on the value of a field on a Contact record</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" action="{!ctabContact.editTab}" rendered="{!NOT(ctabContact.isEditingTab)}" immediate="true" rerender="pbWizard" />
 	       	<apex:commandButton value="Save" action="{!ctabContact.saveTab}" rendered="{!ctabContact.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;

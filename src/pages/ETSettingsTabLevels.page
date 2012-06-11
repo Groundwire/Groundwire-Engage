@@ -3,6 +3,12 @@
 <apex:outputPanel id="frmLevels" >
 	<apex:form >
   		<apex:pageMessages />
+   		<apex:outputPanel layout="block" >
+   			<br/>
+   			<div class="cssTabTitle" >Level Settings</div>
+   			<div class="cssTabSubTitle">specify the name of your engagement levels</div>
+   			<br/>
+   		</apex:outputPanel>
 		<apex:outputPanel layout="block" style="text-align:center;" >
 	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabLevels.editTab}" rendered="{!NOT(ctabLevels.isEditingTab)}" immediate="true" rerender="frmLevels,tabPanel" />
 	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabLevels.saveTab}" rendered="{!ctabLevels.isEditingTab}" immediate="false" rerender="frmLevels,tabPanel" />&nbsp;&nbsp;

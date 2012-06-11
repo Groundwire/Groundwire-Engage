@@ -75,9 +75,14 @@
 	}
 	
 	.cssTabTitle {
-		font-size: 150%;
-		position: absolute;
-		left: 10px;		
+		margin-left: 16px;
+		font-size: 140%;
+		font-weight: bold;
+	}
+	
+	.cssTabSubTitle {
+		margin-left: 16px;
+		font-size: 100%;
 	}
 	
 </style>
