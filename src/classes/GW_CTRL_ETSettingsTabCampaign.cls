@@ -20,7 +20,7 @@ public with sharing class GW_CTRL_ETSettingsTabCampaign {
     }	
 
 	public PageReference AddEmptyRows() {
-		for (integer i = 0; i < 5; i++) {
+		for (integer i = 0; i < GW_CTRL_ETSettingsWizard.cEmptyRows; i++) { 
 			listCampaignSettings.add(new EngagementCampaignSettings__c());
 		}
 		return null;

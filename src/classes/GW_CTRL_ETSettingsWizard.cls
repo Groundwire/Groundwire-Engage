@@ -273,8 +273,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 			return (GW_BATCH_EngagementRollup.IsGWBaseInstalled);
 		}
 	}
-	
-	
+		
 	public boolean isnullStr(string str) {
 		return (str == null || str == '');
 	}
@@ -282,6 +281,8 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 	public boolean isnullNum(decimal num) {
 		return (num == null || num == 0);
 	}
+	
+	public static integer cEmptyRows = 3;
 	
 	//---------------------------------------- TEST CODE -------------------------------------------------
 	static testmethod void TestWizard() {
