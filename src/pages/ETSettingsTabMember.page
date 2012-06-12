@@ -3,16 +3,24 @@
 	<apex:outputPanel id="frmMember" >	
 	<apex:form >
   		<apex:pageMessages />	
-   		<apex:outputPanel layout="block" >
+   		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Membership Settings</div>
    			<div class="cssTabSubTitle">rules for assigning engagement levels based off memberships</div>
+			<a class="cssTabHelpLink" id="linkHelpMember" onclick="document.getElementById('linkHelpMember').hide();
+				document.getElementById('divHelpMember').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+	   		<div id="divHelpMember" class="cssHelpText" style="display:none" >
+				<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
+				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpMember').hide();document.getElementById('linkHelpMember').show();"><br/>Hide</a>  
+	  		</div>
    			<br/>
    		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="text-align:center;" >
-	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" rerender="pbWizard" />
 			<p/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
@@ -34,19 +42,12 @@
 	        		</apex:pageBlockSectionItem>        			
 	        	</apex:pageBlockSection>	        	         	        	        
 	       	</apex:panelGroup> 
-	       	<apex:panelGroup >
-	       		<apex:pageMessage severity="info" strength="1" title="Membership Settings" escape="false"
-	       			summary="<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
-	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
-	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
-	       					" />
-	       	</apex:panelGroup>
         </apex:panelGrid>	
-		<apex:outputPanel layout="block" style="text-align:center;" >
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
 			<p/>
-	       	<apex:commandButton value="Edit" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" />
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabMember.editTab}" rendered="{!NOT(ctabMember.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabMember.saveTab}" rendered="{!ctabMember.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" rerender="pbWizard" />
    		</apex:outputPanel>
 	</apex:form>
 	</apex:outputPanel> 

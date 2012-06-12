@@ -1,5 +1,7 @@
 <apex:page controller="GW_CTRL_ETSettingsWizard" title="Engagement Settings">
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
 <style>
 
 	.pbBody .cssGrayText {
@@ -75,34 +77,68 @@
 	}
 	
 	.cssTabTitle {
-		margin-left: 16px;
 		font-size: 140%;
 		font-weight: bold;
 	}
 	
 	.cssTabSubTitle {
-		margin-left: 16px;
 		font-size: 100%;
 	}
+
+	.cssTabHelpLink {
+		font-size: 90%;
+		text-decoration: underline;
+		vertical-align: top;
+	}
 	
+	.cssHelpText {
+	}
+	
+	.cssTabInfo {	
+		margin-left: 16px;
+		width: 700px;
+	}
+	
+	.cssTabButtons {
+		margin-left: 200px;
+	}
+	
+	.cssDelLink {
+		text-decoration: underline;
+	}
+		
 </style>
 
+<script type="text/javascript">
+    var j$ = jQuery.noConflict();
+    
+	// utility to support the delete link on datatable rows.
+	// clears out all select and input HTML elements in the row.
+	function DelOnClick(ctrl) {
+		if (ctrl == null) return;
+
+		// clear all select lists.
+		j$(ctrl).parent().parent().find('select').each(function(index, elem) {
+			j$(elem).val('');
+		});
+
+		// clear all text boxes.
+		j$(ctrl).parent().parent().find('input').each(function(index, elem) {
+			j$(elem).val('');
+		});
+	}
+    
+</script>
 
     <apex:sectionHeader title="Engagement Tracker Settings" />    
   	<apex:pageBlock mode="maindetail" id="pbWizard" >
-  	
-		<!-- <apex:actionStatus id="statusLoad" onstart="j$('.loading').fadeIn();" onstop="j$('.loading').fadeOut();" /> -->
 		<apex:actionStatus id="statusLoad" onstart="document.getElementById('divLoading').show();" onstop="document.getElementById('divLoading').hide();" />
-		<div class="loading clsLoading" id="divLoading" >
+		<div class="loading clsLoading" id="divLoading" style="display:none" >
 		  <p style="vertical-align: middle;" >
 			<img src="/img/loading.gif" alt="Processing..." width="16" height="16" title="Processing..." style="vertical-align: middle;"/>
 			<span class="loadingText" style="vertical-align: middle;" >Processing...</span>
 		  </p>
 		</div>        				            					            
-
-<script>
-	document.getElementById('divLoading').hide();
-</script>
   	
 	    <apex:tabPanel switchType="client" value="{!strCurrentTab}" id="tabPanel" disabledTabClass="cssGrayText" >
 	    

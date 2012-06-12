@@ -3,7 +3,7 @@
 	<apex:outputPanel id="frmSchedule" >	
 	<apex:form >
   		<apex:pageMessages />	
-   		<apex:outputPanel layout="block" >
+   		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Scheduling Engagement Rollup</div>
    			<div class="cssTabSubTitle"><p>Engagement Rollup is the recalculation of every contact's engagement level based on current donation, 
@@ -13,7 +13,7 @@
 		       				<a  href='/08e?setupid=ScheduledJobs'>Scheduled Jobs page</a> to view all scheduled jobs.</p></div>
    			<br/>
    		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="margin-left:auto;margin-right:auto;width:50%" > 
+		<apex:outputPanel layout="block" styleClass="cssTabInfo" > 
 	        <apex:panelGrid columns="1">
 	        	<apex:panelGroup >
 		       	</apex:panelGroup> 
@@ -28,9 +28,9 @@
 		       	</apex:panelGroup>
 	        </apex:panelGrid>	
    		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="text-align:center;" >
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
 			<p/>
-	       	<apex:commandButton value="Schedule" action="{!ctabSchedule.ScheduleIt}" immediate="false" rerender="pbWizard" />
+	       	<apex:commandButton value="Schedule" status="statusLoad" action="{!ctabSchedule.ScheduleIt}" immediate="true" rerender="pbWizard" />
    		</apex:outputPanel>
 	</apex:form>
 	</apex:outputPanel> 

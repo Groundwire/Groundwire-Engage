@@ -3,22 +3,40 @@
 	<apex:form >
 	<apex:outputPanel id="frmFrequency" >	
   		<apex:pageMessages />	
-   		<apex:outputPanel layout="block" >
+   		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Repeated Actions</div>
    			<div class="cssTabSubTitle">Specify an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level</div>
+			<a class="cssTabHelpLink" id="linkHelpFrequency" onclick="document.getElementById('linkHelpFrequency').hide();
+				document.getElementById('divHelpFrequency').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+	   		<div id="divHelpFrequency" class="cssHelpText" style="display:none" >
+				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
+	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
+					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
+				</apex:outputText>
+				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
+	       		<apex:outputText rendered="{!isGWBaseInstalled}" >
+   					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
+				</apex:outputText>
+				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
+				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpFrequency').hide();document.getElementById('linkHelpFrequency').show();"><br/>Hide</a>  
+	  		</div>
    			<br/>
    		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="text-align:center;" >
-	       	<apex:commandButton value="Edit" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" />
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" rerender="pbWizard" />
 			<p/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsFrequency" >
 					<apex:pageBlockTable value="{!ctabFrequency.listFreqSettings}" var="fs" >
+						<apex:column rendered="{!ctabFrequency.isEditingTab}" >
+							<a class="cssDelLink" onclick="DelOnClick(this);" >del</a>
+						</apex:column>
 						<apex:column >
 							<apex:facet name="header">When Campaign<br/>Engagement Level is</apex:facet>
 					    	<apex:selectList value="{!fs.Level_Required__c}" size="1" disabled="{!NOT(ctabFrequency.isEditingTab)}" required="false" >			    			
@@ -58,31 +76,12 @@
 					</apex:pageBlockTable>														
 	        	</apex:pageBlockSection>	        	         	        	        
 	       	</apex:panelGroup>  
-	       	<apex:panelGroup >
-	       		<apex:pageMessage severity="info" strength="1" title="{!$ObjectType.EngagementFrequencySettings__c.Label}" escape="false"
-	       			summary="<p>Specify an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level.</p>
-	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
-	       				{!IF(hasCampaignRecordTypes, 
-	       					'<p><b>' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label + '</b> - ' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText + '</p>'
-	       					, '')}	       					
-	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
-						{!IF(IsGWBaseInstalled,	       					
-	       					'<p><b>' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label + '</b> - ' + $ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText + '</p>'
-	       					, '')}	       					
-	       			
-	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
-	       					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
-	       					" />
-	       	</apex:panelGroup>
         </apex:panelGrid>	
-		<apex:outputPanel layout="block" style="text-align:center;" >
-			<br/><br/>
-   		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="text-align:center;" > 
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" > 
 			<p/>
-	       	<apex:commandButton value="Edit" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" />
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabFrequency.editTab}" rendered="{!NOT(ctabFrequency.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabFrequency.saveTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabFrequency.cancelTab}" rendered="{!ctabFrequency.isEditingTab}" immediate="true" rerender="pbWizard" />
    		</apex:outputPanel>
 	</apex:outputPanel>  
 	</apex:form>

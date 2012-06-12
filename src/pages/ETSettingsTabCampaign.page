@@ -1,25 +1,43 @@
 <apex:page controller="GW_CTRL_ETSettingsWizard" >
 
+
 	<apex:outputPanel id="frmCampaign" >	
 	<apex:form >
   		<apex:pageMessages />	
-   		<apex:outputPanel layout="block" >
+   		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Campaign Defaults</div>
    			<div class="cssTabSubTitle">default engagement levels for campaign types, passive engagement levels</div>
+			<a class="cssTabHelpLink" id="linkHelpCampaign" onclick="document.getElementById('linkHelpCampaign').hide();
+				document.getElementById('divHelpCampaign').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+	   		<div id="divHelpCampaign" class="cssHelpText" style="display:none" >
+	       		<p>Specify a default Engagement Level to be set for Campaigns of various types.</p>
+	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
+	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
+				</apex:outputText>	       					
+	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
+	       		<apex:outputText rendered="IsGWBaseInstalled" >
+	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
+				</apex:outputText>
+	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>	       			
+	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
+				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();"><br/>Hide</a>  
+	  		</div>
    			<br/>
    		</apex:outputPanel>
-		<apex:outputPanel layout="block" style="text-align:center;" >
-			<!-- <apex:outputLabel value="{!$ObjectType.EngagementCampaignSettings__c.Label}" styleClass="cssTabTitle" />  -->
-	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" rerender="pbWizard" />
 			<p/>
    		</apex:outputPanel>
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsCampaign" >
 					<apex:pageBlockTable value="{!ctabCampaign.listCampaignSettings}" var="cs" >
+						<apex:column rendered="{!ctabCampaign.isEditingTab}" >
+							<a class="cssDelLink" onclick="DelOnClick(this);" >del</a>
+						</apex:column>
 						<apex:column rendered="{!hasCampaignRecordTypes}" >
 							<apex:facet name="header">{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</apex:facet>
 					    	<apex:selectList value="{!cs.Campaign_Record_Type__c}" size="1" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
@@ -45,41 +63,23 @@
 					    	</apex:selectList>
 					    </apex:column>						
 					</apex:pageBlockTable>														
-	        	
-	        		<apex:pageBlockSectionItem >
-	        		</apex:pageBlockSectionItem>
-	        		<apex:pageBlockSectionItem >
-	        		</apex:pageBlockSectionItem>
-	        		
+
+	        		<apex:pageBlockSectionItem />
+
 	        		<apex:pageBlockSectionItem >
 	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}" />
 				    	<apex:selectCheckboxes value="{!ctabCampaign.listNonRespondedLevels}" layout="pageDirection" disabled="{!NOT(ctabCampaign.isEditingTab)}" >			    			
 				    		<apex:selectOptions value="{!ctabCampaign.listSONonRespondedLevels}" />
 				    	</apex:selectCheckboxes>							
-	        		</apex:pageBlockSectionItem>
-	        		
+	        		</apex:pageBlockSectionItem>	        	
 	        	</apex:pageBlockSection>	        	         	        	        
 	       	</apex:panelGroup> 
-	       	<apex:panelGroup style="width:50%">
-	       		<apex:pageMessage severity="info" strength="1"  escape="false"
-	       			summary="<p>Specify a default Engagement Level to be set for Campaigns of various types.</p>
-	       				{!IF(hasCampaignRecordTypes, 
-	       					'<p><b>' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label + '</b> - ' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText + '</p>'
-	       					, '')}
-	       					<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
-						{!IF(IsGWBaseInstalled,	       					
-	       					'<p><b>' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label + '</b> - ' + $ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText + '</p>'
-	       					, '')}
-	       					<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>	       			
-	       					<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
-	       					" />
-	       	</apex:panelGroup>
         </apex:panelGrid>	
-		<apex:outputPanel layout="block" style="text-align:center;" >
+		<apex:outputPanel layout="block" styleClass="cssTabButtons" >
 			<p/>
-	       	<apex:commandButton value="Edit" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
-	       	<apex:commandButton value="Save" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
-	       	<apex:commandButton value="Cancel" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" />
+	       	<apex:commandButton value="Edit" status="statusLoad" action="{!ctabCampaign.editTab}" rendered="{!NOT(ctabCampaign.isEditingTab)}" immediate="true" rerender="pbWizard" />
+	       	<apex:commandButton value="Save" status="statusLoad" action="{!ctabCampaign.saveTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="false" rerender="pbWizard" />&nbsp;&nbsp;
+	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabCampaign.cancelTab}" rendered="{!ctabCampaign.isEditingTab}" immediate="true" rerender="pbWizard" />
    		</apex:outputPanel>
 	</apex:form>
 	</apex:outputPanel> 
