@@ -6,15 +6,15 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Donation Settings</div>
-   			<div class="cssTabSubTitle">rules for assigning engagement levels based off donations</div>
-			<a class="cssTabHelpLink" id="linkHelpDonor" onclick="document.getElementById('linkHelpDonor').hide();
-				document.getElementById('divHelpDonor').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Specify the Engagement Level given for tiers of donation totals.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpDonor" onclick="document.getElementById('linkHelpDonor').hide();
+				document.getElementById('divHelpDonor').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpDonor" class="cssHelpText" style="display:none" >
 				<p><b>Calculate Engagement Levels based on Donations</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
 				<p><b>Calculate Engagement Levels based on Household Donation Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpDonor').hide();document.getElementById('linkHelpDonor').show();"><br/>Hide</a>  
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpDonor').hide();document.getElementById('linkHelpDonor').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

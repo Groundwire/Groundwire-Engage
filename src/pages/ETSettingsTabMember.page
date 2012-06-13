@@ -6,14 +6,14 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Membership Settings</div>
-   			<div class="cssTabSubTitle">rules for assigning engagement levels based off memberships</div>
-			<a class="cssTabHelpLink" id="linkHelpMember" onclick="document.getElementById('linkHelpMember').hide();
-				document.getElementById('divHelpMember').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Specify how membership determines a Contact's Engagement Level.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpMember" onclick="document.getElementById('linkHelpMember').hide();
+				document.getElementById('divHelpMember').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpMember" class="cssHelpText" style="display:none" >
 				<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpMember').hide();document.getElementById('linkHelpMember').show();"><br/>Hide</a>  
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpMember').hide();document.getElementById('linkHelpMember').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>
@@ -23,7 +23,7 @@
 	       	<apex:commandButton value="Cancel" status="statusLoad" action="{!ctabMember.cancelTab}" rendered="{!ctabMember.isEditingTab}" immediate="true" rerender="pbWizard" />
 			<p/>
    		</apex:outputPanel>
-        <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" > 
+        <apex:panelGrid columns="1" columnClasses="cssPanelGridColumn1" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsMember" >
 		      		<apex:inputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!ctabMember.isEditingTab}"  />

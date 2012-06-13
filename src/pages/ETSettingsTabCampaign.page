@@ -7,11 +7,10 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Campaign Defaults</div>
-   			<div class="cssTabSubTitle">default engagement levels for campaign types, passive engagement levels</div>
-			<a class="cssTabHelpLink" id="linkHelpCampaign" onclick="document.getElementById('linkHelpCampaign').hide();
-				document.getElementById('divHelpCampaign').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Automatically set a Campaign's Engagement Level when the Campaign is created.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpCampaign" onclick="document.getElementById('linkHelpCampaign').hide();
+				document.getElementById('divHelpCampaign').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpCampaign" class="cssHelpText" style="display:none" >
-	       		<p>Specify a default Engagement Level to be set for Campaigns of various types.</p>
 	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
 	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
 				</apex:outputText>	       					
@@ -20,8 +19,8 @@
 	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
 				</apex:outputText>
 	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>	       			
-	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();"><br/>Hide</a>  
+	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - The list of Engagement Levels that don't require the Contact to have a Status of Responded on the Campaign.</p>	       			
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>
