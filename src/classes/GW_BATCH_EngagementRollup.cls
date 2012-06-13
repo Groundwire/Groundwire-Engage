@@ -1013,7 +1013,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     static boolean INCOPPS,INCMBR;
     
     
-    static void setSettingsForTests(string txtfield1, string txtfield1FV, double txtfield1lvl) {
+    public static void setSettingsForTests(string txtfield1, string txtfield1FV, double txtfield1lvl) {
 
         settings.Include_Opps__c = IsNPSPHHInstalled || IsGWBaseInstalled; 
         settings.Timeframe_Recent__c = 12;
