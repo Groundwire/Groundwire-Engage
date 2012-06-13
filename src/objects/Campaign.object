@@ -27,6 +27,16 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Response_Rate__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>includes sub-campaigns in hierarchy that have same or higher engagement level</inlineHelpText>
+        <label>Engagement Response Rate</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>1</scale>
+        <type>Percent</type>
+    </fields>
+    <fields>
         <fullName>Leadership_Level__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>Level of leadership: 1-organizing, 2-consistent leader, 3-inconsistent leader, 4-activist, 5-donor/member</inlineHelpText>
@@ -59,6 +69,22 @@
             <sorted>false</sorted>
         </picklist>
         <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Levels_Below_Top_of_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF ( Parent.Parent.Parent.Parent.Id != null , 4 ,
+IF (Parent.Parent.Parent.Id != null, 3,
+IF (Parent.Parent.Id != null, 2,
+IF (Parent.Id != null, 1 , 0)
+)))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Levels Below Top of Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>New_Engagement_Conversions__c</fullName>
@@ -164,6 +190,50 @@
         <type>Picklist</type>
     </fields>
     <fields>
+        <fullName>TEST_MostRecentCM__c</fullName>
+        <description>just testing for response rate metrics</description>
+        <externalId>false</externalId>
+        <label>TEST_MostRecentCM</label>
+        <summarizedField>CampaignMember.LastModifiedDate</summarizedField>
+        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+        <summaryOperation>max</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Top_Hierarchy_Campaign_ID__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF ( Parent.Parent.Parent.Parent.Id != null , Parent.Parent.Parent.Parent.Id ,
+  IF (Parent.Parent.Parent.Id != null, Parent.Parent.Parent.Id, 
+    IF (Parent.Parent.Id  != null, Parent.Parent.Id ,
+       IF (Parent.Id  != null, Parent.Id , Id )
+)))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Top of Hierarchy Campaign ID</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Total_Unique_Contacts_In_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <label>Total Unique Contacts In Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Total_Unique_Responses_in_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <label>Total Unique Responses in Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Type</fullName>
         <picklist>
             <picklistValues>
@@ -259,6 +329,125 @@
         </filters>
         <label>My Active Campaigns</label>
     </listViews>
+    <recordTypes>
+        <fullName>TEST</fullName>
+        <active>true</active>
+        <description>test campaign record type.  DO NOT include in package</description>
+        <label>TEST</label>
+        <picklistValues>
+            <picklist>Leadership_Level__c</picklist>
+            <values>
+                <fullName>1 - Observing</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>2 - Following</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>3 - Endorsing</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>4 - Contributing</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>5 - Owning</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>6 - Leading</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>Status</picklist>
+            <values>
+                <fullName>Aborted</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Completed</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>In Progress</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Planned</fullName>
+                <default>true</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>Type</picklist>
+            <values>
+                <fullName>Advertisement</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Appeal</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Banner Ads</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Conference</fullName>
+                <default>true</default>
+            </values>
+            <values>
+                <fullName>Direct Mail</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Email</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Letter to Congress</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Lobby Day</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Other</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Partners</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Petition</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Public Relations</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Referral Program</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Telemarketing</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Trade Show</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>Webinar</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+    </recordTypes>
     <webLinks>
         <fullName>npo02__Household_Mailing_List</fullName>
         <availability>online</availability>
