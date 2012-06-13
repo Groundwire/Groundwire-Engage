@@ -16,7 +16,7 @@
         <externalId>false</externalId>
         <formula>TODAY() -  First_Action_Date_Curr_Level__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Days In Current Level</label>
+        <label>Days Since First Action at Level</label>
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
