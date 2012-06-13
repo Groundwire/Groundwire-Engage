@@ -8,8 +8,10 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     id campCursor;
     id conCursor;
     
+    /* 
     // tallies
     long conTally,leadTally,respTally,respAtLvlTally;
+    */
     
     // map of wrapper classes
     map <id,campTotals> wrapMap; 
@@ -18,15 +20,62 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 	// wrapper class
 	public class campTotals {
 		id campId;
+		Campaign camp;
 		integer engLvl;
-		long conCount,leadCount,respCount;
+		long conCount,leadCount,respCount,engRespCount;		// overall totals
+		boolean currConSent,currConSentLead,currConResp,currConEngResp;		// temporary flags for each contact in loop
+		
+		set<Id> parentCampIDs;						// all direct parents
+		set<Id> eligibleParentCampIDs;				// only those parents that our responses will roll up to for response rate 
+													// i.e. has eng. level, but is same or lower than my level 
 		
 		// constructor
-		public campTotals (id campId) {
-			this.campId = campId;
-			conCount = 0;
-			leadCount = 0;
-			respCount = 0;
+		public campTotals (Campaign camp) {
+			this.campId = camp.Id;
+			this.camp = camp;
+			this.engLvl = (camp.Engagement_Level_Numeric__c == null) ? null : camp.Engagement_Level_Numeric__c.intvalue();
+			
+			this.conCount = 0;
+			this.leadCount = 0;
+			this.respCount = 0;
+			this.parentCampIDs = new set<Id>();
+			this.eligibleParentCampIDs = new set<Id>();
+			
+			if (camp.Parent.Id != null) parentCampIDs.add(camp.Parent.Id);
+			if (camp.Parent.Engagement_Level_Numeric__c <= engLvl) eligibleParentCampIDs.add(camp.Parent.Parent.Id);
+			if (camp.Parent.Parent.Id != null) parentCampIDs.add(camp.Parent.Parent.Id);
+			if (camp.Parent.Parent.Engagement_Level_Numeric__c <= engLvl) eligibleParentCampIDs.add(camp.Parent.Parent.Id);
+			if (camp.Parent.Parent.Parent.Id != null) parentCampIDs.add(camp.Parent.Parent.Parent.Id);
+			if (camp.Parent.Parent.Parent.Engagement_Level_Numeric__c <= engLvl) eligibleParentCampIDs.add(camp.Parent.Parent.Parent.Id);
+			if (camp.Parent.Parent.Parent.Parent.Id != null) parentCampIDs.add(camp.Parent.Parent.Parent.Parent.Id);
+			if (camp.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c <= engLvl) eligibleParentCampIDs.add(camp.Parent.Parent.Parent.Parent.Id);
+		}
+		
+		public void SetCurrConFlags (boolean isLead, boolean isResp, integer respLvl) {
+			// based on a campaign membership being considered by the main process, set boolean flags 
+			// which indicate whether we have a send/response/etc for the current contact
+			// in every case we don't need to check what the current value of flag is, setting it to true twice doesn't hurt anything
+			if (isLead) {
+				currConSentLead = true;
+			} else {
+				currConSent = true;
+			}
+			if (isResp) currConResp = true;
+			if (respLvl >= engLvl) currConEngResp = true;
+		}
+		
+		public void SetCurrConFlagsParents (boolean isLead, boolean isResp, integer respLvl) {
+			// set the flags (as in the SetCurrConFlags method) but for all appropriate parents of this campaign
+			for (Id parentCampId : parentCampIDs) {
+				
+			}
+		}
+		
+		public void ResetCurrConFlags () {
+			currConSentLead = false;
+			currConSent = false;
+			currConResp = false;
+			currConEngResp = false;
 		}
 	}
 
@@ -44,13 +93,16 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     
     
     private void constructQuery () {
-    	string soql = 'SELECT Id,CampaignId,ContactId,LeadId,Status,HasResponded,';
+    	string soql = 'SELECT Id,CampaignId,ContactId,LeadId,Status,HasResponded,Campaign.Engagement_Level_Numeric__c,';
     	soql +=			' Campaign.Parent.Id,Campaign.Parent.Parent.Id,Campaign.Parent.Parent.Parent.Id,Campaign.Parent.Parent.Parent.Parent.Id, ';
-    	soql +=			' Campaign.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c ';
+    	soql +=	 		' Campaign.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c, ';
+    	soql +=	 		' Campaign.Top_Hierarchy_Campaign_ID__c ';
     	soql +=			' FROM CampaignMember';
     	// soql +=			'WHERE ';
-    	soql +=			' ORDER BY Campaign.Top_Hierarchy_Campaign_ID__c,Campaign.Levels_Below_Top_of_Hierarchy__c DESC,CampaignId,ContactId';
+    	soql +=			' ORDER BY Campaign.Top_Hierarchy_Campaign_ID__c,ContactId,LeadId,Campaign.Levels_Below_Top_of_Hierarchy__c DESC,CampaignId';
+    	soql = GW_BATCH_EngagementRollup.addAllNSPrefixET(soql,true,false);
     	
+    	system.debug (LoggingLevel.WARN,'soql: ' + soql);
     	batchQuery = soql;
     }
     
@@ -63,43 +115,83 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		
         for (sobject s: SBatch) {
             CampaignMember cm = (CampaignMember)s;
+			system.debug (LoggingLevel.WARN,'cm in loop: ' + cm);
+			system.debug (LoggingLevel.WARN,'cm.campaign in loop: ' + cm.Campaign);
 			
+			if (cm.ContactId != conCursor && cm.LeadId != conCursor) {
+				// loop thru all campaigns in current hiearchy "group"
+				// and add to totals based on booleans
+				// tbd
+				
+				// finally reset the cursor
+				conCursor = (cm.ContactId == null) ? cm.LeadId : cm.ContactId;
+			}
+
 			if (cm.CampaignId != campCursor) {
-				// new campaign, finalize numbers on old campaign
+				// ***NEW CAMPAIGN***
+				// create wrappers (if necessary) for campaign and parents
+				CheckForWrappers(cm);
 				
-				// first see if we alrady have totals for this campaign (rolled up from subcampaign(s))
-				campTotals totals = wrapMap.get(campCursor);
-				
-				// if not start a fresh one
-				if (totals == null) {
-					totals = new campTotals (campCursor);
-				}
-				
-				// then add in our tallies
-				totals.conCount += conTally;
-				totals.leadCount += leadTally;
-				totals.respCount += respTally;
-				
+				// then reset the cursor
+				campCursor = cm.CampaignId;
 			}
 
 			if (cm.Campaign.Top_Hierarchy_Campaign_ID__c != hierarchyCursor) {
 				// tbd new campaign "group"
 			}
-			if (cm.ContactId != conCursor) {
-				// tbd new contact
-			}
-			
-			if (cm.ContactId != null) {
-				conTally += 1;
-			} else if (cm.LeadId != null) {
-				leadTally += 1;
+
+			// then always flag which metrics this CM will increment (writes to wrapper for current campaign and all eligible parents)
+			// first figure out which metrics this qualifies for
+			boolean isResp = false;
+			boolean isLead = false;
+			integer respLvl = 0;
+			if (cm.LeadId != null) {
+				isLead = true;
+				// conTally += 1;
 			}
 			if (cm.HasResponded == true) {
-				respTally += 1;
-			}         	   
+				isResp = true;
+				// respTally += 1;
+			}
+			if (cm.Campaign.Engagement_Level_Numeric__c != null) {
+				respLvl = cm.Campaign.Engagement_Level_Numeric__c.intvalue();
+			}
+			campTotals totals = wrapMap.get(cm.Campaign.Id);
+			totals.SetCurrConFlags(isLead, isResp, respLvl);
+			         	   
         }
 		
     }  
+
+
+	private void CheckForWrappers (CampaignMember cm) {
+		// see if we alrady have a wrapper for this campaign (created from subcampaign)
+		// if not start a fresh one
+		if (wrapMap.get(cm.Campaign.Id) == null) {
+			campTotals totals = new campTotals (cm.Campaign);
+			wrapMap.put(cm.Campaign.Id,totals);
+			system.debug (LoggingLevel.WARN,'new wrap obj: ' + totals);
+		}
+		
+		// then do the same for each of the parents up the chain
+		if (cm.Campaign.Parent.Id != null && wrapMap.get(cm.Campaign.Parent.Id) == null) {
+			campTotals totals = new campTotals (cm.Campaign.Parent);
+			wrapMap.put(cm.Campaign.Parent.Id,totals);					
+		}
+		if (cm.Campaign.Parent.Parent.Id != null && wrapMap.get(cm.Campaign.Parent.Parent.Id) == null) {
+			campTotals totals = new campTotals (cm.Campaign.Parent.Parent);
+			wrapMap.put(cm.Campaign.Parent.Parent.Id,totals);					
+		}
+		if (cm.Campaign.Parent.Parent.Parent.Id != null && wrapMap.get(cm.Campaign.Parent.Parent.Parent.Id) == null) {
+			campTotals totals = new campTotals (cm.Campaign.Parent.Parent.Parent);
+			wrapMap.put(cm.Campaign.Parent.Parent.Parent.Id,totals);					
+		}
+		if (cm.Campaign.Parent.Parent.Parent.Parent.Id != null && wrapMap.get(cm.Campaign.Parent.Parent.Parent.Parent.Id) == null) {
+			campTotals totals = new campTotals (cm.Campaign.Parent.Parent.Parent.Parent);
+			wrapMap.put(cm.Campaign.Parent.Parent.Parent.Parent.Id,totals);					
+		}		
+	}
+
 
     global void finish(Database.BatchableContext BC){
         

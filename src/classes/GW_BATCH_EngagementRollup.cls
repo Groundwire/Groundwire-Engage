@@ -831,7 +831,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	     
 	}
 		    
-    private static string addAllNSPrefixET (string str,boolean isETFields, boolean isNP02Fields) {
+    public static string addAllNSPrefixET (string str,boolean isETFields, boolean isNP02Fields) {
 		string[] fields = str.split(',');
 		string newString = '';
 		for (string s:fields) {
