@@ -1031,7 +1031,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         settings.Level_6_Name__c = '6 - lvl six';
         settings.Householded_Donor_Levels__c = settings.Include_Opps__c; 
         upsert settings;
-
         
         // clear out list settings
         ONEN_UnitTestData.DeleteListCustomSettingRecs ('EngagementContactFieldSettings__c');
@@ -1105,6 +1104,26 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         INCMBR = settings.Include_Membership__c;
         NEWMBRLVL = settings.New_Member_Level__c.intvalue();
         RENMBRLVL = settings.Renewing_Member_Level__c.intvalue();        
+
+		// also set settings for NPSP households (which drives rollups in NPSP) using dynamic DML
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+			SObject NPSPSettings;
+			// first do a query to see if we have any settings recs in there, and delete them
+			string soql = 'SELECT Id FROM npo02__Households_Settings__c';
+			SObject[] settingsRecs = Database.query(soql);
+			if (settingsRecs != null) delete settingsRecs;
+			
+			// now insert our own
+			SObjectType token = Schema.getGlobalDescribe().get('npo02__Households_Settings__c');
+			NPSPsettings = token.newSobject();
+			NPSPsettings.put ('npo02__Enable_Opp_Rollup_Triggers__c',true);
+			NPSPsettings.put ('npo02__Household_Rules__c','All New or Edited Contacts');
+			NPSPsettings.put ('npo02__Membership_Record_Types__c',ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS);
+			NPSPsettings.put ('npo02__Household_Contact_Roles_On__c',true);
+			insert NPSPsettings;
+			
+		}
+
     }
 
 
@@ -1353,8 +1372,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		test.startTest();
 		
         // create new opps
-        double smallAmt = donorBreakpoints[1] - 5; // assumes at least $5 of separation, good assumption I hope!
-        double majAmt = donorBreakpoints[2] - 5;   // also assumes at least 3 lvls
+        double smallAmt = (donorBreakpoints[1] / 2) - 1 ; 			// just less than half, so two small gifts doesn't put them into the next tier
+        double majAmt = donorBreakpoints[2] - 5;   					// also assumes at least 3 lvls
         Contact[] ConsForSmallOpps = new Contact[]{TestCons[6],TestCons[7],TestCons[8],TestCons[9],TestCons[10],TestCons[12],TestCons[13],TestCons[16],TestCons[23]};
         Opportunity[] recentSmallOpps = ONEN_UnitTestData.OppsForContactList (ConsForSmallOpps,null,'Closed Won',startDateRecent,smallAmt,GiftRectype,null);
         Contact[] ConsForMajOpps = new Contact[]{TestCons[7],TestCons[17]};
@@ -1362,7 +1381,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Contact[] ConsOldMajOpps = new Contact[]{TestCons[8]};
         Opportunity[] oldMajOpps = ONEN_UnitTestData.OppsForContactList (ConsOldMajOpps,null,'Closed Won',startDateOld,majAmt,GiftRectype,null);
         Contact[] ConsMediumSmallOpps = new Contact[]{TestCons[9]};
-        Opportunity[] medSmallOpps = ONEN_UnitTestData.OppsForContactList (ConsMediumSmallOpps,null,'Closed Won',startDateMedium,smallAmt,GiftRectype,null);
+        Opportunity[] medSmallOpps = ONEN_UnitTestData.OppsForContactList (ConsMediumSmallOpps,null,'Closed Won',startDateMedium,(smallAmt+10),GiftRectype,null);
         Contact[] ConsMbrshipThisYear = new Contact[]{TestCons[12],TestCons[13]};
         Opportunity[] mbrshipsThisYr = ONEN_UnitTestData.OppsForContactList (ConsMbrshipThisYear,null,'Closed Won',startDateRecent,smallAmt,MbrRectype,null);
         Contact[] ConsMbrshipLastYear = new Contact[]{TestCons[13]};
