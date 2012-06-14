@@ -1,0 +1,77 @@
+<apex:page controller="GW_CTRL_ETGratitude" title="Gratitude Machine">
+
+<style>
+
+	.cssActionColumn a {
+		color: #015BA7;
+		text-decoration: none;
+	}	
+
+	.cssHelpText {
+		padding: 10px;		
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	
+</style>
+
+    <apex:sectionHeader title="Gratitude Machine" />        
+    	<apex:form >
+    		<apex:pageBlock title="Show Some Love!" mode="edit">
+		   		<div class="cssHelpText" >
+	    			Let's find some people that you should gratify!<br/>
+	    			<i>New Climbers</i> are people who are most recently in their level.<br/>  
+	    			<i>Old Steadies</i> are people we are longest in their level, but have done some action in the last year.
+	    		</div>
+	    		
+				<apex:pageBlockSection columns="1">
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="How Many Thank-You's" />
+						<apex:inputText value="{!numRecipients}" size="4" />
+					</apex:pageBlockSectionItem>
+					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Who to Include" />
+				        <apex:selectRadio layout="pageDirection" value="{!strWhoToInclude}" >
+				            <apex:selectOption itemValue="New" itemLabel="New Climbers"/>
+				            <apex:selectOption itemValue="Old" itemLabel="Old Steadies"/>
+				            <apex:selectOption itemValue="Both" itemLabel="Both"/>
+				        </apex:selectRadio> 
+   					</apex:pageBlockSectionItem>
+   					<apex:pageBlockSectionItem >
+						<apex:outputLabel value="Limit to Campaign (optional)" />
+						<apex:inputField value="{!cmFilter.CampaignId}" required="false" />
+   					</apex:pageBlockSectionItem>
+   					<apex:pageBlockSectionItem >
+   						<apex:outputLabel />
+   						<apex:commandButton value="Go" action="{!GetRecipients}" />
+   					</apex:pageBlockSectionItem>
+				</apex:pageBlockSection>
+
+
+
+	    		<apex:pageBlockSection >
+					<apex:pageBlockTable value="{!listRecipient}" var="rec" >
+
+						<apex:column styleClass="cssActionColumn" >		 				
+							<apex:facet name="header">Action</apex:facet>
+			                	<nobr>
+				                <apex:commandLink value="Thanked" />&nbsp;|&nbsp;
+				                <apex:commandLink value="Left Msg" />&nbsp;|&nbsp;
+				                <apex:commandLink value="Del" />&nbsp;
+				                </nobr>
+						</apex:column>	
+						
+						<apex:column value="{!rec.cm.Status}" />
+						
+						<apex:repeat value="{!$ObjectType.Contact.FieldSets.Gratitude_Machine}" var="f" >
+							<apex:column value="{!rec.con[f]}" />					
+						</apex:repeat>
+												
+					</apex:pageBlockTable>	    		
+	    		</apex:pageBlockSection>
+    		</apex:pageBlock>
+    	
+    	</apex:form>
+
+</apex:page>
