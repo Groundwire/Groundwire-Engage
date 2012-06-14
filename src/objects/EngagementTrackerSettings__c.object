@@ -125,7 +125,7 @@
     <fields>
         <fullName>New_Member_Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>Level to assign to active members with a Last Membership Origin of New, if Membership is checked.</inlineHelpText>
+        <inlineHelpText>Level to assign to active members with a Last Membership Origin of New.</inlineHelpText>
         <label>New Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
@@ -170,7 +170,7 @@
     <fields>
         <fullName>Renewing_Member_Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>Level to assign to active members with Last Membership Origin of Renewal, if Membership is checked.</inlineHelpText>
+        <inlineHelpText>Level to assign to active members with Last Membership Origin of Renewal.</inlineHelpText>
         <label>Renewing Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
