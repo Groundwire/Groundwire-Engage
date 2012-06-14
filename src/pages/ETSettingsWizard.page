@@ -13,7 +13,7 @@
 	}
 
 	.cssPanelGridColumn1 {
-		width: 400px;
+		width: 600px;
 	}
 	.cssPanelGridColumn2 {
 		width: 550px;
@@ -86,12 +86,18 @@
 	}
 
 	.cssTabHelpLink {
-		font-size: 90%;
-		text-decoration: underline;
-		vertical-align: top;
+		cursor: pointer; 
 	}
 	
 	.cssHelpText {
+		background-color: mintcream;
+		border-style: solid;
+		border-width: 1px;
+		border-color: lightBlue;
+		border-radius: 10px;
+		padding: 10px;		
+		margin-top: 10px;
+		margin-bottom: 10px;
 	}
 	
 	.cssTabInfo {	
@@ -100,7 +106,7 @@
 	}
 	
 	.cssTabButtons {
-		margin-left: 200px;
+		margin-left: 300px;
 	}
 	
 	.cssDelLink {

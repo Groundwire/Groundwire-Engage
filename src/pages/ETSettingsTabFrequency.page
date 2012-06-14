@@ -6,21 +6,21 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Repeated Actions</div>
-   			<div class="cssTabSubTitle">Specify an Engagement Level to be set based on the frequency of a Contact's participation in Campaigns at a certain level</div>
-			<a class="cssTabHelpLink" id="linkHelpFrequency" onclick="document.getElementById('linkHelpFrequency').hide();
-				document.getElementById('divHelpFrequency').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Specify the Engagement Level to give based on the frequency of a Contact's participation in a type of Campaign.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpFrequency" onclick="document.getElementById('linkHelpFrequency').hide();
+				document.getElementById('divHelpFrequency').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpFrequency" class="cssHelpText" style="display:none" >
-				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
+				<p><b>When Campaign Engagement Level is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
 	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
-					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
+					<p><b>And Campaign Record Type is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
 				</apex:outputText>
-				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
+				<p><b>And Campaign Type is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Type__c.InlineHelpText}</p>
 	       		<apex:outputText rendered="{!isGWBaseInstalled}" >
-   					<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
+   					<p><b>And Campaign Sub-Type is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
 				</apex:outputText>
-				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
-				<p><b>{!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.Label}</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpFrequency').hide();document.getElementById('linkHelpFrequency').show();"><br/>Hide</a>  
+				<p><b>And Contact Participates ___ Times</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
+				<p><b>Set Contact's Engagement Level to</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpFrequency').hide();document.getElementById('linkHelpFrequency').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

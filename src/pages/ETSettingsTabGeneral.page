@@ -6,16 +6,16 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >General Settings</div>
-   			<div class="cssTabSubTitle">various settings that effect Engagement Level calculations</div>
-			<a class="cssTabHelpLink" id="linkHelpGeneral" onclick="document.getElementById('linkHelpGeneral').hide();
-				document.getElementById('divHelpGeneral').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Settings that affect Engagement Level calculation.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpGeneral" onclick="document.getElementById('linkHelpGeneral').hide();
+				document.getElementById('divHelpGeneral').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpGeneral" class="cssHelpText" style="display:none" >
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpGeneral').hide();document.getElementById('linkHelpGeneral').show();"><br/>Hide</a>  
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpGeneral').hide();document.getElementById('linkHelpGeneral').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

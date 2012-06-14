@@ -6,14 +6,14 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Contact Field Settings</div>
-   			<div class="cssTabSubTitle">assign an Engagement Level to a contact based on the value of a field on a Contact record</div>
-			<a class="cssTabHelpLink" id="linkHelpContact" onclick="document.getElementById('linkHelpContact').hide();
-				document.getElementById('divHelpContact').show();"><br/>Help<span class="helpButton"><img src="/s.gif" alt="" class="helpOrb" title=""/></span></a>   		
+   			<div class="cssTabSubTitle">Determine a Contact's Engagement Level based on the value of a Contact record field.</div>
+			<a class="cssTabHelpLink helpLink" id="linkHelpContact" onclick="document.getElementById('linkHelpContact').hide();
+				document.getElementById('divHelpContact').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpContact" class="cssHelpText" style="display:none" >
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink" onclick="document.getElementById('divHelpContact').hide();document.getElementById('linkHelpContact').show();"><br/>Hide</a>  
+				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpContact').hide();document.getElementById('linkHelpContact').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

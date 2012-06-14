@@ -6,11 +6,12 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Scheduling Engagement Rollup</div>
-   			<div class="cssTabSubTitle"><p>Engagement Rollup is the recalculation of every contact's engagement level based on current donation, 
-		       				campaign and custom contact field information.  Use the Engagement Rollup tab above to start the process manually 
-		       				at any time.  We recommend scheduling Engagement Rollup to run nightly by clicking the Schedule button.   
-		       				If it is already scheduled you will receive an error message, telling you so. &nbsp;Click 
-		       				<a  href='/08e?setupid=ScheduledJobs'>Scheduled Jobs page</a> to view all scheduled jobs.</p></div>
+   			<div class="cssTabSubTitle"><p>Engagement Rollup is the recalculation of every contact's Engagement Level based on current donation, 
+		       				campaign and custom contact field information.  Clicking the Schedule button below will add Engagement Rollup to run 
+		       				nightly at 2:00 am. If it is already scheduled you will receive an error message. 
+		       				To view all schedule jobs go to the&nbsp;
+		       				<a  href='/08e?setupid=ScheduledJobs'>Scheduled Jobs page.</a>
+		       				You can also start Engagement Rollup manually via the Engagement Rollup tab above.</p></div>
    			<br/>
    		</apex:outputPanel>
 		<apex:outputPanel layout="block" styleClass="cssTabInfo" > 
