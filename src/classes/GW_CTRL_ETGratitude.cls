@@ -8,6 +8,9 @@ public with sharing class GW_CTRL_ETGratitude {
 		strWhoToInclude = 'Both';
 		cmFilter = new CampaignMember();
 		
+		// start with empty list so it won't get filled.
+		listRecipient = new list<CRecipient>();
+		
 	}
 		
 	public integer numRecipients { get; set; }
@@ -22,7 +25,38 @@ public with sharing class GW_CTRL_ETGratitude {
 		return null;
 	}
 	
+	public boolean hasRecipients {
+		get {
+			return listRecipient != null && listRecipient.size() > 0;
+		}
+	}
+	
 	// the generated list of Recipients to display
+	//
+	// strategies:
+	//
+	// - if we aren't filtering by Campaign, just query directly against Contact
+	//
+	// - if filtering by Campaign, need to get id's of Campaign and its ancestors,
+	// 		and query against campaign members who are in that set of campaigns.
+	//
+	// - for New Climbers, look at smallest 'days in current level'.
+	//
+	// - for Old Steadies, look for largest 'days in current level' with some action in the last N days.
+	//
+	// - only include people who are at least level X.
+	//
+	// - only include people once!
+	//
+	// - only include a single person from a household.  
+	//		(seems lower priority; let them see both and they can choose who to talk to)
+	//
+	// - exclude people who have already been 'loved' in the last N days.
+	//		need to decide how this is tracked:
+	//		- look at campaign members of type Gratitude Machine with appropriate status
+	//		- look at activities of unique record type or custom field value
+	//		- look at custom field on contact (last loved date)
+	// 
 	public list<CRecipient> listRecipient {
 		get {
 			if (listRecipient == null) {
@@ -45,12 +79,13 @@ public with sharing class GW_CTRL_ETGratitude {
 					strSoql += ' and Contact.Last_Leadership_Action_Date__c >= LAST_N_DAYS:365 ';
 					strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c desc ';				
 				}
+				strSoql += ' limit 100 ';
 
 				list<CampaignMember> listCM = database.query(strSoql);
 				for (CampaignMember cm : listCM) {
 					if (setConId.add(cm.ContactId)) {
 						cCon++;
-						if (cCon == numRecipients) {
+						if (cCon >= numRecipients) {
 							break;
 						}
 					}
