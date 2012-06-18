@@ -17,7 +17,7 @@
     <fields>
         <fullName>Field_Value__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>For non-checkbox fields, the value that the field must have to qualify for the level.  Enter an asterisk (*) to match any non-empty value.</inlineHelpText>
+        <inlineHelpText>For non-checkbox fields, the value that the field must have to qualify for the level. Enter an asterisk (*) to match any non-empty value. For checkboxes, leave the field blank.</inlineHelpText>
         <label>Field Value</label>
         <length>255</length>
         <required>false</required>
