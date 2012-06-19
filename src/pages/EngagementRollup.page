@@ -1,39 +1,50 @@
 <apex:page controller="GW_CTRL_EngagementRollup" title="Engagement Tracker Rollup"
 	tabStyle="Engagement_Rollup__tab" >
+
 	<!--
-Visualforce Rollup Page
-Written by Evan Callahan, copyright (c) 2010 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
-This program is released under the GNU General Public License. http://www.gnu.org/licenses/
--->
+	Visualforce Rollup Page
+	Written by Evan Callahan, David Habib, and Matthew Scholtz copyright (c) 2012 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
+	This program is released under the GNU General Public License. http://www.gnu.org/licenses/
+	-->
+	
 	<style>
-ul.err li {
-	list-style-type: none;
-	color: #cc0000;
-	font-weight: bold;
-}
-</style>
+	ul.err li {
+		list-style-type: none;
+		color: #cc0000;
+		font-weight: bold;
+	}
+	
+	p {
+		font-size: medium;
+	}
+	</style>
+
 	<apex:sectionHeader title="Batch Engagement Tracker Rollup" />
 	<apex:form >
 		<apex:pageBlock >
 			<apex:pageBlockButtons rendered="{!batching}">
-				<apex:commandButton action="{!rollup}" value="Continue"
+				<apex:commandButton action="{!rollup}" value="Begin Rollup"
 					disabled="{!batchRunning}" />
-				<apex:commandButton action="{!cancel}" value="Cancel" />
+				<apex:commandButton action="{!cancel}" value="Cancel" disabled="{!batchRunning}" />
 			</apex:pageBlockButtons>
 			<apex:messages styleClass="err" />
 			<apex:outputText rendered="{!batching}">
-				<p>Engagement Rollup is the recalculation of every contact's engagement level based on current donation, 
-				campaign and custom contact field information. The process may take some time; you can close this page 
-				and the process will continue in the background.</p>			
+				<p>Engagement Rollup runs two batch processes.  The first will recalculate every contact's engagement level based on campaign and opportunity history, and other info.
+				The second will update response rates and related info on Campaigns.  You will see two progress bars below for each of these processes.
+				 The processes may take some time; it will take longer the more data you have in your database.  You can close this page 
+				and the process will continue in the background.   Go to Setup > Monitoring > Apex Jobs for more detailed info.</p>			
 			
-				<p><i>We strongly recommend that you avoid running Engagement Rollup until you have completely set up 
-				your engagement settings and have imported all of your data into Salesforce. This will ensure 
+				<p>Generally we recommend scheduling this rollup to run nightly.  However, you can use this page to launch additional rollup runs if you need to update 
+				engagement metrics before the next nightly run.</p>
+			
+				<p><i><b>We strongly recommend that you avoid running this rollup until you have imported all of your data into Salesforce and have completely set up 
+				your engagement settings.</b> This will ensure 
 				engagement metrics are calculated accurately.</i></p>
 			</apex:outputText>
 		</apex:pageBlock>
 		<apex:outputPanel rendered="{!batchRunning}">
-			<c:batchJobs batchComponentLabel="Batch Rollup Progress"
-				numberOfJobs="1" />
+			<c:batchJobs batchComponentLabel="Engagement Rollup Progress"
+				numberOfJobs="2" />
 		</apex:outputPanel>
 	</apex:form>
 </apex:page>

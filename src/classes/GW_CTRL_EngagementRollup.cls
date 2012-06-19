@@ -68,6 +68,15 @@ public class GW_CTRL_EngagementRollup {
         return null;                
     }
 
+	
+	public PageReference campaignRollup() {
+    	GW_BATCH_CampaignEngagementRollup campRollup = new GW_BATCH_CampaignEngagementRollup();
+    	campRollup.execute(null);
+        batchRunning = true;
+        return null;                
+		
+	}
+
     public PageReference cancel() {
         PageReference ref = new PageReference('/home/home.jsp');
         ref.setRedirect(true);

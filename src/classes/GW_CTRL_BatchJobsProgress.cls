@@ -8,6 +8,9 @@
 * be the same for all calls in a transaction, and by calling it statically we reduce the calls
 * that are made, making the total transaction more efficient.
 *
+* modified 6/12/12 by Matthew Scholtz for Groundwire
+*  to omit BatchApexWorker records, and to limit to batches created in last 2 hours
+*
 * This program is released under the GNU General Public License. http://www.gnu.org/licenses/
 */
 global class GW_CTRL_BatchJobsProgress {
@@ -41,9 +44,12 @@ global class GW_CTRL_BatchJobsProgress {
         }
  
         //Query the Batch apex jobs
+        datetime cutoff = System.now().addHours(-2);
         for(AsyncApexJob a : [select TotalJobItems, Status, NumberOfErrors, MethodName, JobType, JobItemsProcessed, Id, 
         							CreatedDate, CreatedById, CompletedDate, ApexClassId, ApexClass.Name 
-        							From AsyncApexJob order by CreatedDate desc limit :numberOfJobs]) {
+        							From AsyncApexJob 
+        							Where JobType != 'BatchApexWorker' And CreatedDate >= :cutoff
+        							order by CreatedDate desc limit :numberOfJobs]) {
             Double itemsProcessed = a.JobItemsProcessed;
             Double totalItems = a.TotalJobItems;
  

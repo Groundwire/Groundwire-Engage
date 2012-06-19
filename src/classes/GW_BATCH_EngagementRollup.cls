@@ -769,10 +769,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     
 
     /*******************************************************************************************************
-	* @description The standard batch finish method.  Currently does nothing.
+	* @description The standard batch finish method.  Once this batch is done, run the campaign-based batch process (for response rates, etc.)
 	*/      
     global void finish(Database.BatchableContext BC){
-        
+		// once this batch is done, run the campaign-based batch process (for response rates, etc.)
+        //Schedule the batch apex to run in 30 seconds
+        if (! Test.isRunningTest()) {
+	        Datetime sysTime = System.Now().addSeconds(30);
+	        String chron_exp = '' + sysTime.second() + ' ' + sysTime.minute() + ' ' + sysTime.hour() + ' ' + sysTime.day() + ' ' + sysTime.month() + ' ? ' + sysTime.year();
+	        GW_BATCH_CampaignEngagementRollup batch = new GW_BATCH_CampaignEngagementRollup();  
+	        System.schedule('GW Engage Campaign Rollup ' + sysTime.getTime(), chron_exp, batch);               
+        }		        
     }
 
 
