@@ -150,7 +150,9 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     
     
     global void execute(SchedulableContext SC) {
-    
+    	// tbd get batch size from settings?
+        GW_BATCH_CampaignEngagementRollup myBatch = new GW_BATCH_CampaignEngagementRollup();
+        id batchinstanceid = database.executeBatch (myBatch, 50);      
     }
     
     
@@ -398,7 +400,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         
         
         
-        // run batch, w/ a low batch size to ensure we'll 
+        // run batch
+        // we'd like to do this w/ a small batch size to test spanning of batches, but SF only lets you run one batch from w/in test
         Test.StartTest();
         GW_BATCH_CampaignEngagementRollup myba = new GW_BATCH_CampaignEngagementRollup ();
         ID batchprocessid = Database.executeBatch(myba);
