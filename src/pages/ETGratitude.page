@@ -22,7 +22,7 @@
 		   		<div class="cssHelpText" >
 	    			Let's find some people that you should gratify!<br/>
 	    			<i>New Climbers</i> are people who are most recently in their level.<br/>  
-	    			<i>Old Steadies</i> are people we are longest in their level, but have done some action in the last year.
+	    			<i>Old Steadies</i> are people who are longest in their level, but have done some action in the last year.
 	    		</div>
 	    		
 				<apex:pageBlockSection columns="1">
@@ -49,8 +49,8 @@
 				</apex:pageBlockSection>
 
 
-
-	    		<apex:pageBlockSection >
+			
+	    		<apex:pageBlockSection id="panelRecipient" rendered="{!hasRecipients}" >
 					<apex:pageBlockTable value="{!listRecipient}" var="rec" >
 
 						<apex:column styleClass="cssActionColumn" >		 				
