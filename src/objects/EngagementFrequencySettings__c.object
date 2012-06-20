@@ -38,8 +38,8 @@
     <fields>
         <fullName>Field_Value_1__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>if this and Fieldname 1 are populated, requires that all actions for this rule have the specified value in specified field.  For checkboxes, enter &quot;True&quot; for checked.</inlineHelpText>
-        <label>Field Value 1</label>
+        <inlineHelpText>This field is no longer used.</inlineHelpText>
+        <label>Field Value 1 - DEPRECATED</label>
         <length>255</length>
         <required>false</required>
         <type>Text</type>
@@ -48,8 +48,8 @@
     <fields>
         <fullName>Fieldname_1__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>enter the name (developer name) of a field in Campaign to check</inlineHelpText>
-        <label>Campaign Fieldname 1</label>
+        <inlineHelpText>This field is no longer used.</inlineHelpText>
+        <label>Campaign Fieldname 1 - DEPRECATED</label>
         <length>200</length>
         <required>false</required>
         <type>Text</type>

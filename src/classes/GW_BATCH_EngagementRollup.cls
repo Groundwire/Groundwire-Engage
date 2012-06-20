@@ -296,7 +296,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         // now check frequency rules that require fields (separate SOQL for each one!)
         for (EngagementFrequencySettings__c fqset : freqSettingsMap.values() ) {
-            if (fqset.Fieldname_1__c != null) {
+            if (fqset.Campaign_Type__c != null || fqset.Campaign_Sub_Type__c != null || fqset.Campaign_Record_Type__c != null ) {
                 string qstr = 'SELECT ContactId,Calendar_Year(Effective_Action_Date__c) yr,COUNT_DISTINCT(Id) CountCMs, ';
                 qstr +=         ' GROUPING(ContactId) subtCon  ';
                 qstr +=         ' FROM CampaignMember WHERE ContactId IN :conIDs AND Campaign.Leadership_Level__c!=Null ';
@@ -304,10 +304,32 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 qstr +=         ' AND Effective_Action_Date__c >= :cutoffDateRecent ';
                 // add our namespace prefix to fields we own.
                 qstr = addAllNSPrefixET (qstr,true,false);
+                
+                /* deprecated
                 // fields coming from settings we can't assume should be namespace prefixed.
-                qstr +=         ' AND Campaign.' + fqset.Fieldname_1__c + '= \'' + fqset.Field_Value_1__c + '\' ';
+                // qstr +=         ' AND Campaign.' + fqset.Fieldname_1__c + '= \'' + fqset.Field_Value_1__c + '\' ';
+                */
+                
+                // set filters based on campaign types
+            	string camptype,campsubtype,camprectype;
+                if (fqset.Campaign_Type__c != null) {
+                	camptype = fqset.Campaign_Type__c;
+                	qstr +=  ' AND Campaign.Type = :camptype ';
+                }
+                // this one is for GWBase only, will throw an err if set & gwbase not installed
+                //  TBD trap this err?
+                if (fqset.Campaign_Sub_Type__c != null) {
+                	campsubtype = fqset.Campaign_Sub_Type__c;
+                	qstr += ' AND ' + addNSPrefixET('Campaign.Campaign_Sub_Type__c',false,false) + ' = :campsubtype ';
+                }
+                if (fqset.Campaign_Record_Type__c != null) {
+                	camprectype = fqset.Campaign_Record_Type__c;
+                	qstr += ' AND Campaign.RecordType.Name = :camprectype ';
+                }
+                
                 qstr +=         addAllNSPrefixET(' GROUP BY ROLLUP ( ContactId, Calendar_Year(Effective_Action_Date__c) )' , true, false);
-                //system.debug (Logginglevel.WARN,'querystring: ' + qstr);
+                system.debug (Logginglevel.WARN,'frequency setting for rule: ' + fqset);
+                system.debug (Logginglevel.WARN,'querystring for frequency rule: ' + qstr);
                 sobject[] results = Database.query(qstr);
                 for (sobject row : results) {
                     double count = (double)row.get('CountCMs');
@@ -1070,8 +1092,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             Level_Required__c = 2,
             Level_To_Assign__c = 3,
             Number_of_Actions_Required__c = 3,
-            Fieldname_1__c = 'Type',
-            Field_Value_1__c = 'Online Action'
+            Campaign_Type__c = 'Online Action'
         );
         insert fqset;
         
