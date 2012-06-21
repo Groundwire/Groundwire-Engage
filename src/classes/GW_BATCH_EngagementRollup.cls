@@ -142,22 +142,24 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         querySOQL = addAllNSPrefixET(querySOQL,true,false);
         
         // then fields w/ same name in gwbase & NPSP
-        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,' +
-        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,Account.Name,Account.OppAmountLastNDays__c,Account.LastCloseDate__c,' +
-	        					'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
-        querySOQLmore = addAllNSPrefixET(querySOQLmore,false,true);
-        querySOQL += ',' + querySOQLmore; 
-
+        if (IsGWBaseInstalled || IsNPSPHHInstalled) {
+	        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,' +
+	        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,Account.Name,Account.OppAmountLastNDays__c,Account.LastCloseDate__c,' +
+		        					'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
+	        querySOQLmore = addAllNSPrefixET(querySOQLmore,false,true);
+	        querySOQL += ',' + querySOQLmore; 
+        }
+        
         if (IsGWBaseInstalled) {
         	// then fields that exist only in gwbase
-        	querySOQLmore = ' Best_Gift_Year__c,Best_Gift_Year_Total__c,OppAmountLastNDaysHH__c, ' + 
+        	string querySOQLmore = ' Best_Gift_Year__c,Best_Gift_Year_Total__c,OppAmountLastNDaysHH__c, ' + 
         							'ONEN_Household__c,ONEN_Household__r.OppsClosedLastNDays__c,ONEN_Household__r.Best_Gift_Year__c,ONEN_Household__r.Best_Gift_Year_Total__c,' +
 									'HouseholdMembershipEndDate__c,';
         	querySOQLmore = addAllNSPrefixET (querySOQLmore,false,true);
         	querySOQL += ',' + querySOQLmore;
         } else if (IsNPSPHHInstalled)	{
         	// and finally fields that only exist in NPSP
-			querySOQLmore = 
+			string querySOQLmore = 
 				'Household__c,' +
 				'Household__r.OppAmountLastNDays__c,' +
 				'Household__r.OppAmountThisYear__c, Household__r.OppAmountLastYear__c, Household__r.OppAmount2YearsAgo__c,' +
@@ -175,11 +177,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // querySOQL = querySOQL.substring(0,querySOQL.length()-1);   //lop off trailing comma
         
         querySOQL += ' FROM Contact';
+        
+        // this should no longer needed w/ new API that only uses test data by default
+        // but for now we need to set our tests as UseAllData b/c otherwise we run into a bug w/ decimals from settings 
+        // see https://twitter.com/rich_unger/status/215563857656156161
+        // once this bug is fixed, we should be able to get rid of this
         if (isTest) {
             querySOQL += ' WHERE LastName=\'Doppleganger\'';
         } else if (filterTestConsOnly) {
             querySOQL += ' WHERE Title=\'testeng\'';
         }
+        
         system.debug (Logginglevel.WARN,'query string: ' + querySOQL);
         Query = querySOQL;      
     }
@@ -764,7 +772,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
 	static void fetchDonorBreakpoints() {
         if (donorBreakpoints == null || donorLvlMap == null) {
-	        donorBreakpoints = new decimal[0];
+	        donorBreakpoints = new list<decimal>();
 	        donorLvlMap = new map<decimal,double>();  
 	        List<Engagement_Donor_Level_Settings__c> donorLvlDefs = Engagement_Donor_Level_Settings__c.getall().values();
 	        if (donorLvlDefs.size() > 0) {
@@ -1099,17 +1107,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // next donor tiers
         Engagement_Donor_Level_Settings__c dset1 = new Engagement_Donor_Level_Settings__c (
             Name = 'foo',
-            Lower_Limit__c = 1,
+            Lower_Limit__c = 1.0,
             Level__c = 2
         );
         Engagement_Donor_Level_Settings__c dset2 = new Engagement_Donor_Level_Settings__c (
             Name = 'foo2',
-            Lower_Limit__c = 100,
+            Lower_Limit__c = 100.0,
             Level__c = 3
         );
         Engagement_Donor_Level_Settings__c dset3 = new Engagement_Donor_Level_Settings__c (
             Name = 'foo3',
-            Lower_Limit__c = 1000,
+            Lower_Limit__c = 1000.0,
             Level__c = 4
         );
         Engagement_Donor_Level_Settings__c[] dsets = new Engagement_Donor_Level_Settings__c[] {dset1,dset2,dset3};
@@ -1173,7 +1181,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     */
     
     
-    public static testMethod void testLevelAssignment() { 
+    @isTest (SeeAllData=true)
+    public static void testLevelAssignment() { 
 
         // note: in addition to this batch process, this test relies on the GW_ContactTriggerBefore trigger
         string txtfield1 = 'Title';
@@ -1202,14 +1211,19 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		
 		// create one account, and spoof some donations this yr
 		Account ac1 = new Account(Name='Doppleganger and Sons');
-		ac1.put( addNSPrefixET('OppAmountLastNDays__c',false,true) , donorBreakpoints[1] - 5);
-		ac1.put( addNSPrefixET('LastCloseDate__c',false,true) , startDateRecent);
+        if (IsGWBaseInstalled || IsNPSPHHInstalled) {
+			ac1.put( addNSPrefixET('OppAmountLastNDays__c',false,true) , donorBreakpoints[1] - 5);
+			ac1.put( addNSPrefixET('LastCloseDate__c',false,true) , startDateRecent);
+			/*
+			string ac1Id = ac1.Id;
+			string fieldlist = addAllNSPrefixET('Id,Name,LastCloseDate__c,OppAmountLastNDays__c' , false, true);
+			string soql = 'SELECT ' + fieldlist + ' FROM Account WHERE Id=:ac1Id LIMIT 1';
+			Sobject[] ac1p = database.query(soql);
+			system.debug(LOGGINGLEVEL.Warn,'ac1p: ' + ac1p);
+			*/
+        }
 		insert ac1;
-		string ac1Id = ac1.Id;
-		string fieldlist = addAllNSPrefixET('Id,Name,LastCloseDate__c,OppAmountLastNDays__c' , false, true);
-		string soql = 'SELECT ' + fieldlist + ' FROM Account WHERE Id=:ac1Id LIMIT 1';
-		Sobject[] ac1p = database.query(soql);
-		system.debug(LOGGINGLEVEL.Warn,'ac1p: ' + ac1p);
+
 		                    
         // create & insert contact(s)
         Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(howMany);
@@ -1419,10 +1433,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         mbrOpps.addAll(mbrshipsThisYr);
         mbrOpps.addAll(mbrshipsLastYr);
     
-        for (Opportunity opp : mbrOpps) {    
-            opp.put( addNSPrefixET('Membership_Start_Date__c',false,false), opp.CloseDate);
-            opp.put( addNSPrefixET('Membership_End_Date__c',false,false), opp.CloseDate.AddYears(1)); 
-        }
+    	if (IsGWBaseInstalled || IsNPSPHHInstalled) {
+	        for (Opportunity opp : mbrOpps) {    
+	            opp.put( addNSPrefixET('Membership_Start_Date__c',false,false), opp.CloseDate);
+	            opp.put( addNSPrefixET('Membership_End_Date__c',false,false), opp.CloseDate.AddYears(1)); 
+	        }
+    	}
         // note that we also made sure contact 12 and 13 (those with membership),
         // have normal gift opps, to work around a bug in NPSP where they wouldn't
         // rollup membership opps if membership was in the excluded set, and the contact
@@ -1675,32 +1691,34 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.AssertEquals ('New' , cmsPmap.get(cm8.Id).Engagement_Conversion_Type__c );
         
         
-        // and conversions for opps
-        map<id,Opportunity> oppPmap = new map<id,Opportunity>();
-        OpportunityContactRole[] conroles = [SELECT OpportunityId,ContactId,Role,Opportunity.Engagement_Conversion__c,
-        									Opportunity.Engagement_Conversion_To_Level__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_Type__c
-        									FROM OpportunityContactRole WHERE OpportunityId IN :allOpps AND IsPrimary = True];
-        for (OpportunityContactRole conrole : conroles) {
-        	oppPmap.put (conrole.OpportunityId,conrole.Opportunity);
+        if (INCOPPS) {
+	        // and conversions for opps
+	        map<id,Opportunity> oppPmap = new map<id,Opportunity>();
+	        OpportunityContactRole[] conroles = [SELECT OpportunityId,ContactId,Role,Opportunity.Engagement_Conversion__c,
+	        									Opportunity.Engagement_Conversion_To_Level__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_Type__c
+	        									FROM OpportunityContactRole WHERE OpportunityId IN :allOpps AND IsPrimary = True];
+	        for (OpportunityContactRole conrole : conroles) {
+	        	oppPmap.put (conrole.OpportunityId,conrole.Opportunity);
+	        }
+	
+			// this one is not a conversion, since they got higher level from campaign
+	        Id con23oppId = recentSmallOpps[8].Id; 		// first in, first out
+	        system.assertEquals (false, oppPmap.get(con23oppId).Engagement_Conversion__c);
+	        system.assertEquals (null , oppPmap.get(con23oppId).Engagement_Conversion_From_Level__c);
+	        system.assertEquals (null, oppPmap.get(con23oppId).Engagement_Conversion_Type__c);
+			
+	        
+	        // this one should be a conversion, he started from lvl 0 and has no campaigns
+	        Id con6oppId = recentSmallOpps[0].Id; 		// first in, first out
+	        system.assertEquals (true , oppPmap.get(con6oppId).Engagement_Conversion__c);
+	        system.assertEquals (0 , oppPmap.get(con6oppId).Engagement_Conversion_From_Level__c);
+	        system.assertEquals ('New', oppPmap.get(con6oppId).Engagement_Conversion_Type__c);
+	        
+	        // con 8 opp shouold not be conversion since same data as CM, and campaigns win the tie
+	        Id con8oppId = recentSmallOpps[2].Id; 		// first in, first out
+	        system.assertEquals (false, oppPmap.get(con8oppId).Engagement_Conversion__c);
         }
-
-		// this one is not a conversion, since they got higher level from campaign
-        Id con23oppId = recentSmallOpps[8].Id; 		// first in, first out
-        system.assertEquals (false, oppPmap.get(con23oppId).Engagement_Conversion__c);
-        system.assertEquals (null , oppPmap.get(con23oppId).Engagement_Conversion_From_Level__c);
-        system.assertEquals (null, oppPmap.get(con23oppId).Engagement_Conversion_Type__c);
-		
-        
-        // this one should be a conversion, he started from lvl 0 and has no campaigns
-        Id con6oppId = recentSmallOpps[0].Id; 		// first in, first out
-        system.assertEquals (true , oppPmap.get(con6oppId).Engagement_Conversion__c);
-        system.assertEquals (0 , oppPmap.get(con6oppId).Engagement_Conversion_From_Level__c);
-        system.assertEquals ('New', oppPmap.get(con6oppId).Engagement_Conversion_Type__c);
-        
-        // con 8 opp shouold not be conversion since same data as CM, and campaigns win the tie
-        Id con8oppId = recentSmallOpps[2].Id; 		// first in, first out
-        system.assertEquals (false, oppPmap.get(con8oppId).Engagement_Conversion__c);
-        
+                
         // finally test that engagement fields are blanked out on clone
         Contact cloneCon = con0P.clone(false,true);	// deep clone not including ID
         insert CloneCon;
@@ -1714,8 +1732,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.assertEquals (null,CloneConP.First_Action_Date_Curr_Level__c);
     }
     
-
-    public static testMethod void testCampaignDefaults() { 
+	@isTest (SeeAllData=true)
+    public static void testCampaignDefaults() { 
 
         // this test relies on the GW_CampaignTriggerBefore trigger
         string txtfield1 = 'Title';
