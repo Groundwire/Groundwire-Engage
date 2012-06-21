@@ -14,7 +14,7 @@
         <groupingColumn>Contact.Engagement_Level__c</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
-        <secondaryGroupingColumn>Contact.Donor__c</secondaryGroupingColumn>
+        <secondaryGroupingColumn>Contact.IsDonor__c</secondaryGroupingColumn>
         <showAxisLabels>true</showAxisLabels>
         <showPercentage>false</showPercentage>
         <showTotal>false</showTotal>
@@ -79,7 +79,7 @@
     <format>Matrix</format>
     <groupingsAcross>
         <dateGranularity>Day</dateGranularity>
-        <field>Contact.Donor__c</field>
+        <field>Contact.IsDonor__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsAcross>
     <groupingsDown>

@@ -1536,6 +1536,16 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(lvlNameMapTest.get(DONORLVL1),con6P.Engagement_Peak__c);
             System.AssertEquals(startDateRecent,con6P.Last_Leadership_Action_Date__c);  
             System.AssertEquals(startDateRecent,con6P.First_Action_Date_Curr_Level__c);
+            
+            if (isNPSPHHInstalled) {
+            	// while we're at it, also check that the Donor? flag was set by trigger (NPSP only) - used in reports
+            	string donorFieldname = addNSPrefixET('IsDonor__c',true,false);
+            	Id con6PId = con6P.Id;
+            	string soql = 'SELECT Id,' + donorFieldname + ' FROM Contact WHERE Id =:con6PId';
+            	SObject[] results = database.query(soql);
+            	contact con6PP = (Contact) results[0];
+            	system.assert (con6PP.get(donorFieldname)==true);  
+            }
     
             // recent small donation & maj donation (should work out to donor tier 3) 
             Contact con7P = conP.get(TestCons[7].Id);
