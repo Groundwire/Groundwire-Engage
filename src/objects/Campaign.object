@@ -37,6 +37,14 @@
         <type>Percent</type>
     </fields>
     <fields>
+        <fullName>Gratitude_Machine__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>True if this campaign for tracking contacts with the Gratitude Machine</inlineHelpText>
+        <label>Gratitude Machine</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Leadership_Level__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>Level of leadership: 1-organizing, 2-consistent leader, 3-inconsistent leader, 4-activist, 5-donor/member</inlineHelpText>
