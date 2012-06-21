@@ -662,32 +662,6 @@
                 <default>false</default>
             </values>
         </picklistValues>
-        <picklistValues>
-            <picklist>npo02__DeliveryInstallationStatus__c</picklist>
-            <values>
-                <fullName>Completed</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>In progress</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>Yet to begin</fullName>
-                <default>false</default>
-            </values>
-        </picklistValues>
-        <picklistValues>
-            <picklist>npo02__systemHouseholdContactRoleProcessor__c</picklist>
-            <values>
-                <fullName>All Opportunities</fullName>
-                <default>true</default>
-            </values>
-            <values>
-                <fullName>No Opportunities</fullName>
-                <default>false</default>
-            </values>
-        </picklistValues>
     </recordTypes>
     <recordTypes>
         <fullName>Membership</fullName>
@@ -800,32 +774,6 @@
                 <default>false</default>
             </values>
         </picklistValues>
-        <picklistValues>
-            <picklist>npo02__DeliveryInstallationStatus__c</picklist>
-            <values>
-                <fullName>Completed</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>In progress</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>Yet to begin</fullName>
-                <default>false</default>
-            </values>
-        </picklistValues>
-        <picklistValues>
-            <picklist>npo02__systemHouseholdContactRoleProcessor__c</picklist>
-            <values>
-                <fullName>All Opportunities</fullName>
-                <default>true</default>
-            </values>
-            <values>
-                <fullName>No Opportunities</fullName>
-                <default>false</default>
-            </values>
-        </picklistValues>
     </recordTypes>
     <recordTypes>
         <fullName>My_First_Record_Type</fullName>
@@ -935,17 +883,6 @@
             </values>
             <values>
                 <fullName>Renewal</fullName>
-                <default>false</default>
-            </values>
-        </picklistValues>
-        <picklistValues>
-            <picklist>npo02__systemHouseholdContactRoleProcessor__c</picklist>
-            <values>
-                <fullName>All Opportunities</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>No Opportunities</fullName>
                 <default>false</default>
             </values>
         </picklistValues>
