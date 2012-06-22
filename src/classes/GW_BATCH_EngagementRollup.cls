@@ -48,6 +48,46 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     static decimal[] donorBreakpoints;
     static map<decimal,double> donorLvlMap;  
     
+    // transitory collections
+    set<id> conIDs;
+    Map<id,engTrackConWrapper> conWrapMap;
+    Contact[] convertedCons;
+    map<integer,list<Contact>> campConvCandidateMap;
+    Contact[] oppConversionCandidateCons;
+    Contact[] consToUpd;
+
+
+    // *** WRAPPER CLASS ***
+    global class engTrackConWrapper {
+        private id conId;
+        global Contact con;
+        global integer CurrLvl = 0;
+        global integer PeakLvl = 0;
+        global integer OrigLvl = 0;
+        global integer OrigPeakLvl = 0;
+        global date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
+        global boolean isConverting;
+        
+        // cache of campaign-based data
+        global integer LvlFromCampaigns = 0;
+        
+        // cache of Opp Rollup data
+        global integer LvlFromOpps = 0;
+        global decimal OppAmountLastNDays_c,OppAmountLastNDaysHH_c,OppsClosedLastNDays_c,OppsClosedLastNDaysHH_c;
+		global decimal Best_Gift_Year_Total_c,Best_Gift_Year_TotalHH_c;
+        global date LastCloseDate_c,LastCloseDateHH_c;
+        global decimal donorTierBreakpoint;
+        
+        // cache of membership data
+        global date MembershipEndDate_c,HouseholdMembershipEndDate_c,LastMembershipDate_c,MembershipJoinDate_c;
+        global string LastMembershipOrigin_c;
+
+        //constructor 
+        public engTrackConWrapper (id argId) {
+            conId = argId;  
+        }   
+    }
+    
     /*******************************************************************************************************
 	* @description This constructor is needed to allow this class to be schedulable.
 	*/
@@ -83,8 +123,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	* @description Loads an instance of EngagementTrackerSettings__c, creating one with useful defaults
 	* if one isn't found.
 	*/   
-	//public class MyException extends Exception {}
-	 
     public static EngagementTrackerSettings__c settings {
         get {
             if (settings == null) {
@@ -102,12 +140,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             }
             return settings;
         }
-        
         set;
     }
+
     
     protected void getSettingParams() {
-
         monthsRecent = settings.Timeframe_Recent__c.intvalue();
         monthsMedium = settings.Timeframe_Medium__c.intvalue();
         fieldSettingsMap = EngagementContactFieldSettings__c.getAll();
@@ -131,11 +168,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         if (settings.Testing_Mode__c && !isTest) {
             filterTestConsOnly = True;
         }
-
     }
     
     
     protected void constructQuery() {
+    	// construct the soql batch query
     	
     	// first ET fields
         string querySOQL = 'SELECT Id,Name,Award_Engagement_Levels_for_Org_Giving__c,' + CON_FIELDS_ET_EDITABLE + CON_FIELDS_ET_READONLY;
@@ -192,6 +229,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Query = querySOQL;      
     }
 
+
     /*******************************************************************************************************
 	* @description Standard batch start method.   This doesn't do anything interesting.  
 	*/    
@@ -204,19 +242,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	*  and then all related Campaigns and Opps for each contact, to determine the correct score to assign.  It only makes a write to the contact if any of the rollup fields need changing.  
 	*/
     global void execute(Database.BatchableContext BC, List<Sobject> SBatch){
-        // system.debug (Logginglevel.WARN,'running execute!');
-        
+
         Map<id,Contact> conMap = new Map<id,Contact>();
-        Map<id,engTrackConWrapper> conWrapMap = new Map<id,engTrackConWrapper>();
-        set<id> conIDs = new set<id>();       
-        Contact[] consToUpd = new Contact[0];
-        
-        // collections for conversion analytics
-        Contact[] convertedCons = new Contact[0]; 
-        // Contact[] campConversionCandidateCons = new Contact[0];
-        map<integer,list<Contact>> campConvCandidateMap = new map<integer,list<Contact>>();
-        Contact[] oppConversionCandidateCons = new Contact[0];
-        
+        conWrapMap = new Map<id,engTrackConWrapper>();
+        conIDs = new set<id>();       
+        consToUpd = new Contact[0];
+          
         cutoffDateRecent = system.today().addMonths(monthsRecent * -1);
         // cutoffDateMedium = system.today().addMonths(monthsMedium * -1);			// deprecated
         
@@ -242,7 +273,40 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         	CalculateOppData(conWrapMap, conIDs);
         }
         
+		// calculate levels based on campaign memberships
+		calcCampaignLevels();
 
+		// calculate "repeated action" rules
+        calcFrequencyLevels();
+
+        // apply contact-centric level rules & opp-based rules 
+    	calcOppAndContactLevels();
+        
+	    //system.debug (Logginglevel.WARN,'conwrapper map after calcs: ' + conWrapMap);
+	    
+	    // do any final custom processing implemented via override
+	    customFinalLvlAssign (conWrapMap, conIDs);
+        
+        // figure changes to engagement fields on the contact, and flag conversions
+        getContactWrites();
+        
+        system.debug (LoggingLevel.WARN,'convertedCons: ' + convertedCons);
+        system.debug (LoggingLevel.WARN,'convertedCons size: ' + convertedCons.size());
+        system.debug (LoggingLevel.WARN,'campConvCandidateMap: ' + campConvCandidateMap);
+        system.debug (Logginglevel.WARN,'consToUpd:' + consToUpd);
+
+        if (consToUpd.size() > 0) {
+			// identify and write to opps & campaign memberships that qualify as conversions (i.e. caused jump in level)
+			calculateConversions();
+			system.debug (Logginglevel.WARN,'consToUpd after conversion calcs:' + consToUpd);
+
+			// and finally update our contacts!
+            update consToUpd;
+        }
+    }
+  
+
+	private void calcCampaignLevels() {
         // fetch campaign mbrships in recent time period and get max level
         //  (require either that the campaign start date be within the time frame, or that the FirstRespondedDate of the CM is, and is also within Campaign start/end dates)
         // note can't GROUP BY a formula field as of may 2010, so need to group by the text field and manually switch it to numeric
@@ -301,8 +365,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     if (lvl > cw.PeakLvl ) cw.PeakLvl = lvl;
                     if (cw.LastActionDate==null) cw.LastActionDate = (date)r.get('LastDate');
         }
-        
-        // now check frequency rules that require fields (separate SOQL for each one!)
+		
+	}
+
+
+	private void calcFrequencyLevels() {
+        // now check "repeated action" rules (separate SOQL for each one!)
         for (EngagementFrequencySettings__c fqset : freqSettingsMap.values() ) {
             if (fqset.Campaign_Type__c != null || fqset.Campaign_Sub_Type__c != null || fqset.Campaign_Record_Type__c != null ) {
                 string qstr = 'SELECT ContactId,Calendar_Year(Effective_Action_Date__c) yr,COUNT_DISTINCT(Id) CountCMs, ';
@@ -364,7 +432,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 }
             }
         }
-    
+		
+	}
+
+
+	private void calcOppAndContactLevels() {
         // now loop back through our contacts and apply contact-centric level rules, opp-based rules & calculate final engagmeent field values
         for (engTrackConWrapper cw : conWrapMap.values() ) {
             Contact con = cw.con;       
@@ -487,13 +559,18 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 if (mbrlvl > cw.PeakLvl) cw.PeakLvl = mbrlvl;  
             }   
         }
-        
-	    //system.debug (Logginglevel.WARN,'conwrapper map after calcs: ' + conWrapMap);
-	    
-	    // do any final custom processing implemented via override
-	    customFinalLvlAssign (conWrapMap, conIDs);
-        
+		
+	}
+
+
+	private void getContactWrites() {
 	    // write chgs to contacts, but only if something actually changed
+	    
+        // collections for conversion analytics
+        convertedCons = new Contact[0]; 
+        campConvCandidateMap = new map<integer,list<Contact>>();
+        oppConversionCandidateCons = new Contact[0];
+	    
         for (engTrackConWrapper cw : conWrapMap.values() ) {
             Contact con = cw.con;               
             
@@ -542,13 +619,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     consToUpd.add(con);
                 }
         }
-        
-        system.debug (LoggingLevel.WARN,'convertedCons: ' + convertedCons);
-        system.debug (LoggingLevel.WARN,'convertedCons size: ' + convertedCons.size());
-        system.debug (LoggingLevel.WARN,'campConvCandidateMap: ' + campConvCandidateMap);
-        system.debug (Logginglevel.WARN,'consToUpd:' + consToUpd);
+		
+	}
 
-        if (consToUpd.size() > 0) {
+
+	private void calculateConversions() {
 			// before updating contacts, figure campaign & opp conversions
 			// need to do this first, b/c relies on the date of last eng change on Contact
 			// first find all CM's that are candidates
@@ -667,13 +742,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				update oppConversionsUpd;
 				system.debug (LoggingLevel.WARN,'oppConversionsUpd list after updates: ' + oppConversionsUpd);				
 			}			
-
-			system.debug (Logginglevel.WARN,'consToUpd after conversion calcs:' + consToUpd);
-            update consToUpd;
-        }
-        
-    }
-  
+		
+	}
+	
   
   	private void setGiftRectypeVars() {
 
@@ -958,50 +1029,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
     
-    // *** WRAPPER CLASS **************************************************************
-    
-    
-    global class engTrackConWrapper {
-        private id conId;
-        global Contact con;
-        
-        global integer CurrLvl = 0;
-        global integer PeakLvl = 0;
-        global date LastActionDate;
-        global date FirstDateInLvl;
-        global date EarliestActivityDateInLvl;
-        global boolean isConverting;
-        global integer OrigLvl = 0;
-        global integer OrigPeakLvl = 0;
-        
-        // cache of campaign-based data
-        global integer LvlFromCampaigns = 0;
-        
-        // our cache of Opp Rollup data
-        global decimal OppAmountLastNDays_c;
-        global decimal OppAmountLastNDaysHH_c;
-        global date LastCloseDate_c;
-        global decimal OppsClosedLastNDays_c;
-        global date LastCloseDateHH_c;
-        global decimal OppsClosedLastNDaysHH_c;
-        global decimal Best_Gift_Year_Total_c;
-        global decimal Best_Gift_Year_TotalHH_c;
-        global integer LvlFromOpps = 0;
-        global decimal donorTierBreakpoint;
-        
-        // our cache of membership data
-        global date MembershipEndDate_c;
-        global date HouseholdMembershipEndDate_c;
-        global string LastMembershipOrigin_c;
-        global date LastMembershipDate_c;
-        global date MembershipJoinDate_c;
 
-        //constructor 
-        public engTrackConWrapper (id argId) {
-            conId = argId;  
-        }   
-
-    }
 
     // called from the Contact before trigger
     public static void ContactEngagementLvlOverride() {    
