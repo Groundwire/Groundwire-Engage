@@ -2,6 +2,23 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Conversion_Candidate__c</fullName>
+        <description>Indicates whether this campaign membership is/was a possible conversion.  In order to qualify, contact must have started out at a lower engagement level than this campaign would give them, and the campaign must occur (start or end date) after the last time the contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Used in conversion rate metrics.</description>
+        <externalId>false</externalId>
+        <formula>IF (  
+  Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
+  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
+  &amp;&amp; NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) 
+  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c)) 
+, &quot;True&quot; , &quot;False&quot; )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Used in conversion rate metrics.  Indicates if this campaign membership was a possible conversion at time of entry.</inlineHelpText>
+        <label>Conversion Candidate</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Conversion_Level_Jump__c</fullName>
         <externalId>false</externalId>
         <formula>Engagement_Conversion_To_Level__c -  Engagement_Conversion_From_Level__c</formula>
@@ -15,9 +32,9 @@
     </fields>
     <fields>
         <fullName>Effective_Action_Date__c</fullName>
-        <description>If campaign has start &amp; end date &amp; CM created within that span, use CreatedDate of CM.  Otherwise:
+        <description>If campaign has start &amp; end date &amp; response logged within that span, use FirstRespondedDate of CM.  Otherwise:
 * if campaign has start &amp; End date, use end date
-* if campaign has start date but no end date, and CM created within a month of the start date, use CM date
+* if campaign has start date but no end date, and response logged within a month of the start date, use FirstRespondedDate
 * if campaign has only start OR End date, use the one we have
 * else use created date of campaign</description>
         <externalId>false</externalId>
@@ -88,6 +105,17 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Engagement_Level_At_Insert__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The contact&apos;s engagement level at the time this campaign membership was created.  Set by trigger.</inlineHelpText>
+        <label>Engagement Level At Insert</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>LeadSource</fullName>
         <picklist>
             <picklistValues>
@@ -113,6 +141,14 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
             <sorted>false</sorted>
         </picklist>
         <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Level_Change_Datestamp_At_Insert__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>At the time of insert of this campaign membership, the datestamp of last engagement level change of the contact.  Used for Conversion metrics.</inlineHelpText>
+        <label>Level Change Datestamp At Insert</label>
+        <required>false</required>
+        <type>DateTime</type>
     </fields>
     <fields>
         <fullName>New_Since_Last_Engagement_Chg__c</fullName>
@@ -173,6 +209,18 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         <fullName>Status</fullName>
         <picklist>
             <picklistValues>
+                <fullName>Ignored</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Left Message</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Listed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
                 <fullName>Planned</fullName>
                 <default>false</default>
             </picklistValues>
@@ -186,6 +234,10 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
             </picklistValues>
             <picklistValues>
                 <fullName>Sent</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Thanked</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>

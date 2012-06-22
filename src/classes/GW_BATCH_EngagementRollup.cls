@@ -628,16 +628,19 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			// need to do this first, b/c relies on the date of last eng change on Contact
 			// first find all CM's that are candidates
 			// meaning they belong to one of our candidate cons, have the right engagement level, and dates are right
+			// the last criterion (Conversion_Candidate__c) is a formula field based on what the contact's level was when campaign membership was inserted, and dates
 			// we will do a series of queries, one for each engagement level that has candidates, so max of 8 queries total here
 			map<Id,CampaignMember> firstCandidateCMmap = new map<Id,CampaignMember>();
 			map<Id,OpportunityContactRole> firstCandidateOppMap = new map<Id,OpportunityContactRole>();
 			for (integer Lvl : campConvCandidateMap.keyset()) {
 				Contact[] conCandidates = campConvCandidateMap.get(Lvl);
-				CampaignMember[] cmCandidates = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,Effective_Action_Date__c 
+				CampaignMember[] cmCandidates = [SELECT Id,ContactId,CampaignID,Status,Engagement_Conversion__c,Engagement_Conversion_To_Level__c,
+												Engagement_Conversion_From_Level__c,Effective_Action_Date__c 
 												FROM CampaignMember
 												WHERE ContactId IN :conCandidates
 													AND (HasResponded = true AND (New_Since_Last_Engagement_Chg__c = 'True' OR Responded_Since_Last_Engagement_Chg__c = 'True'))
 													AND Campaign.Engagement_Level_Numeric__c = :Lvl AND Effective_Action_Date__c >= :cutoffDateRecent
+													AND Conversion_Candidate__c = 'True'
 													ORDER BY Effective_Action_Date__c];
 				system.debug (LoggingLevel.WARN,'cmCandidates for lvl ' + Lvl + ':' + cmCandidates);
 													
@@ -1266,7 +1269,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		// in order to get around trigger that blanks these out on insert (to avoid probs w/ cloning contacts)
         TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);
         TestCons[1].Engagement_Level_Numeric__c = 2;   
-        TestCons[1].Engagement_Peak_Numeric__c = 2;   
+        TestCons[1].Engagement_Peak_Numeric__c = 2;
+        TestCons[1].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
         TestCons[11].Engagement_Peak_Numeric__c = 5;
@@ -1534,10 +1538,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(4,con1P.Engagement_Peak_Numeric__c);
         System.AssertEquals(lvlNameMapTest.get(4),con1P.Engagement_Peak__c);
         System.AssertEquals(startDateMedium,con1P.Last_Leadership_Action_Date__c);
-        // also test that the level stamp on the campaign membership worked
-        CampaignMember cm1p = [SELECT Id,Engagement_Level_At_Insert__c FROM CampaignMember WHERE Id=:cm1.Id LIMIT 1];
+        // also test that the level & date stamp on the campaign membership worked
+        CampaignMember cm1p = [SELECT Id,Engagement_Level_At_Insert__c,Level_Change_Datestamp_At_Insert__c FROM CampaignMember WHERE Id=:cm1.Id LIMIT 1];
         System.AssertEquals(2,cm1p.Engagement_Level_At_Insert__c);  
-        
+        System.AssertEquals(startDateOld.addMonths(-3),cm1p.Level_Change_Datestamp_At_Insert__c);  
+
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
         System.AssertEquals(4,con2P.Engagement_Level_Numeric__c);

@@ -2,6 +2,16 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableFeeds>false</enableFeeds>
     <fields>
+        <fullName>Engagement_Conversion_Rate__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>What pct. of possible conversions were converted to this engagement level or higher, by this campaign and any sub-campaigns.</inlineHelpText>
+        <label>Engagement Conversion Rate</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Percent</type>
+    </fields>
+    <fields>
         <fullName>Engagement_Conversions__c</fullName>
         <externalId>false</externalId>
         <label>Engagement Conversions</label>
@@ -13,6 +23,17 @@
         <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Engagement_Conversions_in_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of contacts that were moved up an engagement level due to this campaign or one of its sub-campaigns.</inlineHelpText>
+        <label>Engagement Conversions in Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>Engagement_Level_Numeric__c</fullName>
@@ -135,28 +156,6 @@ IF (Parent.Id != null, 1 , 0)
         <type>Percent</type>
     </fields>
     <fields>
-        <fullName>Response_Rate__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF ( (NumberOfContacts +  NumberOfLeads ) &gt; 0 ,  NumberOfResponses /  (NumberOfContacts +  NumberOfLeads ) , 0 )</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Response Rate</label>
-        <precision>18</precision>
-        <required>false</required>
-        <scale>1</scale>
-        <type>Percent</type>
-    </fields>
-    <fields>
-        <fullName>Response_Rate_for_Hierarchy__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF ( ( HierarchyNumberOfContacts + HierarchyNumberOfLeads ) &gt; 0 , HierarchyNumberOfResponses / (HierarchyNumberOfContacts + HierarchyNumberOfLeads ) , 0 )</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Response Rate for Hierarchy</label>
-        <precision>18</precision>
-        <required>false</required>
-        <scale>1</scale>
-        <type>Percent</type>
-    </fields>
-    <fields>
         <fullName>Returning_Engagement_Conversions__c</fullName>
         <externalId>false</externalId>
         <label>Returning Engagement Conversions</label>
@@ -196,16 +195,6 @@ IF (Parent.Id != null, 1 , 0)
             <sorted>false</sorted>
         </picklist>
         <type>Picklist</type>
-    </fields>
-    <fields>
-        <fullName>TEST_MostRecentCM__c</fullName>
-        <description>just testing for response rate metrics</description>
-        <externalId>false</externalId>
-        <label>TEST_MostRecentCM</label>
-        <summarizedField>CampaignMember.LastModifiedDate</summarizedField>
-        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
-        <summaryOperation>max</summaryOperation>
-        <type>Summary</type>
     </fields>
     <fields>
         <fullName>Top_Hierarchy_Campaign_ID__c</fullName>
