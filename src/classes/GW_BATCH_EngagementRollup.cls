@@ -1236,7 +1236,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
 		// have to update some fields after insert in order to spoof existing history of engagement changes
 		// in order to get around trigger that blanks these out on insert (to avoid probs w/ cloning contacts)
-        TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
+        TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);
+        TestCons[1].Engagement_Level_Numeric__c = 2;   
+        TestCons[1].Engagement_Peak_Numeric__c = 2;   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
         TestCons[11].Engagement_Peak_Numeric__c = 5;
@@ -1503,7 +1505,10 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(4,con1P.Engagement_Level_Numeric__c);       
         System.AssertEquals(4,con1P.Engagement_Peak_Numeric__c);
         System.AssertEquals(lvlNameMapTest.get(4),con1P.Engagement_Peak__c);
-        System.AssertEquals(startDateMedium,con1P.Last_Leadership_Action_Date__c);  
+        System.AssertEquals(startDateMedium,con1P.Last_Leadership_Action_Date__c);
+        // also test that the level stamp on the campaign membership worked
+        CampaignMember cm1p = [SELECT Id,Engagement_Level_At_Insert__c FROM CampaignMember WHERE Id=:cm1.Id LIMIT 1];
+        System.AssertEquals(2,cm1p.Engagement_Level_At_Insert__c);  
         
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
