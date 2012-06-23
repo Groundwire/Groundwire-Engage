@@ -24,6 +24,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		boolean currConSent,currConSentLead,currConResp,currConEngResp,currConConvCandidate,currConConv;		// temporary flags for each contact in loop
 		decimal responseRate,conversionRate;
 		string campName;
+		boolean doConversionRate;
 		
 		set<Id> parentCampIDs;						// all direct parents
 		set<Id> eligibleParentCampIDs;				// only those parents that our responses will roll up to for response rate 
@@ -44,6 +45,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			this.convCount = 0;
 			this.parentCampIDs = new set<Id>();
 			this.eligibleParentCampIDs = new set<Id>();
+			this.doConversionRate = false;
 			
 			ResetCurrConFlags();
 			
@@ -70,7 +72,11 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			}
 			if (isResp) currConResp = true;
 			if (isResp && respLvl >= engLvl) currConEngResp = true;
-			currConConvCandidate = isConvCandidate;
+			// count actual conversions as potential conversions even if not flagged as such (due to data migration timing etc.)
+			// but still only run the conversion rate if we have one or more flagged as potential
+			//  which means that at least one CM was entered post-migration 
+			if (isConvCandidate) doConversionRate = true;
+			currConConvCandidate = (isConvCandidate || isConv);			
 			if (isConv && respLvl >= engLvl) currConConv = true;
 			system.debug (LoggingLevel.WARN,'set curr con flags for campaign ' + camp.Name + ':  ' + 'currConSent=' + currConSent + '  currConResp=' + currConResp + '  currConEngResp=' + currConEngResp);
 		}
