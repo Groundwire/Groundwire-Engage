@@ -3,15 +3,21 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Conversion_Candidate__c</fullName>
-        <description>Indicates whether this campaign membership is/was a possible conversion.  In order to qualify, contact must have started out at a lower engagement level than this campaign would give them, and the campaign must occur (start or end date) after the last time the contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Used in conversion rate metrics.</description>
+        <description>Indicates whether this campaign membership is/was a possible conversion.  In order to qualify, contact must have started out at a lower engagement level than this campaign would give them, and the campaign must occur (start or end date) after the last time the 
+contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Used in conversion rate metrics.</description>
         <externalId>false</externalId>
         <formula>IF (  
+(
   Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
-  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
-  &amp;&amp; NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) 
-  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c)) 
+  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
+  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
+  &amp;&amp; NOT(ISBLANK(ContactId))  
+) || (
+  NOT(ISBLANK(LeadId))  
+)
+&amp;&amp; NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) 
+
 , &quot;True&quot; , &quot;False&quot; )</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <inlineHelpText>Used in conversion rate metrics.  Indicates if this campaign membership was a possible conversion at time of entry.</inlineHelpText>
         <label>Conversion Candidate</label>
         <required>false</required>

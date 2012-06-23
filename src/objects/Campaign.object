@@ -221,6 +221,16 @@ IF (Parent.Id != null, 1 , 0)
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Total_Unique_Leads_in_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <label>Total Unique Leads in Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Total_Unique_Responses_in_Hierarchy__c</fullName>
         <externalId>false</externalId>
         <label>Total Unique Responses in Hierarchy</label>
@@ -315,6 +325,22 @@ IF (Parent.Id != null, 1 , 0)
             <value>1</value>
         </filters>
         <label>All Active Campaigns</label>
+    </listViews>
+    <listViews>
+        <fullName>Campaigns_w_Engagement_Metrics</fullName>
+        <columns>CAMPAIGN.NAME</columns>
+        <columns>CAMPAIGN.CAMPAIGN_TYPE</columns>
+        <columns>CAMPAIGN.START_DATE</columns>
+        <columns>CAMPAIGN.END_DATE</columns>
+        <columns>Leadership_Level__c</columns>
+        <columns>Engagement_Response_Rate__c</columns>
+        <columns>Total_Unique_Contacts_In_Hierarchy__c</columns>
+        <columns>Total_Unique_Responses_in_Hierarchy__c</columns>
+        <columns>Engagement_Conversion_Rate__c</columns>
+        <columns>Engagement_Conversions__c</columns>
+        <columns>Engagement_Conversions_in_Hierarchy__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>Campaigns w/ Engagement Metrics</label>
     </listViews>
     <listViews>
         <fullName>MyActiveCampaigns</fullName>

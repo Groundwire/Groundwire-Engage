@@ -151,6 +151,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 					Id = camp.Id,
 					Total_Unique_Contacts_In_Hierarchy__c = conCount,
 					Total_Unique_Responses_in_Hierarchy__c = respCount,
+					Total_Unique_Leads_in_Hierarchy__c = leadCount,
 					Engagement_Response_Rate__c = responseRate,
 					Engagement_Conversion_Rate__c = conversionRate
 				);
@@ -182,7 +183,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     
     private void constructQuery () {
     	string soql = 'SELECT Id,CampaignId,ContactId,LeadId,Status,HasResponded,Campaign.Id,Campaign.Name,Campaign.Engagement_Level_Numeric__c,Contact.Name, ';
-    	soql +=			' Conversion_Candidate__c,Engagement_Conversion__c, ';
+    	soql +=			' Conversion_Candidate__c,Engagement_Conversion__c,Campaign.Total_Unique_Leads_in_Hierarchy__c, ';
     	soql +=			' Campaign.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Total_Unique_Responses_in_Hierarchy__c,Campaign.Engagement_Response_Rate__c,Campaign.Engagement_Conversion_Rate__c, ';
     	soql +=			' Campaign.Parent.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Parent.Total_Unique_Responses_in_Hierarchy__c,Campaign.Parent.Engagement_Response_Rate__c,Campaign.Parent.Engagement_Conversion_Rate__c, ';
     	soql +=			' Campaign.Parent.Parent.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Parent.Parent.Total_Unique_Responses_in_Hierarchy__c,Campaign.Parent.Parent.Engagement_Response_Rate__c,Campaign.Parent.Parent.Engagement_Conversion_Rate__c, ';
@@ -191,7 +192,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     	soql +=			' Campaign.Parent.Id,Campaign.Parent.Parent.Id,Campaign.Parent.Parent.Parent.Id,Campaign.Parent.Parent.Parent.Parent.Id, ';
     	soql +=			' Campaign.Parent.Name,Campaign.Parent.Parent.Name,Campaign.Parent.Parent.Parent.Name,Campaign.Parent.Parent.Parent.Parent.Name, ';
     	soql +=	 		' Campaign.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c, ';
-    	soql +=	 		' Campaign.Top_Hierarchy_Campaign_ID__c ';
+    	soql +=	 		' Campaign.Top_Hierarchy_Campaign_ID__c, ';
+    	soql +=	 		' Campaign.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c ';
     	soql +=			' FROM CampaignMember';
     	// soql +=			'WHERE ';
     	soql +=			' ORDER BY Campaign.Top_Hierarchy_Campaign_ID__c,ContactId,LeadId,Campaign.Levels_Below_Top_of_Hierarchy__c DESC,CampaignId';
@@ -375,19 +377,29 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		// first hierarchy
 		Campaign top1 = new Campaign (name = 'top1');
 		insert top1;
-		Campaign sub1a = new Campaign (name = 'sub1a',ParentId = top1.Id,Leadership_Level__c = '3 - lvl three');
-		insert sub1a;
-		Campaign subsub1aa = new Campaign (name = 'subsub1aa',ParentId = sub1a.Id,Leadership_Level__c = '3 - lvl three',StartDate=System.Today().addDays(-30));
-		insert subsub1aa;
-		Campaign subsub1ab = new Campaign (name = 'subsub1ab',ParentId = sub1a.Id,Leadership_Level__c = '1 - lvl one');
-		insert subsub1ab;
+		Campaign child_1a = new Campaign (name = 'child_1a',ParentId = top1.Id,Leadership_Level__c = '3 - lvl three');
+		insert child_1a;
+		Campaign grandchild_1aa = new Campaign (name = 'grandchild_1aa',ParentId = child_1a.Id,Leadership_Level__c = '3 - lvl three',StartDate=System.Today().addDays(-30));
+		insert grandchild_1aa;
+		Campaign grandchild_1ab = new Campaign (name = 'grandchild_1ab',ParentId = child_1a.Id,Leadership_Level__c = '1 - lvl one');
+		insert grandchild_1ab;
+		Campaign child_1b = new Campaign (name = 'child_1b',ParentId = top1.Id,Leadership_Level__c = '3 - lvl three');
+		insert child_1b;
+		Campaign grandchild_1ba = new Campaign (name = 'grandchild_1ba',ParentId = child_1b.Id,Leadership_Level__c = '3 - lvl three',StartDate=System.Today().addDays(-30));
+		insert grandchild_1ba;
+		Campaign greatgrand_1baa = new Campaign (name = 'greatgrand_1baa',ParentId = grandchild_1ba.Id,Leadership_Level__c = '3 - lvl three',StartDate=System.Today().addDays(-30));
+		insert greatgrand_1baa;
+		Campaign greatgrand_1bab = new Campaign (name = 'greatgrand_1bab',ParentId = grandchild_1ba.Id,Leadership_Level__c = '4 - lvl four',StartDate=System.Today().addDays(-30));
+		insert greatgrand_1bab;
+		Campaign greatgreatgrand_1baaa = new Campaign (name = 'greatgreatgrand_1baaa',ParentId = greatgrand_1baa.Id,Leadership_Level__c = '3 - lvl three',StartDate=System.Today().addDays(-30));
+		insert greatgreatgrand_1baaa;
 		
 		// 2nd hierarchy, just one campaign
-		Campaign top2 = new Campaign (name = 'top2', Leadership_Level__c = '4 - lvl four');
+		Campaign top2 = new Campaign (name = 'top2', Leadership_Level__c = '4 - lvl four',StartDate=System.Today().addDays(-30));
 		insert top2;
 		
 		
-		Id[] allCampIds = new Id[] {top1.Id,sub1a.Id,subsub1aa.Id,subsub1ab.Id,top2.Id};
+		Id[] allCampIds = new Id[] {top1.Id,child_1a.Id,grandchild_1aa.Id,grandchild_1ab.Id,top2.Id,child_1b.Id,grandchild_1ba.Id,greatgrand_1baa.Id,greatgrand_1bab.Id,greatgreatgrand_1baaa.Id};
 		
 		// create cons
         Contact[] cons = ONEN_UnitTestData.CreateMultipleTestContacts(20);
@@ -401,37 +413,70 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         cons[10].Engagement_Level_Numeric__c = 4;
         cons[10].Engagement_Peak_Numeric__c = 4;
         cons[10].Last_Engagement_Lvl_Chg_Datestamp__c = system.Now().addMonths(-3);
+        cons[14].Engagement_Level_Numeric__c = 3;
+        cons[14].Engagement_Peak_Numeric__c = 3;
+        cons[14].Last_Engagement_Lvl_Chg_Datestamp__c = system.Now().addMonths(-3);
         // then one that will not be conversion or cand, since level changed too recently
         cons[6].Engagement_Level_Numeric__c = 1;
         cons[6].Engagement_Peak_Numeric__c = 1;
         cons[6].Last_Engagement_Lvl_Chg_Datestamp__c = system.Now().addDays(-2);
         update cons;
         
+        // create a few leads
+        Lead lead1 = new Lead (FirstName='Lead1',LastName='Test',Company='Foo');
+        Lead lead2 = new Lead (FirstName='Lead2',LastName='Test',Company='Foo');
+        Lead lead3 = new Lead (FirstName='Lead3',LastName='Test',Company='Foo');
+        insert new Lead[] {lead1,lead2,lead3};
+        
+        
         // first few cons responded on parent, all but 1 is conversion
         set<id> con0thru2 = new set<id> {cons[0].Id,cons[1].Id,cons[2].Id} ;
         set<id> con1nonConv = new set<id> {cons[1].Id} ;
-        insert testCMs(sub1a.Id,con0thru2,'Responded',con1nonConv);
+        insert testCMs(child_1a.Id,con0thru2,'Responded',con1nonConv);
+        
+        // and one lead on the parent (unrealistic, but tests that leads are unduped)
+        set<id> leads3 = new set<id> {lead3.Id} ;
+        insert testLeadCMs(child_1a.Id,leads3,'Sent');
 		
 		// one of those plus 4 new ones responded on child that counts
         set<id> con2thru6 = new set<id> {cons[2].Id,cons[3].Id,cons[4].Id,cons[5].Id,cons[6].Id} ;
         set<id> con6nonConv = new set<id> {cons[6].Id} ;
-        insert testCMs(subsub1aa.Id,con2thru6,'Responded',con6nonConv);
+        insert testCMs(grandchild_1aa.Id,con2thru6,'Responded',con6nonConv);
 		
 		// all of those plus 4 new ones responded on chlid that doesn't count
         set<id> con2thru10 = new set<id> {cons[2].Id,cons[3].Id,cons[4].Id,cons[5].Id,cons[6].Id,cons[7].Id,cons[8].Id,cons[9].Id,cons[10].Id} ;
-        set<id> con6and10nonConv = new set<id> {cons[6].Id,cons[10].Id} ;
-        insert testCMs(subsub1ab.Id,con2thru10,'Responded',con6and10nonConv);
+        set<id> con6and10 = new set<id> {cons[6].Id,cons[10].Id} ;
+        insert testCMs(grandchild_1ab.Id,con2thru10,'Responded',con6and10);
 
-		// and finally 4 more that didn't respond on same campaign
+		// and 4 more that didn't respond on same campaign
         set<id> con11thru14 = new set<id> {cons[11].Id,cons[12].Id,cons[13].Id,cons[14].Id} ;
         set<id> nullSet = new set<id>();
-        insert testCMs(subsub1ab.Id,con11thru14,'Sent',nullSet);
+        insert testCMs(grandchild_1ab.Id,con11thru14,'Sent',nullSet);
+
+		// and finally that one gets a few leads, one of which is responded (email click-through)
+		set<id> leads12 = new set<id> {lead1.Id,lead2.Id} ;
+		insert testLeadCMs(grandchild_1ab.Id,leads12,'Sent');
+		insert testLeadCMs(grandchild_1ab.Id,leads3,'Responded');
+
+		// put a few responders in other branch of hierarchy
+        set<id> con1and6 = new set<id> {cons[1].Id,cons[6].Id} ;
+        insert testCMs(greatgrand_1baa.Id,con1and6,'Responded',con1and6);
 		
+		// and a few in its sibling
+        set<id> con18and19 = new set<id> {cons[18].Id,cons[19].Id} ;
+        insert testCMs(greatgrand_1bab.Id,con18and19,'Responded',nullSet);
+		
+		//and finally a few at the lowest (5 levels deep) child		
+        set<id> con15thru17 = new set<id> {cons[15].Id,cons[16].Id,cons[17].Id} ;
+        insert testCMs(greatgreatgrand_1baaa.Id,con6and10,'Responded',con6and10);
+        insert testCMs(greatgreatgrand_1baaa.Id,con15thru17,'Sent',nullSet);
+        set<id> con7 = new set<id> {cons[7].Id} ;
+        insert testCMs(greatgreatgrand_1baaa.Id,con7,'Responded',nullSet);
+        		
 		// 2 thru 6 also in 2nd hierarchy, not responded        
         insert testCMs(top2.Id,con2thru6,'Sent',nullSet);
         
         // and a few cons that weren't in hierarchy 1 at all, responded
-        set<id> con15thru17 = new set<id> {cons[15].Id,cons[16].Id,cons[17].Id} ;
         insert testCMs(top2.Id,con15thru17,'Responded',nullSet);
         
         
@@ -445,35 +490,80 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         
         // make sure rollup is correct
         map<id,Campaign> campMap = new map<id,Campaign> ([SELECT Id,Name,ParentId,Total_Unique_Contacts_In_Hierarchy__c,
-        					Total_Unique_Responses_in_Hierarchy__c,Engagement_Response_Rate__c,Engagement_Conversion_Rate__c
+        					Total_Unique_Responses_in_Hierarchy__c,Engagement_Response_Rate__c,Engagement_Conversion_Rate__c,
+        					Total_Unique_Leads_in_Hierarchy__c 
         					FROM Campaign WHERE Id IN :allCampIds]);
         					
         Campaign top1p = campMap.get(top1.Id);
-        system.assertEquals (15,top1p.Total_Unique_Contacts_In_Hierarchy__c);
-        system.assertEquals (11,top1p.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (20,top1p.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (3,top1p.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (14,top1p.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (null,top1p.Engagement_Response_Rate__c);
+        system.assertEquals (null,top1p.Engagement_Conversion_Rate__c);
         					
-        Campaign sub1aP = campMap.get(sub1a.Id);
+        Campaign sub1aP = campMap.get(child_1a.Id);
         system.assertEquals (15,sub1aP.Total_Unique_Contacts_In_Hierarchy__c);
-        system.assertEquals (11,sub1aP.Total_Unique_Responses_in_Hierarchy__c);
-        system.assertEquals (46.7,sub1aP.Engagement_Response_Rate__c);
+        system.assertEquals (3,sub1aP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (12,sub1aP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (38.9,sub1aP.Engagement_Response_Rate__c);
+        system.assertEquals (35.7,sub1aP.Engagement_Conversion_Rate__c);
         					
-        Campaign subsub1aaP = campMap.get(subsub1aa.Id);
+        Campaign subsub1aaP = campMap.get(grandchild_1aa.Id);
         system.assertEquals (5,subsub1aaP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,subsub1aaP.Total_Unique_Leads_in_Hierarchy__c);
         system.assertEquals (5,subsub1aaP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (100,subsub1aaP.Engagement_Response_Rate__c);
         system.assertEquals (100,subsub1aaP.Engagement_Conversion_Rate__c);
         					
-        Campaign subsub1abP = campMap.get(subsub1ab.Id);
+        Campaign subsub1abP = campMap.get(grandchild_1ab.Id);
         system.assertEquals (13,subsub1abP.Total_Unique_Contacts_In_Hierarchy__c);
-        system.assertEquals (9,subsub1abP.Total_Unique_Responses_in_Hierarchy__c);
-        system.assertEquals (69.2,subsub1abP.Engagement_Response_Rate__c);
-        system.assertEquals (63.6,subsub1abP.Engagement_Conversion_Rate__c);
+        system.assertEquals (3,subsub1abP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (10,subsub1abP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (62.5,subsub1abP.Engagement_Response_Rate__c);
+        system.assertEquals (53.8,subsub1abP.Engagement_Conversion_Rate__c);
+
+        Campaign child_1bP = campMap.get(child_1b.Id);
+        system.assertEquals (9,child_1bP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,child_1bP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (6,child_1bP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (66.7,child_1bP.Engagement_Response_Rate__c);
+        system.assertEquals (50,child_1bP.Engagement_Conversion_Rate__c);
+
+        Campaign grandchild_1baP = campMap.get(grandchild_1ba.Id);
+        system.assertEquals (9,grandchild_1baP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,grandchild_1baP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (6,grandchild_1baP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (66.7,grandchild_1baP.Engagement_Response_Rate__c);
+        system.assertEquals (50,grandchild_1baP.Engagement_Conversion_Rate__c);
+
+        Campaign greatgrand_1baaP = campMap.get(greatgrand_1baa.Id);
+        system.assertEquals (7,greatgrand_1baaP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,greatgrand_1baaP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (4,greatgrand_1baaP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (57.1,greatgrand_1baaP.Engagement_Response_Rate__c);
+        system.assertEquals (25,greatgrand_1baaP.Engagement_Conversion_Rate__c);
+
+        Campaign greatgrand_1babP = campMap.get(greatgrand_1bab.Id);
+        system.assertEquals (2,greatgrand_1babP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,greatgrand_1babP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (2,greatgrand_1babP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (100,greatgrand_1babP.Engagement_Response_Rate__c);
+        system.assertEquals (100,greatgrand_1babP.Engagement_Conversion_Rate__c);
+
+        Campaign greatgreatgrand_1baaaP = campMap.get(greatgreatgrand_1baaa.Id);
+        system.assertEquals (6,greatgreatgrand_1baaaP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,greatgreatgrand_1baaaP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (3,greatgreatgrand_1baaaP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (50,greatgreatgrand_1baaaP.Engagement_Response_Rate__c);
+        system.assertEquals (25,greatgreatgrand_1baaaP.Engagement_Conversion_Rate__c);
+
         					
         Campaign top2P = campMap.get(top2.Id);
         system.assertEquals (8,top2P.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,top2P.Total_Unique_Leads_in_Hierarchy__c);
         system.assertEquals (3,top2P.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (37.5,top2P.Engagement_Response_Rate__c);
+        system.assertEquals (42.9,top2P.Engagement_Conversion_Rate__c);
         					
        	
         
@@ -490,6 +580,16 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			} else {
 				cm.Engagement_Conversion__c = true;
 			}
+			cms.add (cm);
+		}
+		return cms;
+ 	}
+ 	
+ 	static list<CampaignMember> testLeadCMs (Id CampId, Set<id> LeadIds, string statusStr) {
+		// create a campaignmember object, including spoofing whether or not it's a conversion
+		CampaignMember[] cms = new CampaignMember[0]; 
+		for (Id lid : LeadIds) {
+			CampaignMember cm = new CampaignMember (CampaignId = CampId,LeadId = lid, Status = statusStr);
 			cms.add (cm);
 		}
 		return cms;
