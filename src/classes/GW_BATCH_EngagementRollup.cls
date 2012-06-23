@@ -59,7 +59,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
     // *** WRAPPER CLASS ***
     global class engTrackConWrapper {
-        private id conId;
+        private id conId,HHid;
         global Contact con;
         global integer CurrLvl = 0;
         global integer PeakLvl = 0;
@@ -494,7 +494,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     boolean useHHTotals = settings.Householded_Donor_Levels__c;
                     decimal bestYrTotal;
                     date lastCloseDate;
-                    if (useHHTotals) {
+                    if (useHHTotals && cw.HHid != null) {
                     	// use HH totals if settings says so
                     	recentGiftTtl = recentGiftTtlHH;
                     	bestYrTotal = cw.Best_Gift_Year_TotalHH_c;
@@ -509,6 +509,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     	Account acct = con.Account;
                     	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
                     	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
+                    	system.debug(LoggingLevel.WARN,'recentGiftTtl:' + recentGiftTtl + '   acctGiftTtl:' + acctGiftTtl);
                     	recentGiftTtl += acctGiftTtl;
                     	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
                     }		
@@ -810,6 +811,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		        cw.Best_Gift_Year_Total_c = (decimal)con.get( addNSPrefixET('Best_Gift_Year_Total__c',false,true) );
 		        cw.OppAmountLastNDaysHH_c = (decimal)con.get( addNSPrefixET('OppAmountLastNDaysHH__c',false,true) );
 		        cw.HouseholdMembershipEndDate_c = (date)con.get( addNSPrefixET('HouseholdMembershipEndDate__c',false,true) );
+		        cw.HHid = (id) con.get(addNSPrefixET('ONEN_Household__c',false,true) );
 				sObject hh = con.getSObject(addNSPrefixET('ONEN_Household__r',false,true) );  
 				if (hh != null) {
 		        	cw.Best_Gift_Year_TotalHH_c = (decimal)hh.get(addNSPrefixET('Best_Gift_Year_Total__c',false,true));
@@ -823,7 +825,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		        cw.Best_Gift_Year_Total_c = math.max(d1 == null ? 0 : d1,
 		        		math.max(d2 == null ? 0 : d2,
 		        			d3 == null ? 0 : d3));
-
+				cw.HHid = (id) con.get(addNSPrefixET('Household__c',false,true) );
 				sObject hh = con.getSObject('npo02__Household__r');  
 				if (hh != null) {
 					// npsp doesn't roll up some HH metrics to the contact
