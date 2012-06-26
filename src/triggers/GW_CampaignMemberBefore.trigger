@@ -7,7 +7,10 @@ trigger GW_CampaignMemberBefore on CampaignMember (before insert) {
 			// first gather contact Id's for our CM's
 			if (cm.ContactId != null) {
 				conIds.add(cm.ContactId);
-			}
+			} else if (cm.LeadId != null)
+				// if it's a lead, go ahead and stamp w/ level 0 - since all leads are equivalent to that 
+				// and that's what the contact will have once they're converted
+				cm.Engagement_Level_At_Insert__c = 0;
 		}
 		if (conIds.size() > 0 ) {
 			// then query for the contacts to get engagement lvls
