@@ -16,6 +16,7 @@
             <default>false</default>
         </values>
     </businessProcesses>
+    <enableFeeds>true</enableFeeds>
     <fields>
         <fullName>Engagement_Conversion_From_Level__c</fullName>
         <externalId>false</externalId>
@@ -295,6 +296,7 @@
         </filters>
         <label>Won</label>
     </listViews>
+    <recordTypeTrackFeedHistory>false</recordTypeTrackFeedHistory>
     <recordTypes>
         <fullName>Donation</fullName>
         <active>true</active>

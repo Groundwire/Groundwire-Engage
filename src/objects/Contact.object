@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <enableFeeds>true</enableFeeds>
     <fieldSets>
         <fullName>Gratitude_Machine</fullName>
         <availableFields>
@@ -516,6 +517,17 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Languages__c</fullName>
+        <externalId>false</externalId>
+        <label>Languages</label>
+        <length>100</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Last_Engagement_Change__c</fullName>
         <externalId>false</externalId>
         <formula>Engagement_Level_Numeric__c -  Former_Engagement_Level_Numeric__c</formula>
@@ -574,6 +586,29 @@ NOTE: This does not take into account any past overrides or formerly-checked che
             </picklistValues>
             <sorted>false</sorted>
         </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Level__c</fullName>
+        <externalId>false</externalId>
+        <label>Level</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Secondary</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Tertiary</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Primary</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Picklist</type>
     </fields>
     <listViews>
