@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Engagement_Conversion_Rate__c</fullName>
         <externalId>false</externalId>
@@ -471,16 +470,4 @@ IF (Parent.Id != null, 1 , 0)
             </values>
         </picklistValues>
     </recordTypes>
-    <webLinks>
-        <fullName>npo02__Household_Mailing_List</fullName>
-        <availability>online</availability>
-        <description>Deduplicated mailing list of Households</description>
-        <displayType>button</displayType>
-        <height>600</height>
-        <linkType>page</linkType>
-        <masterLabel>Household Mailing List</masterLabel>
-        <openType>sidebar</openType>
-        <page>npo02__BTNCampaignHHDedupe</page>
-        <protected>false</protected>
-    </webLinks>
 </CustomObject>

@@ -1718,7 +1718,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         // also test for conversions
         map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,
-        							Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,gwet__Engagement_Conversion_Type__c
+        							Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,Engagement_Conversion_Type__c
         							FROM CampaignMember WHERE Id IN :cms] );
         
         // for con0, the old CM shouldn't be a conversion, but the newer one should

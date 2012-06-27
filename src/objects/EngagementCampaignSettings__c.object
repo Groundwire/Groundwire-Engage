@@ -3,6 +3,7 @@
     <customSettingsType>List</customSettingsType>
     <customSettingsVisibility>Public</customSettingsVisibility>
     <description>Rules for the Engagement Level to defaultly assign to campaigns when they are created, based on their record type, type, or subtype.</description>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Campaign_Record_Type__c</fullName>
