@@ -4,6 +4,26 @@
     <fieldSets>
         <fullName>Gratitude_Machine</fullName>
         <availableFields>
+            <field>Days_Since_First_Action_at_Level__c</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Title</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Engagement_Level_Numeric__c</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Engagement_Level_Override_Numeric__c</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Engagement_Level_Override__c</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
             <field>Engagement_Level_Numeric_After_Override__c</field>
             <isRequired>false</isRequired>
         </availableFields>
@@ -33,34 +53,6 @@
         </availableFields>
         <availableFields>
             <field>OtherCountry</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>OtherCity</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>MailingStreet</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>MailingState</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Title</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Engagement_Level_Numeric__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Engagement_Level_Override_Numeric__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Engagement_Level_Override__c</field>
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
@@ -97,6 +89,10 @@
         </availableFields>
         <availableFields>
             <field>Award_Engagement_Levels_for_Org_Giving__c</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Last_Engagement_Change__c</field>
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
@@ -175,11 +171,23 @@
             <field>MailingPostalCode</field>
             <isRequired>false</isRequired>
         </availableFields>
-        <description>The list of Contact fields to display on the Gratitude Machine&apos;s list of contacts.</description>
-        <displayedFields>
+        <availableFields>
+            <field>MailingState</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>MailingStreet</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
             <field>Name</field>
             <isRequired>false</isRequired>
-        </displayedFields>
+        </availableFields>
+        <availableFields>
+            <field>OtherCity</field>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <description>The list of Contact fields to display on the Gratitude Machine&apos;s list of contacts.</description>
         <displayedFields>
             <field>AccountId</field>
             <isRequired>false</isRequired>
@@ -201,19 +209,11 @@
             <isRequired>false</isRequired>
         </displayedFields>
         <displayedFields>
-            <field>Days_Since_First_Action_at_Level__c</field>
-            <isRequired>false</isRequired>
-        </displayedFields>
-        <displayedFields>
             <field>First_Action_Date_Curr_Level__c</field>
             <isRequired>false</isRequired>
         </displayedFields>
         <displayedFields>
             <field>Last_Leadership_Action_Date__c</field>
-            <isRequired>false</isRequired>
-        </displayedFields>
-        <displayedFields>
-            <field>Last_Engagement_Change__c</field>
             <isRequired>false</isRequired>
         </displayedFields>
         <displayedFields>

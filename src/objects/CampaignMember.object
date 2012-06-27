@@ -235,11 +235,19 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
                 <default>false</default>
             </picklistValues>
             <picklistValues>
+                <fullName>Removed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
                 <fullName>Responded</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
                 <fullName>Sent</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Skipped</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
