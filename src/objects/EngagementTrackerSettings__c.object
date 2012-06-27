@@ -17,6 +17,54 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Gratitude_Machine_Days_To_Exclude__c</fullName>
+        <defaultValue>365</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Exclude contacts in the Gratitude Machine that have already been on a Gratitude Machine campaign within this number of days.</inlineHelpText>
+        <label>Gratitude Machine Days To Exclude</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Gratitude_Machine_Minimum_Days_in_Level__c</fullName>
+        <defaultValue>90</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>When finding &quot;Old Steadies&quot;, only include contacts who have been in their level at least this number of days.</inlineHelpText>
+        <label>Gratitude Machine Minimum Days in Level</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Gratitude_Machine_Minumum_Level__c</fullName>
+        <defaultValue>3</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>The minum Engagement Level of contacts to include in the Gratitude Machine.</inlineHelpText>
+        <label>Gratitude Machine Minimum Level</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Gratitude_Machine_Recent_Activity_Days__c</fullName>
+        <defaultValue>365</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>For &quot;Old Steadies&quot; the number of days they must have done some engagement related action in.</inlineHelpText>
+        <label>Gratitude Machine Recent Activity Days</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Householded_Donor_Levels__c</fullName>
         <defaultValue>true</defaultValue>
         <externalId>false</externalId>

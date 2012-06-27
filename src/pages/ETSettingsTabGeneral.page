@@ -15,6 +15,10 @@
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Days_To_Exclude__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Days_To_Exclude__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Recent_Activity_Days__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Recent_Activity_Days__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minimum_Days_in_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minimum_Days_in_Level__c.InlineHelpText}</p>
 				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpGeneral').hide();document.getElementById('linkHelpGeneral').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
@@ -42,6 +46,22 @@
 
 		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
 		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
+
+	        		<apex:pageBlockSectionItem >
+	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.Label}" />
+				    	<apex:selectList value="{!etSettings.Gratitude_Machine_Minumum_Level__c}" size="1" disabled="{!NOT(ctabGeneral.isEditingTab)}" >			    			
+				    		<apex:selectOptions value="{!listSOLevels}" />
+				    	</apex:selectList>							
+	        		</apex:pageBlockSectionItem>
+
+		      		<apex:inputField value="{!etSettings.Gratitude_Machine_Days_To_Exclude__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Gratitude_Machine_Days_To_Exclude__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
+
+		      		<apex:inputField value="{!etSettings.Gratitude_Machine_Recent_Activity_Days__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Gratitude_Machine_Recent_Activity_Days__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
+
+		      		<apex:inputField value="{!etSettings.Gratitude_Machine_Minimum_Days_in_Level__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
+		      		<apex:outputField value="{!etSettings.Gratitude_Machine_Minimum_Days_in_Level__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
 	        	</apex:pageBlockSection>
 	       	</apex:panelGroup> 
         </apex:panelGrid>	
