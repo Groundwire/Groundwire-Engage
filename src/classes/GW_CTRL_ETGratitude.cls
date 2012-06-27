@@ -6,11 +6,7 @@ public with sharing class GW_CTRL_ETGratitude {
 		// initialize filter choices
 		numRecipients = 10;
 		strWhoToInclude = 'New';
-		cmFilter = new CampaignMember();
-		
-		// start with empty list so it won't get filled.
-		listRecipient = new list<CRecipient>();
-		
+		cmFilter = new CampaignMember();		
 	}
 		
 	public integer numRecipients { get; set; }
@@ -21,10 +17,29 @@ public with sharing class GW_CTRL_ETGratitude {
 	public CampaignMember cmFilter { get; set; } 
 	
 	// action method to create a new gratitude campaign
-	public PageReference NewGratitudeRun() {
+	public PageReference newGratitudeRun() {
+		
+		// find a unique campaign name
+		string strName = system.now().format('MMMM yyyy') + ' Gratitude Machine%';
+		list<Campaign> listCmp = [select Id, Name from Campaign where Name like :strName];
+		if (listCmp.size() == 0) {
+			strName = strName.replace('%', '');
+		} else {
+			integer i = listCmp.size() + 1;
+			while (true) {
+				strName = system.now().format('MMMM yyyy') + ' Gratitude Machine ' + string.valueOf(i);
+				listCmp = [select Id, Name from Campaign where Name = :strName];
+				if (listCmp.size() == 0) {
+					// found unique name
+					break;
+				}	
+				i++;			
+			}			
+		}
+		
 		// create the new campaign
 		Campaign cmp = new Campaign();
-		cmp.Name = system.now().format('MMMM yyyy') + ' Gratitude Machine';
+		cmp.Name = strName; 
 		cmp.Gratitude_Machine__c = true;
 		cmp.StartDate = system.today();
 		cmp.IsActive = true;
@@ -32,23 +47,90 @@ public with sharing class GW_CTRL_ETGratitude {
 		cmp.Status = 'In Progress';
 		insert cmp;
 		
+		// initialize the appropriate status values
+		list<CampaignMemberStatus> listCMSToDel = [Select Id From CampaignMemberStatus WHERE CampaignId = :cmp.Id]; 
+	    list<CampaignMemberStatus> listCMS = new list<CampaignMemberStatus>();			
+ 	    CampaignMemberStatus cms1 = new CampaignMemberStatus(
+	        Label = 'Listed',
+	        CampaignId = cmp.Id,
+	        HasResponded = false,
+	        SortOrder = 100,
+	        IsDefault = true
+	    );
+	    listCMS.add(cms1);
+	    CampaignMemberStatus cms2 = new CampaignMemberStatus(
+	        Label = 'Thanked',
+	        CampaignId = cmp.Id,
+	        HasResponded = true,
+	        SortOrder = 200
+	    );
+	    listCMS.add(cms2);
+	    CampaignMemberStatus cms3 = new CampaignMemberStatus(
+	        Label = 'Left Message',
+	        CampaignId = cmp.Id,
+	        HasResponded = true,
+	        SortOrder = 300
+	    );
+	    listCMS.add(cms3);
+	    CampaignMemberStatus cms4 = new CampaignMemberStatus(
+	        Label = 'Removed',
+	        CampaignId = cmp.Id,
+	        HasResponded = true,
+	        SortOrder = 400
+	    );
+	    listCMS.add(cms4);  
+	    // now save the statuses
+	    insert listCMS;
+	    delete listCMSToDel;
+				
 		cmpIdGratitude = cmp.Id;
-		listRecipient = null;
-		// force it to get filled in action method, so inserting the
-		// CampaignMembers will succeed (which fail when accessed from visualforce)
-		list<CRecipient> listT = listRecipient;
+		if (!FAddNewRecipientsToCampaignId(cmpIdGratitude)) {
+			apexpages.addMessage(new ApexPages.Message(ApexPages.Severity.Info, 'We did not find any contacts that need to be thanked.'));
+			delete cmp;
+			cmpIdGratitude = null;
+			return null;		
+		}		
+		FillRecipientsFromCampaignId(cmpIdGratitude);
+		return null;		
+	}
+	
+	// action method to edit an existing gratitude campaign
+	public PageReference editGratitudeRun() {
+		FillRecipientsFromCampaignId(cmpIdGratitude);
 		return null;
 	}
-	
+
+	// do we have a list of Recipients to display?
 	public boolean hasRecipients {
 		get {
-			return listRecipient != null && listRecipient.size() > 0;
+			return listRecipient != null && (listRecipient.size() > 0 || listRecipientDone.size() > 0);
 		}
 	}
+
+	// the Gratitude campaign currently being edited
+	public ID cmpIdGratitude { 
+		get; 
+		set {
+			if (cmpIdGratitude != value) {
+				cmpIdGratitude = value;
+				strNameCampaignGratitude = null;
+			}
+		}
+	}
+		
+	// the name of the Gratitude campaign currently being edited
+	public string strNameCampaignGratitude {
+		get {
+			if (strNameCampaignGratitude == null && cmpIdGratitude != null) {
+				Campaign cmp = [select Name from Campaign where Id = :cmpIdGratitude];
+				strNameCampaignGratitude = cmp.Name;
+			}
+			return strNameCampaignGratitude;
+		}
+		set;
+	}
 	
-	// the generated list of Recipients to display
-	//
-	// strategies:
+	// Strategies for generating the list of Recipients to display
 	//
 	// - if we aren't filtering by Campaign, just query directly against Contact (DONE)
 	//
@@ -60,92 +142,169 @@ public with sharing class GW_CTRL_ETGratitude {
 	// - for Old Steadies, look for largest 'days in current level' with some action in the last N days. (DONE)
 	//
 	// - only include people who are at least level X. (DONE)
-	private static integer minLevel = 2;
 	//
 	// - only include people once! (DONE)
 	//
-	// - only include a single person from a household.  
-	//		(seems lower priority; let them see both and they can choose who to talk to)
+	// - only include a single person from a household. (DONE)  
 	//
-	// - exclude people who have already been 'loved' in the last N days.
-	//		need to decide how this is tracked:
+	// - exclude people who have already been 'loved' in the last N days.  (DONE)
 	//		- look at campaign members of type Gratitude Machine with appropriate status
-	//		- look at activities of unique record type or custom field value
-	//		- look at custom field on contact (last loved date)
 	// 
-	public list<CRecipient> listRecipient {
-		get {
-			if (listRecipient == null) {
-				listRecipient = new list<CRecipient>();
-				set<ID> setConId = new set<ID>();
-				integer cCon = 0;
-				string strSoql;
+	
+	// private method to query for and add a new set of contacts to the given campaign
+	private boolean FAddNewRecipientsToCampaignId(ID cmpId) {
+		set<ID> setConId = new set<ID>();
+		integer cCon = 0;
+		string strSoql;
+		integer minLevel = integer.valueOf(etSettings.Gratitude_Machine_Minumum_Level__c);
+		integer numDaysRecentAction = integer.valueOf(etSettings.Gratitude_Machine_Recent_Activity_Days__c);
+		integer numDaysToSkip = integer.valueOf(etSettings.Gratitude_Machine_Days_To_Exclude__c);
+		integer minDaysAtLevelOld = integer.valueOf(etSettings.Gratitude_Machine_Minimum_Days_in_Level__c);
+		
+		// environment specific Household field 
+		string strHHField = null;
+		if (GW_BATCH_EngagementRollup.IsGWBaseInstalled) 
+			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('ONEN_Household__c', false, false);
+		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) 
+			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('Household__c', false, true);
+		// to keep track of the Households we've seen
+		set<ID> setHHId = new set<ID>();
 				
-				// if we are filtering by campaigns....
-				if (cmFilter.CampaignId != null) {
-
-					strSoql = 'select ContactId ';
-					strSoql += ' from CampaignMember ';
-					strSoql += ' where Contact.Engagement_Level__c <> null and Contact.Engagement_Level_Numeric__c >= :minLevel';
-					
-					set<ID> setCmpId;
-					setCmpId = setCampaignsToFilter();
-					strSoql += ' and CampaignId in :setCmpId ';
+		// if we are filtering by campaigns....
+		if (cmFilter.CampaignId != null) {
+			
+			// first get the set of people already thanked that we should ignore.
+			strSoql = 'select ContactId from CampaignMember where Campaign.Gratitude_Machine__c = true and ';
+			strSoql += 		' Campaign.StartDate >= LAST_N_DAYS:' + numDaysToSkip;
+			list<CampaignMember> listCM = database.query(strSoql);
+			set<ID> setContactIdThanked = new set<ID>();
+			for (CampaignMember cm : listCM) {
+				setContactIdThanked.add(cm.ContactId);			
+			}
+			strSoql = 'select ContactId ';
+			if (strHHField != null) strSoql += ', Contact.' + strHHField;
+			strSoql += ' from CampaignMember ';
+			strSoql += ' where Contact.Engagement_Level__c <> null and Contact.Engagement_Level_Numeric__c >= :minLevel';
+			strSoql += ' and (Contact.Phone <> null or Contact.HomePhone <> null or Contact.MobilePhone <> null or Contact.Email <> null) ';
+			
+			set<ID> setCmpId;
+			setCmpId = setCampaignsToFilter();
+			strSoql += ' and CampaignId in :setCmpId ';
 	
-					if (strWhoToInclude == 'New') {
-						strSoql += ' and Contact.Last_Engagement_Change__c >= 0 ';
-						strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c asc ';				
-					} else if (strWhoToInclude == 'Old') {
-						strSoql += ' and Contact.Last_Leadership_Action_Date__c >= LAST_N_DAYS:365 ';
-						strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c desc ';				
-					}
-					strSoql += ' limit 100 ';
+			// clause to avoid recent gratitudees
+			// can't do this in subquery because Salesforce doesn't allow the subquery to be on the same main object!
+			strSoql += ' and ContactId not in :setContactIdThanked ';
+
+			if (strWhoToInclude == 'New') {
+				strSoql += ' and Contact.Last_Engagement_Change__c >= 0 ';
+				strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c asc ';				
+			} else if (strWhoToInclude == 'Old') {
+				strSoql += ' and Contact.Last_Leadership_Action_Date__c >= LAST_N_DAYS:' + numDaysRecentAction;
+				strSoql += ' and Contact.Days_Since_First_Action_at_Level__c >= :minDaysAtLevelOld ';
+				strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c desc ';				
+			}
+			integer lim = numRecipients * 10;
+			if (lim > 1000) lim = 1000;
+			strSoql += ' limit ' + lim;  
 	
-					// get the list of CampaignMembers, and extract numRecipients (since multi campaign, contacts can be duped)
-					list<CampaignMember> listCM = database.query(strSoql);
-					for (CampaignMember cm : listCM) {
-						if (setConId.add(cm.ContactId)) {
-							cCon++;
-							if (cCon >= numRecipients) {
-								break;
-							}
-						}
-					}  
- 
-					strSoql = 'select ' + strContactFields + ' from Contact ';
-					strSoql += ' where Id in :setConId ';	
-					strSoql += ' order by Days_Since_First_Action_at_Level__c, LastName, FirstName ';
-
-				} else { // we are NOT filtering by Campaigns...				
-					strSoql = 'select ' + strContactFields + ' from Contact ';
-					strSoql += ' where Contact.Engagement_Level__c <> null and Contact.Engagement_Level_Numeric__c >= :minLevel';
-
-					if (strWhoToInclude == 'New') {
-						strSoql += ' and Contact.Last_Engagement_Change__c >= 0 ';
-						strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c asc, LastName asc, FirstName  asc ';				
-					} else if (strWhoToInclude == 'Old') {
-						strSoql += ' and Contact.Last_Leadership_Action_Date__c >= LAST_N_DAYS:365 ';
-						strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c desc, LastName asc, FirstName asc ';				
+			// get the list of CampaignMembers, and extract numRecipients (since multi campaign, contacts can be duped)
+			listCM = database.query(strSoql);
+			// bail out if no one found
+			if (listCM.size() == 0) {
+				return false;
+			}			
+			for (CampaignMember cm : listCM) {
+				if (strHHField != null) {
+					sObject con = cm.getSObject('Contact');					
+					ID hhId = (ID)con.get(strHHField);
+					// if we've already seen this household, skip this contact
+					if (hhId != null && !setHHId.add(hhId))
+						continue;					
+				}
+				if (setConId.add(cm.ContactId)) {
+					cCon++;
+					if (cCon >= numRecipients) {
+						break;
 					}
-					strSoql += ' limit ' + string.valueOf(numRecipients);				
-				}				
+				}
+			}  
+		} else { // we are NOT filtering by Campaigns...				
+			strSoql = 'select Id ';
+			if (strHHField != null) strSoql += ', ' + strHHField;
+			strSoql += ' from Contact ';
+			strSoql += ' where Contact.Engagement_Level__c <> null and Contact.Engagement_Level_Numeric__c >= :minLevel';
+			strSoql += ' and (Contact.Phone <> null or Contact.HomePhone <> null or Contact.MobilePhone <> null or Contact.Email <> null) ';
+			
+			// clause to avoid recent gratitudees
+			strSoql += ' and Contact.Id not in (select ContactId from CampaignMember where Campaign.Gratitude_Machine__c = true and ';
+			strSoql += 		' Campaign.StartDate >= LAST_N_DAYS:' + numDaysToSkip + ') ';
 
-				// we now have a soql string on contacts.  do it and create our recipient list.
-				list<Contact> listCon = database.query(strSoql);
-				list<CampaignMember> listCMNew = new list<CampaignMember>();
-				for (Contact con : listCon) {
-					CampaignMember cm = new CampaignMember(contactId=con.Id, campaignId=cmpIdGratitude, Status='Sent');
-					listCMNew.add(cm);
-					CRecipient recipient = new CRecipient(con, cm);
-					listRecipient.add(recipient);
-				} 
-				system.debug('DJH about to insert listCMNew');
-				system.debug(listCMNew);  
-				insert listCMNew;
-			} 
-			return listRecipient;
+			if (strWhoToInclude == 'New') {
+				strSoql += ' and Contact.Last_Engagement_Change__c >= 0 ';
+				strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c asc, LastName asc, FirstName  asc ';				
+			} else if (strWhoToInclude == 'Old') {
+				strSoql += ' and Contact.Last_Leadership_Action_Date__c >= LAST_N_DAYS:' + numDaysRecentAction;
+				strSoql += ' and Contact.Days_Since_First_Action_at_Level__c >= :minDaysAtLevelOld ';
+				strSoql += ' order by Contact.Days_Since_First_Action_at_Level__c desc, LastName asc, FirstName asc ';				
+			}
+			strSoql += ' limit ' + string.valueOf(numRecipients);				
+			list<Contact> listCon = database.query(strSoql);			
+			// bail out if no one found
+			if (listCon.size() == 0) {
+				return false;
+			}			
+			for (Contact con : listCon) {
+				if (strHHField != null) {
+					ID hhId = (ID)con.get(strHHField);
+					// if we've already seen this household, skip this contact
+					if (hhId != null && !setHHId.add(hhId))
+						continue;					
+				}
+				setConId.add(con.Id);
+			}
+		}				
+
+		// we now have in setConId, all of our contacts we want to add to the campaign.
+		list<CampaignMember> listCMNew = new list<CampaignMember>();
+		for (ID conId : setConId) {
+			CampaignMember cm = new CampaignMember(contactId=conId, campaignId=cmpId, status='Listed');
+			listCMNew.add(cm);
+		} 
+		insert listCMNew;
+		
+		return true;		
+	}	
+	
+	// private method to create the recipients list from the given campaign
+	private void FillRecipientsFromCampaignId(ID campaignId) {
+		// get the campaign members
+		list<CampaignMember> listCM = [select Id, contactId, campaignId, Status from CampaignMember 
+			where campaignId = :campaignId and Status <> 'Removed'];
+			
+		// put the campaign members on a map by contactId			
+		map<ID, CampaignMember> mapContactIdCM = new map<ID, CampaignMember>();
+		for (CampaignMember cm : listCM) {
+			mapContactIdCM.put(cm.contactId, cm);
 		}
-		set;
+		
+		// get the contacts
+		set<ID> setContactId = mapContactIdCM.keySet();
+		string strSoql = 'select ' + strContactFields + ' from Contact ';
+		strSoql += ' where Id in :setContactId ';	
+		strSoql += ' order by LastName, FirstName ';
+		list<Contact> listCon =  database.query(strSoql);
+		
+		// create receipients from the contacts and Cm's and put on the list
+		listRecipient = new list<CRecipient>();
+		listRecipientDone = new list<CRecipient>();
+		for (Contact con : listCon) {
+			CRecipient recipient = new CRecipient(con, mapContactIdCM.get(con.Id));
+			if (recipient.cm.Status == 'Listed') {
+				listRecipient.add(recipient);			
+			} else {
+				listRecipientDone.add(recipient);
+			}			
+		}		
 	}
 	
 	// utility to return the set of all campaignId's that are descendents of the filter campaignId.
@@ -172,17 +331,23 @@ public with sharing class GW_CTRL_ETGratitude {
 		
 		return setCmpId;		
 	}
+
+	// holds the list of recipients for the current campaign we are gratituding
+	public list<CRecipient> listRecipient { get; set; }
 	
+	// holds the list of recipients for the current campaign we already dealt with
+	public list<CRecipient> listRecipientDone { get; set; }
+	
+	// wrapper class to hold a contact and its campaign member on the gratitude campaign.
 	public class CRecipient {
-		
+		// constructor
 		public CRecipient(Contact conT, CampaignMember cmT) {
 			con = conT;
 			cm = cmT;
 		}
 		
 		public Contact con { get; set; }
-		public CampaignMember cm { get; set; }
-		
+		public CampaignMember cm { get; set; }		
 	}
 
 	// helper routine to return all Contact field names from the Field Set
@@ -211,15 +376,12 @@ public with sharing class GW_CTRL_ETGratitude {
 
 	// action method to start over
 	public PageReference doneWithRecipients() {
-		// reset with empty list so it won't get filled.
-		listRecipient = new list<CRecipient>();	
+		listRecipient = null;
+		listRecipientDone = null;	
 		// force list of gratitude campaigns to get refreshed (since we just edited one!)
 		listCmpGratitude = null;	
 		return null;
 	}
-	
-	// the Gratitude campaign currently being edited
-	public ID cmpIdGratitude { get; set; }
 	
 	// list of recent Gratitude campaigns
 	public list<Campaign> listCmpGratitude {
@@ -227,11 +389,52 @@ public with sharing class GW_CTRL_ETGratitude {
 			if (listCmpGratitude == null) {
 				listCmpGratitude = [select Id, Name, Type, NumberOfContacts, NumberOfResponses, StartDate 
 					from Campaign
-					where Gratitude_Machine__c = true limit 10];
+					where Gratitude_Machine__c = true order by StartDate desc, Name desc limit 10];
 			}
 			return listCmpGratitude;			
 		}
 		set;
 	}
 
+	// to hold the current contactId an action was applied to
+	public string contactIdEdit { get; set; }
+	
+	// to hold the status to set for the action
+	public string cmStatus { get; set; }
+	
+	// public method for doing an action on a recipient
+	public PageReference doRecipientAction() {
+		if (contactIdEdit == null || contactIdEdit == '') {
+			return null;
+		}
+		// find the recipient
+		for (CRecipient rec : listRecipient) {
+			if (rec.con.Id == contactIdEdit) {
+				rec.cm.Status = cmStatus;
+				update rec.cm;
+				// reset our lists
+				FillRecipientsFromCampaignId(cmpIdGratitude);				
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	private EngagementTrackerSettings__c etSettings {
+        get {
+            if (etSettings == null) {
+                etSettings = EngagementTrackerSettings__c.getOrgDefaults();                  
+                if (etSettings == null) {
+            		etSettings = new EngagementTrackerSettings__c();
+                }
+                // handle incomplete settings object
+                if (etSettings.Gratitude_Machine_Minumum_Level__c == null) etSettings.Gratitude_Machine_Minumum_Level__c = 3;
+                if (etSettings.Gratitude_Machine_Days_To_Exclude__c == null) etSettings.Gratitude_Machine_Days_To_Exclude__c = 365;
+                if (etSettings.Gratitude_Machine_Recent_Activity_Days__c == null) etSettings.Gratitude_Machine_Recent_Activity_Days__c = 365;
+                if (etSettings.Gratitude_Machine_Minimum_Days_in_Level__c == null) etSettings.Gratitude_Machine_Minimum_Days_in_Level__c = 90;
+            }
+            return etSettings;
+        }
+        set;
+	}	
 }

@@ -12,6 +12,10 @@
 		margin-top: 10px;
 		margin-bottom: 10px;
 	}
+	
+	.cssTableTitle {
+		font-weight: bold;
+	}
 
 	
 </style>
@@ -47,18 +51,24 @@
 	   					</apex:pageBlockSectionItem>
 	   					<apex:pageBlockSectionItem >
 	   						<apex:outputLabel />
-	   						<apex:commandButton value="Go" action="{!NewGratitudeRun}" />
+	   						<apex:commandButton value="Go" action="{!newGratitudeRun}" />
 	   					</apex:pageBlockSectionItem>
 					</apex:pageBlockSection>
+					<apex:pageMessages />		       			
 				</apex:pageBlockSection>
-
+						       					
     			<apex:pageBlockSection Title="Recent Gratitude Runs" columns="1" rendered="{!NOT(hasRecipients)}" >
 					<apex:pageBlockTable value="{!listCmpGratitude}" var="cmp" >
 						<apex:column styleClass="cssActionColumn" >		 				
 							<apex:facet name="header">Action</apex:facet>
-				                <apex:commandLink value="Go" />
+				                <apex:commandLink value="Go" action="{!editGratitudeRun}" >
+				                	<apex:param value="{!cmp.Id}" assignTo="{!cmpIdGratitude}" name="cmpIdGratitude" /> 
+				                </apex:commandLink>
 						</apex:column>	
-						<apex:column value="{!cmp.Name}" />		 				
+						<apex:column style="white-space:nowrap" >
+							<apex:facet name="header">Name</apex:facet>
+							<apex:outputLink value="{!'/' + cmp.Id}" >{!cmp.Name}</apex:outputLink>						
+						</apex:column>
 						<apex:column value="{!cmp.Type}" />		 				
 						<apex:column value="{!cmp.StartDate}" />		 				
 						<apex:column value="{!cmp.NumberOfContacts}" />		 				
@@ -66,24 +76,57 @@
 					</apex:pageBlockTable>		 				
     			</apex:pageBlockSection>
 			
-	    		<apex:pageBlockSection id="panelRecipient" rendered="{!hasRecipients}" >
+	    		<apex:pageBlockSection id="panelRecipient" columns="1" rendered="{!hasRecipients}" Title="{!strNameCampaignGratitude}" >
+					<br/>
+					<apex:outputLabel value="To Be Thanked" styleClass="cssTableTitle" />
 					<apex:pageBlockTable value="{!listRecipient}" var="rec" >
 						<apex:column styleClass="cssActionColumn" >		 				
 							<apex:facet name="header">Action</apex:facet>
 			                	<nobr>
-				                <apex:commandLink value="Thanked" />&nbsp;|&nbsp;
-				                <apex:commandLink value="Left Msg" />&nbsp;|&nbsp;
-				                <apex:commandLink value="Remove" />&nbsp;
+				                <apex:commandLink value="Thanked" action="{!doRecipientAction}" >
+				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
+				                	<apex:param value="Thanked" assignTo="{!cmStatus}" name="cmStatus" /> 
+				                </apex:commandLink>&nbsp;|&nbsp;
+				                <apex:commandLink value="Left Msg" action="{!doRecipientAction}" >
+				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
+				                	<apex:param value="Left Message" assignTo="{!cmStatus}" name="cmStatus" /> 
+				                </apex:commandLink>&nbsp;|&nbsp;
+				                <apex:commandLink value="Remove"  action="{!doRecipientAction}" >
+				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
+				                	<apex:param value="Removed" assignTo="{!cmStatus}" name="cmStatus" />  
+				                </apex:commandLink>&nbsp;
 				                </nobr>
 						</apex:column>	
-						
-						<apex:column value="{!rec.cm.Status}" />
+						 
+						<apex:column style="white-space:nowrap" >
+							<apex:facet name="header">Name</apex:facet>
+							<apex:outputLink value="{!'/' + rec.con.Id}" >{!rec.con.Name}</apex:outputLink>						
+						</apex:column>
 						
 						<apex:repeat value="{!$ObjectType.Contact.FieldSets.Gratitude_Machine}" var="f" >
-							<apex:column value="{!rec.con[f]}" />					
+							<apex:column value="{!rec.con[f]}" style="white-space:nowrap;" />					
 						</apex:repeat>
 												
 					</apex:pageBlockTable>	    		
+
+					<br/>
+					<apex:outputLabel value="Already Thanked" styleClass="cssTableTitle" />
+					<apex:pageBlockTable value="{!listRecipientDone}" var="rec" >
+						 
+						<apex:column value="{!rec.cm.Status}" style="white-space:nowrap" />
+						
+						<apex:column style="white-space:nowrap" >
+							<apex:facet name="header">Name</apex:facet>
+							<apex:outputLink value="{!'/' + rec.con.Id}" >{!rec.con.Name}</apex:outputLink>						
+						</apex:column>
+						
+						<apex:repeat value="{!$ObjectType.Contact.FieldSets.Gratitude_Machine}" var="f" >
+							<apex:column value="{!rec.con[f]}" style="white-space:nowrap;" />					
+						</apex:repeat>
+												
+					</apex:pageBlockTable>	    		
+
+
 	    		</apex:pageBlockSection>
     		</apex:pageBlock>
     	
