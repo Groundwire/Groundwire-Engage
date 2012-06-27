@@ -20,8 +20,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		public id campId;
 		public Campaign camp;
 		public integer engLvl;
-		public long conCount,leadCount,respCount,engRespCount,convCandidateCount,convCount;		// overall totals
-		boolean currConSent,currConSentLead,currConResp,currConEngResp,currConConvCandidate,currConConv;		// temporary flags for each contact in loop
+		public long conCount,leadCount,respCount,engRespCount,convCandidateCount,convCount,engConvCount;		// overall totals
+		boolean currConSent,currConSentLead,currConResp,currConEngResp,currConConvCandidate,currConConv,currConEngConv;		// temporary flags for each contact in loop
 		decimal responseRate,conversionRate;
 		string campName;
 		boolean doConversionRate;
@@ -43,6 +43,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			this.engRespCount = 0;
 			this.convCandidateCount = 0;
 			this.convCount = 0;
+			this.engConvCount = 0;
 			this.parentCampIDs = new set<Id>();
 			this.eligibleParentCampIDs = new set<Id>();
 			this.doConversionRate = false;
@@ -77,7 +78,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			//  which means that at least one CM was entered post-migration 
 			if (isConvCandidate) doConversionRate = true;
 			currConConvCandidate = (isConvCandidate || isConv);			
-			if (isConv && respLvl >= engLvl) currConConv = true;
+			if (isConv) currConConv = true;
+			if (isConv && respLvl >= engLvl) currConEngConv = true;
 			system.debug (LoggingLevel.WARN,'set curr con flags for campaign ' + camp.Name + ':  ' + 'currConSent=' + currConSent + '  currConResp=' + currConResp + '  currConEngResp=' + currConEngResp);
 		}
 		
@@ -93,7 +95,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 				if (isResp) parentTotals.currConResp = true;
 				if (isResp && respLvl >= parentTotals.engLvl) parentTotals.currConEngResp = true;
 				ParentTotals.currConConvCandidate = isConvCandidate;
-				if (isConv && respLvl >= parentTotals.engLvl) parentTotals.currConConv = true;
+				if (isConv) parentTotals.currConConv = true;
+				if (isConv && respLvl >= parentTotals.engLvl) parentTotals.currConEngConv = true;
 				system.debug (LoggingLevel.WARN,'set curr con flags for campaign ' + ParentTotals.camp.Name + ':  ' + 'currConSent=' + ParentTotals.currConSent + '  currConResp=' + ParentTotals.currConResp + '  currConEngResp=' + ParentTotals.currConEngResp);
 			}
 		}
@@ -105,6 +108,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			currConEngResp = false;
 			currConConvCandidate = false;
 			currConConv = false;
+			currConEngConv = false;
 		}
 		
 		public void UpdateTotals () {
@@ -115,6 +119,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			if (currConEngResp) engRespCount += 1;
 			if (currConConvCandidate) convCandidateCount += 1;
 			if (currConConv) convCount += 1;
+			if (currConEngConv) engConvCount += 1;
 			ResetCurrConFlags();
 			system.debug (LoggingLevel.WARN,'wrapper after updating totals: ' + this);
 		}
@@ -134,7 +139,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		private void calculateConversionRate() {
 			if (engLvl > 0 && convCandidateCount > 0) {
 				// need to convert integers to decimals otherwise division doesn't work
-				conversionRate = (decimal.valueOf(convCount) / decimal.valueOf(convCandidateCount) ) * 100;
+				conversionRate = (decimal.valueOf(engConvCount) / decimal.valueOf(convCandidateCount) ) * 100;
 				conversionRate = conversionRate.setScale (1,System.RoundingMode.HALF_UP);				// round to one decimal place
 			} else {
 				system.debug (LoggingLevel.WARN,'skipped calcing conversion rate for campaign ' + camp.Name);
@@ -152,14 +157,16 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			
 			// TBD ADD LEADS
 			if ( conCount != camp.Total_Unique_Contacts_In_Hierarchy__c || respCount != camp.Total_Unique_Responses_in_Hierarchy__c 
-				|| responseRate != camp.Engagement_Response_Rate__c || conversionRate != camp.Engagement_Conversion_Rate__c) {
+				|| responseRate != camp.Engagement_Response_Rate__c || conversionRate != camp.Engagement_Conversion_Rate__c
+				|| convCount != camp.Engagement_Conversions_in_Hierarchy__c || leadCount != camp.Total_Unique_Leads_in_Hierarchy__c) {
 				Campaign campForUpdate = new Campaign (
 					Id = camp.Id,
 					Total_Unique_Contacts_In_Hierarchy__c = conCount,
 					Total_Unique_Responses_in_Hierarchy__c = respCount,
 					Total_Unique_Leads_in_Hierarchy__c = leadCount,
 					Engagement_Response_Rate__c = responseRate,
-					Engagement_Conversion_Rate__c = conversionRate
+					Engagement_Conversion_Rate__c = conversionRate,
+					Engagement_Conversions_in_Hierarchy__c = convCount
 				);
 				system.debug (LoggingLevel.WARN,'returning campaign for write: ' + campForUpdate);
 				return campForUpdate;
@@ -497,7 +504,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         // make sure rollup is correct
         map<id,Campaign> campMap = new map<id,Campaign> ([SELECT Id,Name,ParentId,Total_Unique_Contacts_In_Hierarchy__c,
         					Total_Unique_Responses_in_Hierarchy__c,Engagement_Response_Rate__c,Engagement_Conversion_Rate__c,
-        					Total_Unique_Leads_in_Hierarchy__c 
+        					Total_Unique_Leads_in_Hierarchy__c,Engagement_Conversions_in_Hierarchy__c 
         					FROM Campaign WHERE Id IN :allCampIds]);
         					
         Campaign top1p = campMap.get(top1.Id);
@@ -506,6 +513,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (14,top1p.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (null,top1p.Engagement_Response_Rate__c);
         system.assertEquals (null,top1p.Engagement_Conversion_Rate__c);
+        system.assertEquals (null,top1p.Engagement_Conversion_Rate__c);
+        system.assertEquals (10,top1p.Engagement_Conversions_in_Hierarchy__c);
         					
         Campaign sub1aP = campMap.get(child_1a.Id);
         system.assertEquals (15,sub1aP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -513,6 +522,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (12,sub1aP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (38.9,sub1aP.Engagement_Response_Rate__c);
         system.assertEquals (35.7,sub1aP.Engagement_Conversion_Rate__c);
+        system.assertEquals (8,sub1aP.Engagement_Conversions_in_Hierarchy__c);
         					
         Campaign subsub1aaP = campMap.get(grandchild_1aa.Id);
         system.assertEquals (5,subsub1aaP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -520,6 +530,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (5,subsub1aaP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (100,subsub1aaP.Engagement_Response_Rate__c);
         system.assertEquals (100,subsub1aaP.Engagement_Conversion_Rate__c);
+        system.assertEquals (4,subsub1aaP.Engagement_Conversions_in_Hierarchy__c);
+        
         					
         Campaign subsub1abP = campMap.get(grandchild_1ab.Id);
         system.assertEquals (13,subsub1abP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -527,6 +539,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (10,subsub1abP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (62.5,subsub1abP.Engagement_Response_Rate__c);
         system.assertEquals (53.8,subsub1abP.Engagement_Conversion_Rate__c);
+        system.assertEquals (7,subsub1abP.Engagement_Conversions_in_Hierarchy__c);
 
         Campaign child_1bP = campMap.get(child_1b.Id);
         system.assertEquals (9,child_1bP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -534,6 +547,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (6,child_1bP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (66.7,child_1bP.Engagement_Response_Rate__c);
         system.assertEquals (50,child_1bP.Engagement_Conversion_Rate__c);
+        system.assertEquals (3,child_1bP.Engagement_Conversions_in_Hierarchy__c);
 
         Campaign grandchild_1baP = campMap.get(grandchild_1ba.Id);
         system.assertEquals (9,grandchild_1baP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -541,6 +555,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (6,grandchild_1baP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (66.7,grandchild_1baP.Engagement_Response_Rate__c);
         system.assertEquals (50,grandchild_1baP.Engagement_Conversion_Rate__c);
+        system.assertEquals (3,grandchild_1baP.Engagement_Conversions_in_Hierarchy__c);
 
         Campaign greatgrand_1baaP = campMap.get(greatgrand_1baa.Id);
         system.assertEquals (7,greatgrand_1baaP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -548,6 +563,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (4,greatgrand_1baaP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (57.1,greatgrand_1baaP.Engagement_Response_Rate__c);
         system.assertEquals (25,greatgrand_1baaP.Engagement_Conversion_Rate__c);
+        system.assertEquals (1,greatgrand_1baaP.Engagement_Conversions_in_Hierarchy__c);
 
         Campaign greatgrand_1babP = campMap.get(greatgrand_1bab.Id);
         system.assertEquals (2,greatgrand_1babP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -555,6 +571,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (2,greatgrand_1babP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (100,greatgrand_1babP.Engagement_Response_Rate__c);
         system.assertEquals (100,greatgrand_1babP.Engagement_Conversion_Rate__c);
+        system.assertEquals (2,greatgrand_1babP.Engagement_Conversions_in_Hierarchy__c);
 
         Campaign greatgreatgrand_1baaaP = campMap.get(greatgreatgrand_1baaa.Id);
         system.assertEquals (6,greatgreatgrand_1baaaP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -562,6 +579,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (3,greatgreatgrand_1baaaP.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (50,greatgreatgrand_1baaaP.Engagement_Response_Rate__c);
         system.assertEquals (25,greatgreatgrand_1baaaP.Engagement_Conversion_Rate__c);
+        system.assertEquals (1,greatgreatgrand_1baaaP.Engagement_Conversions_in_Hierarchy__c);
 
         					
         Campaign top2P = campMap.get(top2.Id);
@@ -570,10 +588,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         system.assertEquals (3,top2P.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (37.5,top2P.Engagement_Response_Rate__c);
         system.assertEquals (42.9,top2P.Engagement_Conversion_Rate__c);
-        					
-       	
-        
-		
+        system.assertEquals (3,top2P.Engagement_Conversions_in_Hierarchy__c);
 	}
 	
 	static list<CampaignMember> testCMs (Id CampId, Set<id> ConIDs, string statusStr, Set<Id> conIDsNotConversions ) {
