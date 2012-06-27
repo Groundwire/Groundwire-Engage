@@ -912,11 +912,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				if (isETField) {
 					// for fields that are part of ET (like the level fields in contact and campaign)
 					// possibilities are:
-					// * GWET prefix (ET package installed in NPSP context, or ET package dev instance)
+					// * GWE prefix (ET package installed in NPSP context, or ET package dev instance)
 					// * GWBase prefix (GWBase installed, or GWBase package dev instance)
 					// * no prefix (unmanaged context, e.g. git clone of GWBase)
 					if (InETPackage) {
-						return 'GWET__' + str;
+						return 'gwe__' + str;
 					} else {
 						return GW_Utilities.StrTokenNSPrefix(str);
 					}
