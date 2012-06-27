@@ -47,6 +47,19 @@ public with sharing class GW_CTRL_EngagementDashboard {
 	
     //--------------------TEST METHOD------------------------
     static testMethod void TestIt(){
+    	
+    	// insert some rows
+    	list<Engagement_Totals__c> ets = new list<Engagement_Totals__c>(); 
+    	for (integer i=0;i<7;i++) {
+    		Engagement_Totals__c et = new Engagement_Totals__c (
+    			Engagement_Level__c = (i+1) + ' - the level you love',
+    			Number_of_Contacts__c = (i+1) * 100,
+    			As_of_Date__c = system.today()
+    		);
+    		ets.add(et);
+    	}
+    	insert ets;
+    	
         GW_CTRL_EngagementDashboard controller = new GW_CTRL_EngagementDashboard();
         controller.queryEngagementCounts();
         system.debug ('rows:' + controller.rows);

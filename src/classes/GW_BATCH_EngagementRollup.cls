@@ -126,7 +126,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     public static EngagementTrackerSettings__c settings {
         get {
             if (settings == null) {
-                settings = EngagementTrackerSettings__c.getOrgDefaults();  
+                settings = EngagementTrackerSettings__c.getValues(UserInfo.getOrganizationId());  
                 
                 if (settings == null) {
            			// MatthewS felt that if no settings exist, we should give an error to the user,
