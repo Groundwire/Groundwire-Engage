@@ -196,7 +196,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     
     private void constructQuery () {
     	string soql = 'SELECT Id,CampaignId,ContactId,LeadId,Status,HasResponded,Campaign.Id,Campaign.Name,Campaign.Engagement_Level_Numeric__c,Contact.Name, ';
-    	soql +=			' Conversion_Candidate__c,Engagement_Conversion__c,Campaign.Total_Unique_Leads_in_Hierarchy__c, ';
+    	soql +=			' Conversion_Candidate__c,Engagement_Conversion__c,Campaign.Total_Unique_Leads_in_Hierarchy__c,Campaign.Engagement_Conversions_in_Hierarchy__c, ';
     	soql +=			' Campaign.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Total_Unique_Responses_in_Hierarchy__c,Campaign.Engagement_Response_Rate__c,Campaign.Engagement_Conversion_Rate__c, ';
     	soql +=			' Campaign.Parent.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Parent.Total_Unique_Responses_in_Hierarchy__c,Campaign.Parent.Engagement_Response_Rate__c,Campaign.Parent.Engagement_Conversion_Rate__c, ';
     	soql +=			' Campaign.Parent.Parent.Total_Unique_Contacts_In_Hierarchy__c,Campaign.Parent.Parent.Total_Unique_Responses_in_Hierarchy__c,Campaign.Parent.Parent.Engagement_Response_Rate__c,Campaign.Parent.Parent.Engagement_Conversion_Rate__c, ';
@@ -206,7 +206,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     	soql +=			' Campaign.Parent.Name,Campaign.Parent.Parent.Name,Campaign.Parent.Parent.Parent.Name,Campaign.Parent.Parent.Parent.Parent.Name, ';
     	soql +=	 		' Campaign.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Engagement_Level_Numeric__c,Campaign.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c, ';
     	soql +=	 		' Campaign.Top_Hierarchy_Campaign_ID__c, ';
-    	soql +=	 		' Campaign.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c ';
+    	soql +=	 		' Campaign.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Parent.Total_Unique_Leads_in_Hierarchy__c, ';
+    	soql +=	 		' Campaign.Parent.Engagement_Conversions_in_Hierarchy__c,Campaign.Parent.Parent.Engagement_Conversions_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Engagement_Conversions_in_Hierarchy__c,Campaign.Parent.Parent.Parent.Parent.Engagement_Conversions_in_Hierarchy__c ';
     	soql +=			' FROM CampaignMember';
     	// soql +=			'WHERE ';
     	soql +=			' ORDER BY Campaign.Top_Hierarchy_Campaign_ID__c,ContactId,LeadId,Campaign.Levels_Below_Top_of_Hierarchy__c DESC,CampaignId';
@@ -380,7 +381,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 	//  TESTS ****************************************************
 	
-	static testmethod void testCampaignRollup () {
+	@isTest // (SeeAllData=true)
+	static void testCampaignRollup () {
 		
         string txtfield1 = 'Title';
         double txtfield1lvl = 6;
