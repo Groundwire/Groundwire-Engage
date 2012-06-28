@@ -8,22 +8,22 @@ contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&a
         <externalId>false</externalId>
         <formula>IF (  
 ((
-  Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
+  ( Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c || Engagement_Level_At_Insert__c &lt;  Campaign.Parent.Engagement_Level_Numeric__c || Engagement_Level_At_Insert__c &lt;  Campaign.Parent.Parent.Engagement_Level_Numeric__c )
   &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
   &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
   &amp;&amp; NOT(ISBLANK(ContactId))  
 ) || (
   NOT(ISBLANK(LeadId))  
 ))
-&amp;&amp; ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) )
+&amp;&amp; ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) || NOT(ISBLANK(Campaign.Parent.Engagement_Level_Numeric__c)) || NOT(ISBLANK(Campaign.Parent.Parent.Engagement_Level_Numeric__c)) )
 
 /* TBD reinstate this when bug fixed, see twitter &amp; http://boards.developerforce.com/t5/Apex-Code-Development/batch-apex-test-err-if-formula-field-references-custom-setting/td-p/460587
 &amp;&amp; ( ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c * 31))
 */
 
 , &quot;True&quot; , &quot;False&quot; )</formula>
-        <inlineHelpText>Used in conversion rate metrics.  Indicates if this campaign membership was a possible conversion at time of entry.</inlineHelpText>
-        <label>Conversion Candidate</label>
+        <inlineHelpText>Used in conversion rate metrics.  Indicates if this campaign membership was a possible conversion at time of entry, including parent campaigns!!</inlineHelpText>
+        <label>Engagement Conversion Candidate</label>
         <required>false</required>
         <type>Text</type>
         <unique>false</unique>
@@ -33,7 +33,7 @@ contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&a
         <externalId>false</externalId>
         <formula>Engagement_Conversion_To_Level__c -  Engagement_Conversion_From_Level__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Conversion Level Jump</label>
+        <label>Engagement Conversion Level Jump</label>
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
@@ -126,6 +126,14 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_List_Growth__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>if checked indicates that this campaign membership was responsible for giving the contact their very first level above 0</description>
+        <externalId>false</externalId>
+        <label>Engagement List Growth</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>LeadSource</fullName>
         <picklist>
             <picklistValues>
@@ -156,7 +164,7 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         <fullName>Level_Change_Datestamp_At_Insert__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>At the time of insert of this campaign membership, the datestamp of last engagement level change of the contact.  Used for Conversion metrics.</inlineHelpText>
-        <label>Level Change Datestamp At Insert</label>
+        <label>Engagement Lvl Chg Datestamp At Insert</label>
         <required>false</required>
         <type>DateTime</type>
     </fields>

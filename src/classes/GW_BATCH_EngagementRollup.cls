@@ -720,6 +720,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					cm.Engagement_Conversion_From_Level__c = cw.OrigLvl;
 					cm.Engagement_Conversion_To_Level__c = cw.CurrLvl;
 					cm.Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
+					if (cw.OrigPeakLvl == 0) cm.Engagement_List_Growth__c = true;
 					// also back-date the "first day in level" on the contact
 					cw.EarliestActivityDateInLvl = cm.Effective_Action_Date__c;
                     cw.con.First_Action_Date_Curr_Level__c = cm.Effective_Action_Date__c;
@@ -738,6 +739,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					opp.Engagement_Conversion_From_Level__c = cw.OrigLvl;
 					opp.Engagement_Conversion_To_Level__c = cw.CurrLvl;
 					opp.Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
+					if (cw.OrigPeakLvl == 0) opp.Engagement_List_Growth__c = true;
 					oppConversionsUpd.add (opp);
 					// also back-date the "first day in level" on the contact
 					cw.EarliestActivityDateInLvl = opp.CloseDate;
@@ -986,7 +988,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		get {
 			if (!CheckedForETPkg) {
 				// first try to look up a ET object using ET pkg namespace - this should only work in an installed (i.e. client) instance
-				Schema.SObjectType token = Schema.getGlobalDescribe().get('GWET__EngagementTrackerSettings__c');
+				Schema.SObjectType token = Schema.getGlobalDescribe().get('gwe__EngagementTrackerSettings__c');
 				if (token != null) {
 					InETPackage = true;
 					CheckedForETPkg = true;
@@ -994,7 +996,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					// if this doesn't work, we are either in the ET dev instance itself, or in an unmanaged developer instance (git clone)
 					// the former still needs to include the prefixes, while the latter needs to not include them
 					// in order to tell the difference, try a dynamic query w/ the prefix and see if we get an err
-					string soql = 'SELECT Id,GWET__Engagement_Level__c FROM Contact LIMIT 1';
+					string soql = 'SELECT Id,gwe__Engagement_Level__c FROM Contact LIMIT 1';
 					try {
 						SObject[] recs = database.query(soql);
 					} catch (exception e) {
@@ -1273,6 +1275,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[1].Engagement_Level_Numeric__c = 2;   
         TestCons[1].Engagement_Peak_Numeric__c = 2;
         TestCons[1].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
+        TestCons[2].Engagement_Peak_Numeric__c = 1;
+        TestCons[2].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
         TestCons[11].Engagement_Peak_Numeric__c = 5;
@@ -1718,7 +1722,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         // also test for conversions
         map<id,CampaignMember> cmsPmap = new map<id,CampaignMember>( [SELECT Id,CampaignId,ContactId,Status,Engagement_Conversion__c,
-        							Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,Engagement_Conversion_Type__c
+        							Engagement_Conversion_To_Level__c,Engagement_Conversion_From_Level__c,Engagement_Conversion_Type__c,
+        							Engagement_List_Growth__c 
         							FROM CampaignMember WHERE Id IN :cms] );
         
         // for con0, the old CM shouldn't be a conversion, but the newer one should
@@ -1726,15 +1731,24 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.AssertEquals (true , cmsPmap.get(cm0.Id).Engagement_Conversion__c );
         system.AssertEquals (0 , cmsPmap.get(cm0.Id).Engagement_Conversion_From_Level__c );
         system.AssertEquals ('New' , cmsPmap.get(cm0.Id).Engagement_Conversion_Type__c );
+        system.AssertEquals (true , cmsPmap.get(cm0.Id).Engagement_List_Growth__c );
+        
+        // for con2, the older CM is a conversion but isn't list growth since had existing peak, even though curr level before was 0
+        system.AssertEquals (true , cmsPmap.get(cm22.Id).Engagement_Conversion__c );
+        system.AssertEquals (0 , cmsPmap.get(cm22.Id).Engagement_Conversion_From_Level__c );
+        system.AssertEquals ('New', cmsPmap.get(cm22.Id).Engagement_Conversion_Type__c );
+        system.AssertEquals (false, cmsPmap.get(cm22.Id).Engagement_List_Growth__c );
         
         // for con5, the CM isn't a conversion since he gets level from field value
         system.AssertEquals (false , cmsPmap.get(cm5.Id).Engagement_Conversion__c );
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_From_Level__c );
         system.AssertEquals (null , cmsPmap.get(cm5.Id).Engagement_Conversion_Type__c );
+        system.AssertEquals (false , cmsPmap.get(cm5.Id).Engagement_List_Growth__c );
         
         // for con11, the lvl 4 CM is a conversion, but not a "virgin" conversion
         system.AssertEquals (true , cmsPmap.get(cm11.Id).Engagement_Conversion__c );
         system.AssertEquals ('Returning' , cmsPmap.get(cm11.Id).Engagement_Conversion_Type__c );
+        system.AssertEquals (false , cmsPmap.get(cm11.Id).Engagement_List_Growth__c );
         
         // con8 CM is conversion since same date as opp
         system.AssertEquals (true , cmsPmap.get(cm8.Id).Engagement_Conversion__c );
@@ -1756,6 +1770,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        system.assertEquals (false, oppPmap.get(con23oppId).Engagement_Conversion__c);
 	        system.assertEquals (null , oppPmap.get(con23oppId).Engagement_Conversion_From_Level__c);
 	        system.assertEquals (null, oppPmap.get(con23oppId).Engagement_Conversion_Type__c);
+	        system.assertEquals (false, oppPmap.get(con23oppId).Engagement_List_Growth__c);
 			
 	        
 	        // this one should be a conversion, he started from lvl 0 and has no campaigns
@@ -1763,6 +1778,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        system.assertEquals (true , oppPmap.get(con6oppId).Engagement_Conversion__c);
 	        system.assertEquals (0 , oppPmap.get(con6oppId).Engagement_Conversion_From_Level__c);
 	        system.assertEquals ('New', oppPmap.get(con6oppId).Engagement_Conversion_Type__c);
+	        system.assertEquals (true, oppPmap.get(con6oppId).Engagement_List_Growth__c);
 	        
 	        // con 8 opp shouold not be conversion since same data as CM, and campaigns win the tie
 	        Id con8oppId = recentSmallOpps[2].Id; 		// first in, first out

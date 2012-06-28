@@ -62,7 +62,7 @@
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
         <inlineHelpText>True if this campaign for tracking contacts with the Gratitude Machine</inlineHelpText>
-        <label>Gratitude Machine</label>
+        <label>Gratitude Machine Campaign</label>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -134,9 +134,53 @@ IF (Parent.Id != null, 1 , 0)
         <type>Summary</type>
     </fields>
     <fields>
+        <fullName>Newly_Engaged_Contacts__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>List growth metric.  Count of how many contacts in this campaign got their very first engagement level because of this campaign.</inlineHelpText>
+        <label>Newly Engaged Contacts</label>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_Conversion__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </summaryFilterItems>
+        <summaryFilterItems>
+            <field>CampaignMember.Engagement_List_Growth__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </summaryFilterItems>
+        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Newly_Engaged_Contacts_in_Hierarchy__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of contacts in hierarchy who got an engagement level for the first time because of the campaign.</inlineHelpText>
+        <label>Newly Engaged Contacts in Hierarchy</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Number_Removed__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of Campaign Members on a Gratitude Machine campaign that have been marked as Removed.</inlineHelpText>
+        <label>Gratitude Machine Number Removed</label>
+        <summaryFilterItems>
+            <field>CampaignMember.Status</field>
+            <operation>equals</operation>
+            <value>Removed</value>
+        </summaryFilterItems>
+        <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
         <fullName>Number_of_Opp_Engagement_Conversions__c</fullName>
         <externalId>false</externalId>
-        <label>Number of Opp Engagement Conversions</label>
+        <label>Opp Engagement Conversions</label>
         <precision>8</precision>
         <required>false</required>
         <scale>0</scale>

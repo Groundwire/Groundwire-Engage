@@ -66,6 +66,15 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Engagement_List_Growth__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>if checked indicates that this campaign membership was responsible for giving the contact their very first level above 0</description>
+        <externalId>false</externalId>
+        <label>Engagement List Growth</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>LeadSource</fullName>
         <picklist>
             <picklistValues>
