@@ -4,18 +4,22 @@
     <fields>
         <fullName>Conversion_Candidate__c</fullName>
         <description>Indicates whether this campaign membership is/was a possible conversion.  In order to qualify, contact must have started out at a lower engagement level than this campaign would give them, and the campaign must occur (start or end date) after the last time the 
-contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Used in conversion rate metrics.</description>
+contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Also can&apos;t have been entered more than x months after the effective date of the campaign, where x is the engagement timeframe.  Used in conversion rate metrics.</description>
         <externalId>false</externalId>
         <formula>IF (  
-(
+((
   Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
   &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
   &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
   &amp;&amp; NOT(ISBLANK(ContactId))  
 ) || (
   NOT(ISBLANK(LeadId))  
-)
-&amp;&amp; NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) 
+))
+&amp;&amp; ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) )
+
+/* TBD reinstate this when bug fixed, see twitter &amp; http://boards.developerforce.com/t5/Apex-Code-Development/batch-apex-test-err-if-formula-field-references-custom-setting/td-p/460587
+&amp;&amp; ( ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c * 31))
+*/
 
 , &quot;True&quot; , &quot;False&quot; )</formula>
         <inlineHelpText>Used in conversion rate metrics.  Indicates if this campaign membership was a possible conversion at time of entry.</inlineHelpText>
@@ -261,5 +265,49 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
             <sorted>true</sorted>
         </picklist>
         <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>TEST_MONTH_MATH_2__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF (  
+
+(
+  Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
+  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
+  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
+  &amp;&amp; NOT(ISBLANK(ContactId))  
+)  
+/*
+|| (
+  NOT(ISBLANK(LeadId))  
+) 
+*/
+/* (1=1 || 2=2) */
+&amp;&amp; 
+ ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) )
+&amp;&amp; ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
+, &quot;True&quot; , &quot;False&quot; )</formula>
+        <label>TEST MONTH MATH 2</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>TEST_MONTH_MATH__c</fullName>
+        <externalId>false</externalId>
+        <formula>IF (
+
+ ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
+
+/*  ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c = 12 &amp;&amp;   ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; 365) || ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c * 31)
+*/
+
+ , &quot;OK&quot; , &quot;too long&quot; )
+&amp; &quot; - &quot; &amp; TEXT (ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>zzTEST MONTH MATH</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
 </CustomObject>
