@@ -12,15 +12,7 @@
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
-            <field>Engagement_Change_from_Last_Quarter__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
             <field>Engagement_Level_Numeric_After_Override__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Engagement_Level_Numeric_Last_Quarter__c</field>
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
@@ -33,10 +25,6 @@
         </availableFields>
         <availableFields>
             <field>Engagement_Level_Override__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Engagement_Level_This_Quarter__c</field>
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
@@ -89,10 +77,6 @@
         </availableFields>
         <availableFields>
             <field>Last_Engagement_Change__c</field>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
-            <field>Last_Engagement_Lvl_Chg_Datestamp__c</field>
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
@@ -246,17 +230,15 @@
         <unique>false</unique>
     </fields>
     <fields>
-        <fullName>Engagement_Change_from_Last_Quarter__c</fullName>
+        <fullName>Engagement_Level_Change_Log__c</fullName>
+        <description>Used by engagement metrics to compare year-over-year levels for a contact.  Should be hidden from end users.  Serialized JSON of a list of apex objects w/ two properties.  Date of change, and value changed to.</description>
         <externalId>false</externalId>
-        <formula>Engagement_Level_Numeric__c -  Engagement_Level_Numeric_Last_Quarter__c</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Engagement Change from Last Quarter</label>
-        <precision>18</precision>
-        <required>false</required>
-        <scale>2</scale>
+        <label>Engagement Level Change Log</label>
+        <length>5000</length>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
-        <type>Number</type>
-        <unique>false</unique>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
     </fields>
     <fields>
         <fullName>Engagement_Level_Numeric_After_Override__c</fullName>
@@ -272,19 +254,6 @@
         <unique>false</unique>
     </fields>
     <fields>
-        <fullName>Engagement_Level_Numeric_Last_Quarter__c</fullName>
-        <description>testing prototype of &quot;where are they now&quot; metric</description>
-        <externalId>false</externalId>
-        <label>Engagement Level Last Quarter</label>
-        <precision>1</precision>
-        <required>false</required>
-        <scale>0</scale>
-        <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
-        <type>Number</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
         <fullName>Engagement_Level_Numeric__c</fullName>
         <description>set automatically by batch process</description>
         <externalId>false</externalId>
@@ -294,6 +263,19 @@
         <scale>0</scale>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>true</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Engagement_Level_One_Year_Ago__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>The contact&apos;s numeric engagement level one year ago, used in metrics for comparing change over time.</inlineHelpText>
+        <label>Engagement Level One Year Ago</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -345,19 +327,6 @@
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Picklist</type>
-    </fields>
-    <fields>
-        <fullName>Engagement_Level_This_Quarter__c</fullName>
-        <description>testing &quot;where are they now&quot; report - level at start of current quarter</description>
-        <externalId>false</externalId>
-        <label>Engagement Level This Quarter</label>
-        <precision>1</precision>
-        <required>false</required>
-        <scale>0</scale>
-        <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
-        <type>Number</type>
-        <unique>false</unique>
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
@@ -517,17 +486,6 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <type>Checkbox</type>
     </fields>
     <fields>
-        <fullName>Languages__c</fullName>
-        <externalId>false</externalId>
-        <label>Languages</label>
-        <length>100</length>
-        <required>false</required>
-        <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
         <fullName>Last_Engagement_Change__c</fullName>
         <externalId>false</externalId>
         <formula>Engagement_Level_Numeric__c -  Former_Engagement_Level_Numeric__c</formula>
@@ -588,29 +546,6 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         </picklist>
         <type>Picklist</type>
     </fields>
-    <fields>
-        <fullName>Level__c</fullName>
-        <externalId>false</externalId>
-        <label>Level</label>
-        <picklist>
-            <picklistValues>
-                <fullName>Secondary</fullName>
-                <default>false</default>
-            </picklistValues>
-            <picklistValues>
-                <fullName>Tertiary</fullName>
-                <default>false</default>
-            </picklistValues>
-            <picklistValues>
-                <fullName>Primary</fullName>
-                <default>false</default>
-            </picklistValues>
-            <sorted>false</sorted>
-        </picklist>
-        <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
-        <type>Picklist</type>
-    </fields>
     <listViews>
         <fullName>AllContacts</fullName>
         <filterScope>Everything</filterScope>
@@ -632,8 +567,6 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <columns>ACCOUNT.NAME</columns>
         <columns>CONTACT.TITLE</columns>
         <columns>CONTACT.EMAIL</columns>
-        <columns>Engagement_Level_Numeric_Last_Quarter__c</columns>
-        <columns>Engagement_Level_This_Quarter__c</columns>
         <columns>Engagement_Level__c</columns>
         <columns>Engagement_Level_Numeric__c</columns>
         <columns>Engagement_Level_Override__c</columns>

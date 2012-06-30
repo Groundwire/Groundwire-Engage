@@ -37,7 +37,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     // all of these fields will be blanked out on insert (clone)
     static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
 									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
-									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,';
+									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,';
 	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,'; 								    
     
     // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
@@ -65,6 +65,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         global integer PeakLvl = 0;
         global integer OrigLvl = 0;
         global integer OrigPeakLvl = 0;
+        global integer YearAgoLvl;
         global date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
         global boolean isConverting;
         
@@ -574,17 +575,22 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	    
         for (engTrackConWrapper cw : conWrapMap.values() ) {
             Contact con = cw.con;               
-            
             string lvlStr = lvlNameMap.get(cw.CurrLvl);
             string peakStr = lvlNameMap.get(cw.PeakLvl);
+
+			// update our year ago level from the log of changes
+			updateYearAgoLevelFromLog(cw);
+
             if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
-                peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c ) 
+                peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
+	                // and add to our JSON changelog
                     if (cw.CurrLvl != cw.OrigLvl) {
                     	con.Last_Engagement_Lvl_Chg_Datestamp__c = system.now();
                     	con.Former_Engagement_Level_Numeric__c = con.Engagement_Level_Numeric__c;
                     	con.First_Action_Date_Curr_Level__c = system.today();
+                    	updateLevelChangeLog(cw);
                     	
                     	// also flag as conversion if level is rising
                     	if (cw.CurrLvl > cw.OrigLvl) {
@@ -611,11 +617,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     	}
                     }
                     
+                    // then update other metrics
                     con.Engagement_Level_Numeric__c = cw.CurrLvl;
                     con.Engagement_Peak_Numeric__c = cw.PeakLvl;
                     con.Engagement_Level__c = lvlStr; 
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
+                    con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
                     
                     consToUpd.add(con);
                 }
@@ -623,6 +631,57 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		
 	}
 
+
+	public class DateIntegerPair {
+		public date d;
+		public integer i;
+		
+		public DateIntegerPair(date d,integer i) {
+			this.d = d;
+			this.i = i;
+		}
+	}
+
+	private void updateLevelChangeLog(engTrackConWrapper cw) {
+		
+		// first deserialize our JSON to a list of objects
+		integer len = 0;
+		list<DateIntegerPair> changes;
+		if (cw.con.Engagement_Level_Change_Log__c != null) {
+			changes = (list<DateIntegerPair>) JSON.deserialize(cw.con.Engagement_Level_Change_Log__c, list<DateIntegerPair>.class);
+			len = cw.con.Engagement_Level_Change_Log__c.length();
+		} else {
+			changes = new list<DateIntegerPair>();
+		}
+		
+		// add our new change to the log 
+		// TBD take out any older than 13 months, and/or police the total char length
+		// TBD replace any existing entries w/ same date
+		DateIntegerPair thisChg = new DateIntegerPair(system.today(),cw.CurrLvl);
+		changes.add(thisChg);
+		cw.con.Engagement_Level_Change_Log__c = JSON.serialize (changes);
+	}
+	
+	private void updateYearAgoLevelFromLog (engTrackConWrapper cw) {
+		// date loopDate;
+		date yrAgo = system.today().addYears(-1);
+		integer lvl;
+		if (cw.con.Engagement_Level_Change_Log__c != null) {
+			list<DateIntegerPair> changes = (list<DateIntegerPair>) JSON.deserialize(cw.con.Engagement_Level_Change_Log__c, list<DateIntegerPair>.class);
+			// loop through until we pass our target date; the last chg before the target is the one we want
+			for (DateIntegerPair chg : changes) {
+				if (chg.d < yrAgo) {
+					// loopDate = chg.d;
+					lvl = chg.i;
+				} else {
+					break;
+				}
+			}
+			cw.YearAgoLvl = lvl;
+		} else {
+			cw.YearAgoLvl = null;
+		}
+	}
 
 	private void calculateConversions() {
 			// before updating contacts, figure campaign & opp conversions
@@ -1274,7 +1333,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[0].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);
         TestCons[1].Engagement_Level_Numeric__c = 2;   
         TestCons[1].Engagement_Peak_Numeric__c = 2;
-        TestCons[1].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
+        TestCons[1].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);
+        // for con 1 also put in an existing level chg log
+        DateIntegerPair chg1 = new DateIntegerPair (startDateOld.addYears(-2),1);   
+        DateIntegerPair chg2 = new DateIntegerPair (startDateOld.addYears(-1),2);
+        list<DateIntegerPair> chgs = new list<DateIntegerPair> {chg1,chg2};
+        TestCons[1].Engagement_Level_Change_Log__c = JSON.serialize(chgs);    
         TestCons[2].Engagement_Peak_Numeric__c = 1;
         TestCons[2].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
@@ -1517,7 +1581,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // query for all the cons we started with
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
-			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c
+			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,Engagement_Level_One_Year_Ago__c 
             FROM Contact WHERE Id IN :ConIDs]);
         system.debug (loggingLevel.WARN, 'conP:' + conP);
         
@@ -1536,7 +1600,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(null,con0P.Engagement_Level_Override__c);       
         System.AssertEquals(null,con0P.Engagement_Override_End_Date__c);
         System.AssertEquals(null,con0P.Former_Engagement_Level_Numeric__c);
-        System.AssertEquals(system.today(),DateFromDatetime(con0P.Last_Engagement_Lvl_Chg_Datestamp__c));        
+        System.AssertEquals(system.today(),DateFromDatetime(con0P.Last_Engagement_Lvl_Chg_Datestamp__c));
+        chgs = (list<DateIntegerPair>) JSON.deserialize(con0p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
+        system.Assert (chgs.size()==1);
+        system.Assert (chgs[0].d == system.today());      
+        system.Assert (chgs[0].i == 3);      
 
         // only last yr
         Contact con1P = conP.get(TestCons[1].Id);
@@ -1547,14 +1615,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // also test that the level & date stamp on the campaign membership worked
         CampaignMember cm1p = [SELECT Id,Engagement_Level_At_Insert__c,Level_Change_Datestamp_At_Insert__c FROM CampaignMember WHERE Id=:cm1.Id LIMIT 1];
         System.AssertEquals(2,cm1p.Engagement_Level_At_Insert__c);  
-        System.AssertEquals(startDateOld.addMonths(-3),cm1p.Level_Change_Datestamp_At_Insert__c);  
-
+        System.AssertEquals(startDateOld.addMonths(-3),cm1p.Level_Change_Datestamp_At_Insert__c);
+        // should have added this chg to the list of chgs already in the contact  
+        chgs = (list<DateIntegerPair>) JSON.deserialize(con1p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
+        system.Assert (chgs.size()==3);
+        system.Assert (chgs[0].d < system.today());      
+        system.Assert (chgs[2].d == system.today());
+        system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
+        
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
         System.AssertEquals(4,con2P.Engagement_Level_Numeric__c);
         System.AssertEquals(lvlNameMapTest.get(4),con2P.Engagement_Level__c);       
         System.AssertEquals(startDateRecent,con2P.Last_Leadership_Action_Date__c);          
-        System.AssertEquals(startDateMedium,con2P.First_Action_Date_Curr_Level__c);         
+        System.AssertEquals(startDateMedium,con2P.First_Action_Date_Curr_Level__c); 
+        system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
         
         // only peak, nothing recent
         Contact con3P = conP.get(TestCons[3].Id);
