@@ -13,7 +13,7 @@
 *
 * This program is released under the GNU General Public License. http://www.gnu.org/licenses/
 */
-global class GW_CTRL_BatchJobsProgress {
+global with sharing class GW_CTRL_BatchJobsProgress {
  
     private List<BatchJob> batchJobs;
     
