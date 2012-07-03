@@ -425,8 +425,6 @@ public with sharing class GW_CTRL_ETGratitude {
 	// public method for doing an action on a recipient
 	public PageReference doRecipientAction() {
 		if (contactIdEdit == null || contactIdEdit == '') {
-			apexpages.addMessage(new ApexPages.Message(ApexPages.Severity.Info, 'doRecipientAction got null contactIdEdit: ' + contactIdEdit + ' status: ' + cmStatus));
-			cmStatus = 'contactIdEdit is empty dude.';
 			return null;
 		}
 		// find the recipient
@@ -434,6 +432,19 @@ public with sharing class GW_CTRL_ETGratitude {
 			if (rec.con.Id == contactIdEdit) {
 				rec.cm.Status = cmStatus;
 				update rec.cm;
+				
+				// log an activity
+				if (cmStatus != 'Removed') {
+					Task ac = new Task();
+					ac.ActivityDate = system.today();
+					ac.Subject = 'Gratitude Machine Call';
+					ac.Description = strActivityNote;
+					ac.Status = 'Completed';
+					ac.WhoId = contactIdEdit;
+					ac.WhatId = cmpIdGratitude;
+					insert ac;
+				}
+								
 				// reset our lists
 				FillRecipientsFromCampaignId(cmpIdGratitude);				
 				return null;
