@@ -4,7 +4,7 @@
 /*******************************************************************************************************
 * @author Matthew Scholtz
 * @date 01/01/2010
-* @description This is the primary class for Engagement Tracker.  This class calculates and assigns engagement levels for contacts based on custom settings and
+* @description This is the primary class for Groundwire Engage.  This class calculates and assigns engagement levels for contacts based on custom settings and
 *  Campaign, Opp, and Contact data.  Currently this class only runs during batch, not from a trigger, so in general we recommend scheduling it to run nightly.  
 */
 global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sobject>, Schedulable {
@@ -59,29 +59,30 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
     // *** WRAPPER CLASS ***
     global class engTrackConWrapper {
+    	
         private id conId,HHid;
-        global Contact con;
-        global integer CurrLvl = 0;
-        global integer PeakLvl = 0;
-        global integer OrigLvl = 0;
-        global integer OrigPeakLvl = 0;
-        global integer YearAgoLvl;
-        global date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
-        global boolean isConverting;
+        public Contact con;
+        public integer CurrLvl = 0;
+        public integer PeakLvl = 0;
+        public integer OrigLvl = 0;
+        public integer OrigPeakLvl = 0;
+        public integer YearAgoLvl;
+        public date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
+        public boolean isConverting;
         
         // cache of campaign-based data
-        global integer LvlFromCampaigns = 0;
+        public integer LvlFromCampaigns = 0;
         
         // cache of Opp Rollup data
-        global integer LvlFromOpps = 0;
-        global decimal OppAmountLastNDays_c,OppAmountLastNDaysHH_c,OppsClosedLastNDays_c,OppsClosedLastNDaysHH_c;
-		global decimal Best_Gift_Year_Total_c,Best_Gift_Year_TotalHH_c;
-        global date LastCloseDate_c,LastCloseDateHH_c;
-        global decimal donorTierBreakpoint;
+        public integer LvlFromOpps = 0;
+        public decimal OppAmountLastNDays_c,OppAmountLastNDaysHH_c,OppsClosedLastNDays_c,OppsClosedLastNDaysHH_c;
+		public decimal Best_Gift_Year_Total_c,Best_Gift_Year_TotalHH_c;
+        public date LastCloseDate_c,LastCloseDateHH_c;
+        public decimal donorTierBreakpoint;
         
         // cache of membership data
-        global date MembershipEndDate_c,HouseholdMembershipEndDate_c,LastMembershipDate_c,MembershipJoinDate_c;
-        global string LastMembershipOrigin_c;
+        public date MembershipEndDate_c,HouseholdMembershipEndDate_c,LastMembershipDate_c,MembershipJoinDate_c;
+        public string LastMembershipOrigin_c;
 
         //constructor 
         public engTrackConWrapper (id argId) {
@@ -582,7 +583,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			updateYearAgoLevelFromLog(cw);
 
             if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
-                peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c ) 
+                peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c 
+                // temp disabled for security review	|| cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c 
+                ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
 	                // and add to our JSON changelog
@@ -623,7 +626,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     con.Engagement_Level__c = lvlStr; 
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
-                    con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
+                    // temp disabled for security review	con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
                     
                     consToUpd.add(con);
                 }
@@ -698,7 +701,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 												Engagement_Conversion_From_Level__c,Effective_Action_Date__c 
 												FROM CampaignMember
 												WHERE ContactId IN :conCandidates
-													AND (HasResponded = true AND (New_Since_Last_Engagement_Chg__c = 'True' OR Responded_Since_Last_Engagement_Chg__c = 'True'))
+													AND ((HasResponded = true OR Campaign.Engagement_Level_Numeric__c IN :lvlsNoNeedResp) AND (New_Since_Last_Engagement_Chg__c = 'True' OR Responded_Since_Last_Engagement_Chg__c = 'True'))
 													AND Campaign.Engagement_Level_Numeric__c = :Lvl AND Effective_Action_Date__c >= :cutoffDateRecent
 													AND Conversion_Candidate__c = 'True'
 													ORDER BY Effective_Action_Date__c];
@@ -1581,7 +1584,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // query for all the cons we started with
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
-			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,Engagement_Level_One_Year_Ago__c 
+			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c
+			// temp disabled for security review ,Engagement_Level_One_Year_Ago__c	 
             FROM Contact WHERE Id IN :ConIDs]);
         system.debug (loggingLevel.WARN, 'conP:' + conP);
         
@@ -1621,7 +1625,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.Assert (chgs.size()==3);
         system.Assert (chgs[0].d < system.today());      
         system.Assert (chgs[2].d == system.today());
-        system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
+        // temp disabled for security review	system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
         
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
@@ -1629,7 +1633,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(lvlNameMapTest.get(4),con2P.Engagement_Level__c);       
         System.AssertEquals(startDateRecent,con2P.Last_Leadership_Action_Date__c);          
         System.AssertEquals(startDateMedium,con2P.First_Action_Date_Curr_Level__c); 
-        system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
+        // temp disabled for security review	system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
         
         // only peak, nothing recent
         Contact con3P = conP.get(TestCons[3].Id);

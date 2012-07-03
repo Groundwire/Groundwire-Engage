@@ -7,13 +7,13 @@
 * @description Class which holds static methods for common utilities, 
 * such as detecting whether we are in a managed package, and some string helpers.
 ********************************************************************************************************/
-global without sharing class GW_Utilities { 
+public without sharing class GW_Utilities { 
 	
 	/******************************************************************************************************
 	* @description boolean property which tracks whether we are running in our managed packaged, or unmanaged code.
 	*******************************************************************************************************/	
 	private static boolean fCheckedForManagedPackage = false;
-	global static boolean InManagedPackage {
+	public static boolean InManagedPackage {
 		get {
 			if (!fCheckedForManagedPackage) {
 				// first try to look up a GW object using pkg namespace - this should only work in an installed (i.e. client) instance
@@ -53,7 +53,7 @@ global without sharing class GW_Utilities {
 	* with DupBlocker installed.
 	********************************************************************************************************/	
 	private static boolean fCheckedForDupBlocker = false;
-	global static boolean IsDupBlockerInstalled {
+	public static boolean IsDupBlockerInstalled {
 		get {
 			if (!fCheckedForDupBlocker) {
 				Schema.SObjectType token = Schema.getGlobalDescribe().get('CRMfusionDBR101__Setting__c');
@@ -97,7 +97,7 @@ global without sharing class GW_Utilities {
 	* @param str token name 
 	* @return token name, with namespace prefix, if required.
 	********************************************************************************************************/
-	global static string StrTokenNSPrefix(string str) {
+	public static string StrTokenNSPrefix(string str) {
 		if (!InManagedPackage) return str;
 		if (str.endsWith('__c')) {
 			str = 'GWBase__' + str;
@@ -113,7 +113,7 @@ global without sharing class GW_Utilities {
 	* @param str string that contains 0 or more token names 
 	* @return same string with token names, namespace prefixed, if required.
 	********************************************************************************************************/
-	global static string StrAllNSPrefix(string str) {
+	public static string StrAllNSPrefix(string str) {
 		if (!InManagedPackage) return str;
 		Pattern pat = Pattern.Compile('[a-zA-z0-9]*__c');
 		Matcher match = pat.matcher(str);
@@ -128,7 +128,7 @@ global without sharing class GW_Utilities {
 	* @param strDevName DeveloperName of the report 
 	* @return reportId
 	********************************************************************************************************/
-	global static ID reportIdFromDevName(string strDevName) { 
+	public static ID reportIdFromDevName(string strDevName) { 
 		Id reportId = null;
 		Report[] rpts = [select Id from Report where DeveloperName = :strDevName];
 		if (!rpts.isEmpty()) reportId = rpts[0].Id;

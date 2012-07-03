@@ -13,24 +13,24 @@
 *
 * This program is released under the GNU General Public License. http://www.gnu.org/licenses/
 */
-global with sharing class GW_CTRL_BatchJobsProgress {
+public with sharing class GW_CTRL_BatchJobsProgress {
  
     private List<BatchJob> batchJobs;
     
 	/*******************************************************************************************************
     * @description number of batch jobs the control will monitor
 	*/ 	
-    global Integer numberOfJobs {get; set;}
+    public Integer numberOfJobs {get; set;}
 
 	/*******************************************************************************************************
     * @description label to display at the top of the progress meter
 	*/ 	
-    global String batchComponentLabel {get; set;}
+    public String batchComponentLabel {get; set;}
  
 	/*******************************************************************************************************
     * @description query for the current batch job progress
 	*/ 	
-    global List<BatchJob> getBatchJobs() {
+    public List<BatchJob> getBatchJobs() {
         //Create new list of BatchJobs, a wrapper class that includes the job and percent complete.
         batchJobs = new List<BatchJob>();
  
@@ -76,9 +76,9 @@ global with sharing class GW_CTRL_BatchJobsProgress {
 	/*******************************************************************************************************
     * @description wrapper class includes the job itself and a value for the percent complete
 	*/ 	
-    global Class BatchJob{
-        global AsyncApexJob job {get; set;}
-        global Integer percentComplete {get; set;}
+    public Class BatchJob{
+        public AsyncApexJob job {get; set;}
+        public Integer percentComplete {get; set;}
     }
  
     //--------------------TEST METHOD------------------------
