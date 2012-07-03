@@ -20,6 +20,12 @@
 	
 </style>
 
+<script>
+	function doActionWithNoteJS(id, status) {
+		doRecipientActionJS(id, status, 'test note');
+	}
+</script>
+
     <apex:sectionHeader title="Gratitude Machine" />        
     	<apex:form >
     		<apex:pageBlock title="Show Some Love!" mode="edit">
@@ -58,43 +64,46 @@
 				</apex:pageBlockSection>
 						       					
     			<apex:pageBlockSection Title="Recent Gratitude Runs" columns="1" rendered="{!NOT(hasRecipients)}" >
-					<apex:pageBlockTable value="{!listCmpGratitude}" var="cmp" >
+					<apex:pageBlockTable value="{!listGratitudeRun}" var="run" >
 						<apex:column styleClass="cssActionColumn" >		 				
 							<apex:facet name="header">Action</apex:facet>
 				                <apex:commandLink value="Go" action="{!editGratitudeRun}" >
-				                	<apex:param value="{!cmp.Id}" assignTo="{!cmpIdGratitude}" name="cmpIdGratitude" /> 
+				                	<apex:param value="{!run.cmp.Id}" assignTo="{!cmpIdGratitude}" name="cmpIdGratitude" /> 
 				                </apex:commandLink>
 						</apex:column>	
 						<apex:column style="white-space:nowrap" >
 							<apex:facet name="header">Name</apex:facet>
-							<apex:outputLink value="{!'/' + cmp.Id}" >{!cmp.Name}</apex:outputLink>						
+							<apex:outputLink value="{!'/' + run.cmp.Id}" >{!run.cmp.Name}</apex:outputLink>						
 						</apex:column>
-						<apex:column value="{!cmp.Type}" />		 				
-						<apex:column value="{!cmp.StartDate}" />		 				
-						<apex:column value="{!cmp.NumberOfContacts}" />		 				
-						<apex:column value="{!cmp.NumberOfResponses}" />
+						<apex:column value="{!run.cmp.Type}" />								 				
+						<apex:column value="{!run.cmp.StartDate}" />		 				
+						<apex:column value="{!run.NumberThanked}" >
+							<apex:facet name="header">Thanked</apex:facet>
+						</apex:column>							 				
+						<apex:column value="{!run.NumberLeftToThank}" >
+							<apex:facet name="header">Left to Thank</apex:facet>
+						</apex:column>						
 					</apex:pageBlockTable>		 				
     			</apex:pageBlockSection>
 			
 	    		<apex:pageBlockSection id="panelRecipient" columns="1" rendered="{!hasRecipients}" Title="{!strNameCampaignGratitude}" >
+				    <apex:actionFunction action="{!doRecipientAction}" name="doRecipientActionJS" rerender="panelRecipient" >
+	                	<apex:param name="contactIdEdit" assignTo="{!contactIdEdit}" value="" /> 
+	                	<apex:param name="cmStatus" assignTo="{!cmStatus}" value="" /> 
+	                	<apex:param name="strActivityNote" assignTo="{!strActivityNote}" value="" />
+				    </apex:actionFunction>	    		
 					<br/>
 					<apex:outputLabel value="To Be Thanked" styleClass="cssTableTitle" />
 					<apex:pageBlockTable value="{!listRecipient}" var="rec" >
 						<apex:column styleClass="cssActionColumn" >		 				
 							<apex:facet name="header">Action</apex:facet>
 			                	<nobr>
-				                <apex:commandLink value="Thanked" action="{!doRecipientAction}" >
-				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
-				                	<apex:param value="Thanked" assignTo="{!cmStatus}" name="cmStatus" /> 
-				                </apex:commandLink>&nbsp;|&nbsp;
-				                <apex:commandLink value="Left Msg" action="{!doRecipientAction}" >
-				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
-				                	<apex:param value="Left Message" assignTo="{!cmStatus}" name="cmStatus" /> 
-				                </apex:commandLink>&nbsp;|&nbsp;
-				                <apex:commandLink value="Remove"  action="{!doRecipientAction}" >
-				                	<apex:param value="{!rec.con.Id}" assignTo="{!contactIdEdit}" name="contactIdEdit" /> 
-				                	<apex:param value="Removed" assignTo="{!cmStatus}" name="cmStatus" />  
-				                </apex:commandLink>&nbsp;
+				                <a><apex:outputLabel value="Thanked" onclick="doActionWithNoteJS('{!rec.con.Id}', 'Thanked');" style="cursor:pointer;" >
+				                </apex:outputLabel></a>&nbsp;|&nbsp;
+				                <a><apex:outputLabel value="Left Msg" onclick="doActionWithNoteJS('{!rec.con.Id}', 'Left Message');" style="cursor:pointer;" >
+				                </apex:outputLabel></a>&nbsp;|&nbsp;
+				                <a><apex:outputLabel value="Remove" onclick="doActionWithNoteJS('{!rec.con.Id}', 'Removed');" style="cursor:pointer;" >
+				                </apex:outputLabel></a>
 				                </nobr>
 						</apex:column>	
 						 

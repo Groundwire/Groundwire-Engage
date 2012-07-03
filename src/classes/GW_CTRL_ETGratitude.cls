@@ -419,9 +419,14 @@ public with sharing class GW_CTRL_ETGratitude {
 	// to hold the status to set for the action
 	public string cmStatus { get; set; }
 	
+	// to hold optional note for the activity getting logged
+	public string strActivityNote { get; set; }
+	
 	// public method for doing an action on a recipient
 	public PageReference doRecipientAction() {
 		if (contactIdEdit == null || contactIdEdit == '') {
+			apexpages.addMessage(new ApexPages.Message(ApexPages.Severity.Info, 'doRecipientAction got null contactIdEdit: ' + contactIdEdit + ' status: ' + cmStatus));
+			cmStatus = 'contactIdEdit is empty dude.';
 			return null;
 		}
 		// find the recipient
@@ -456,7 +461,8 @@ public with sharing class GW_CTRL_ETGratitude {
 	}
 	
 	//---------------------------------------- TEST CODE -------------------------------------------------
-	static testmethod void TestGM() {
+	@isTest (SeeAllData=false)
+	public static void TestGM() {
 		GW_CTRL_ETGratitude ctrl = new GW_CTRL_ETGratitude();
 		
 		system.assert(ctrl != null);
@@ -467,52 +473,115 @@ public with sharing class GW_CTRL_ETGratitude {
 		// create some contacts with different engagement levels and dates
         GW_BATCH_EngagementRollup.setSettingsForTests('Title', 'Board Member', 6);  
         list<Contact> listCon = ONEN_UnitTestData.CreateMultipleTestContacts(5);
+		insert listCon;
+
+		// a New Climber
         listCon[1].Email = 'testcontact1@foo.com';
         listCon[1].Engagement_Level__c = '4 - lvl four';
-        listCon[1].Engagement_Level_Override__c = '1 - lvl one';
+        listCon[1].Engagement_Level_Override__c = '4 - lvl four';
         listCon[1].Engagement_Level_Numeric__c = 4;   
         listCon[1].Engagement_Peak_Numeric__c = 4;
         listCon[1].Former_Engagement_Level_Numeric__c = 1;
         listCon[1].First_Action_Date_Curr_Level__c = system.today().addDays(-30);
         listCon[1].Last_Leadership_Action_Date__c = system.today().addDays(-20);
-		insert listCon;
-		system.assert(listCon[1].id != null);
+		update listCon;
 		
 		ID idT = listCon[1].Id;
 		string strSoql = 'select ' + ctrl.strContactFields + ' from Contact where Id =:idT';
 		list<Contact> listConT = database.query(strSoql);
 		system.debug('DJH: our test contacts ');
 		system.debug(listConT);
-		 
 		
 		system.assert(ctrl.cmpIdGratitude == null);
 		ctrl.strWhoToInclude = 'New';
-		ctrl.newGratitudeRun();
-		
-		// UNDONE: tests not yet working.
-		return;
-		
+		ctrl.newGratitudeRun();	
 		system.assert(ctrl.cmpIdGratitude != null);
 		system.assert(ctrl.listRecipient != null);
 		system.assertEquals(1, ctrl.listRecipient.size());
 		system.assert(ctrl.listRecipientDone != null);
 		system.assertEquals(0, ctrl.listRecipientDone.size());
+		system.assertEquals(true, ctrl.hasRecipients);		
+		system.assert(ctrl.strNameCampaignGratitude != null);
 		
+		ctrl.contactIdEdit = listCon[1].Id;
+		ctrl.cmStatus = 'Thanked';
+		ctrl.doRecipientAction();
+		system.assertEquals(0, ctrl.listRecipient.size());
+		system.assertEquals(1, ctrl.listRecipientDone.size());
+		 		
+		ctrl.doneWithRecipients();
+		system.assertEquals(1, ctrl.listGratitudeRun.size());
 		
-		// newGratitudeRun()
-		// editGratitudeRun()
-		// hasRecipients
-		// cmpIdGratitude
-		// strNameCampaignGratitude()
-		// listRecipient
-		// listRecipientDone
-		// doneWithRecipients
-		// listGratitudeRun
-		// contactIdEdit
-		// cmStatus
-		// doRecipientAction
+		system.assertEquals(false, ctrl.hasRecipients);
+		ctrl.cmpIdGratitude = ctrl.listGratitudeRun[0].cmp.Id;
+		system.assertEquals(1, ctrl.listGratitudeRun[0].NumberThanked);
+		system.assertEquals(0, ctrl.listGratitudeRun[0].NumberLeftToThank);
+		ctrl.editGratitudeRun();
+		system.assertEquals(true, ctrl.hasRecipients);
 		
+		// an Old Steady
+        listCon[2].Email = 'testcontact2@foo.com';
+        listCon[2].Engagement_Level__c = '4 - lvl four';
+        listCon[2].Engagement_Level_Override__c = '4 - lvl four';
+        listCon[2].Engagement_Level_Numeric__c = 4;   
+        listCon[2].Engagement_Peak_Numeric__c = 4;
+        listCon[2].Former_Engagement_Level_Numeric__c = 1;
+        listCon[2].First_Action_Date_Curr_Level__c = system.today().addDays(-1000);
+        listCon[2].Last_Leadership_Action_Date__c = system.today().addDays(-20);
+
+		// another Old Steady
+        listCon[3].Email = 'testcontact3@foo.com';
+        listCon[3].Engagement_Level__c = '4 - lvl four';
+        listCon[3].Engagement_Level_Override__c = '4 - lvl four';
+        listCon[3].Engagement_Level_Numeric__c = 4;   
+        listCon[3].Engagement_Peak_Numeric__c = 4;
+        listCon[3].Former_Engagement_Level_Numeric__c = 1;
+        listCon[3].First_Action_Date_Curr_Level__c = system.today().addDays(-1000);
+        listCon[3].Last_Leadership_Action_Date__c = system.today().addDays(-20);
+		update listCon;
 		
+		ctrl.doneWithRecipients();
+		ctrl.strWhoToInclude = 'Old';
+		ctrl.newGratitudeRun();	
+		system.assert(ctrl.cmpIdGratitude != null);
+		system.assert(ctrl.listRecipient != null);
+		system.assertEquals(2, ctrl.listRecipient.size());
+		
+		ctrl.doneWithRecipients();
+		ctrl.strWhoToInclude = 'Old';
+		ctrl.newGratitudeRun();	
+		system.assertEquals(null, ctrl.cmpIdGratitude);
+		system.assertEquals(false, ctrl.hasRecipients);
+		
+		// now test with Campaigns.
+		Campaign cmp1 = new Campaign(Name='test campaign 1', isActive=true, startDate=system.Today());
+		insert cmp1;
+		ctrl.cmFilter.CampaignId = cmp1.Id;
+		ctrl.newGratitudeRun();	
+		system.assertEquals(null, ctrl.cmpIdGratitude);
+		system.assertEquals(false, ctrl.hasRecipients);
+		
+		// another New Climber
+        listCon[4].Email = 'testcontact4@foo.com';
+        listCon[4].Engagement_Level__c = '4 - lvl four';
+        listCon[4].Engagement_Level_Override__c = '4 - lvl four';
+        listCon[4].Engagement_Level_Numeric__c = 4;   
+        listCon[4].Engagement_Peak_Numeric__c = 4;
+        listCon[4].Former_Engagement_Level_Numeric__c = 1;
+        listCon[4].First_Action_Date_Curr_Level__c = system.today().addDays(-30);
+        listCon[4].Last_Leadership_Action_Date__c = system.today().addDays(-20);
+		update listCon;
+		
+		Campaign cmp2 = new Campaign(Name='test campaign 2', isActive=true, startDate=system.Today(), ParentId=cmp1.Id);
+		insert cmp2;
+		CampaignMember cm2 = new CampaignMember(CampaignId=cmp2.Id, ContactId=listCon[4].Id, Status='Responded');
+		insert cm2;
+		ctrl.strWhoToInclude = 'New';
+		ctrl.cmFilter.CampaignId = cmp1.Id;
+		ctrl.newGratitudeRun();	
+		system.assert(ctrl.cmpIdGratitude != null);
+		system.assertEquals(true, ctrl.hasRecipients);
+		system.assertEquals(1, ctrl.listRecipient.size());
 		
 	}	
 }
