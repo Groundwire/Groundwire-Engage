@@ -17,21 +17,25 @@ public with sharing class GW_CTRL_EngagementDashboard {
 		
 		// get the most recent day's totals from the analytic snapshot
 		// first find out the most recent date we have data for - should be today unless early in the a.m. 
-		Engagement_Totals__c lastTotals = [SELECT Id,As_of_Date__c FROM Engagement_Totals__c ORDER BY As_of_Date__c DESC LIMIT 1];
-		date lastDate = lastTotals.As_of_Date__c;
-		if (lastDate.daysBetween(System.today()) > 7) {
+		Engagement_Totals__c[] lastTotals = [SELECT Id,As_of_Date__c FROM Engagement_Totals__c ORDER BY As_of_Date__c DESC LIMIT 1];
+		if (lastTotals.size() == 0) {
 			noRecentData = true;
-		}  else {
-			// query for all the totals from that date
-			Engagement_Totals__c[] results = [Select Engagement_Level__c, Number_of_Contacts__c  
-				FROM Engagement_Totals__c WHERE As_of_Date__c = :lastDate
-				ORDER BY Engagement_Level__c];
-			
-			for (Engagement_Totals__c result:results) {
-				aggEngagementRow row = new aggEngagementRow();
-				row.levelName = result.Engagement_Level__c;
-				row.countCons = (integer) result.Number_of_Contacts__c;
-				rows.add(row);
+		} else {
+			date lastDate = lastTotals[0].As_of_Date__c;
+			if (lastDate.daysBetween(System.today()) > 7) {
+				noRecentData = true;
+			}  else {
+				// query for all the totals from that date
+				Engagement_Totals__c[] results = [Select Engagement_Level__c, Number_of_Contacts__c  
+					FROM Engagement_Totals__c WHERE As_of_Date__c = :lastDate
+					ORDER BY Engagement_Level__c];
+				
+				for (Engagement_Totals__c result:results) {
+					aggEngagementRow row = new aggEngagementRow();
+					row.levelName = result.Engagement_Level__c;
+					row.countCons = (integer) result.Number_of_Contacts__c;
+					rows.add(row);
+				}
 			}
 		}		
 	}
