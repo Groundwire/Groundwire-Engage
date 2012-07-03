@@ -258,5 +258,5 @@
         <type>Number</type>
         <unique>false</unique>
     </fields>
-    <label>Engagement Tracker Settings</label>
+    <label>Groundwire Engage General Settings</label>
 </CustomObject>

@@ -63,7 +63,7 @@ NOT(ISBLANK(Campaign.StartDate)) ,
 	)
 )</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <inlineHelpText>The date used for Engagement Tracker calculations - the date this action is considered to have taken place.</inlineHelpText>
+        <inlineHelpText>The date used for Groundwire Engage calculations - the date this action is considered to have taken place.</inlineHelpText>
         <label>Effective Action Date</label>
         <required>false</required>
         <type>Date</type>

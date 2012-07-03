@@ -31,7 +31,7 @@
         <aggregateTypes>Average</aggregateTypes>
         <field>Engagement_Totals__c.Number_of_Contacts__c</field>
     </columns>
-    <description>showing what % of total population each level represents over time; note that report begins from when engagement tracker was installed</description>
+    <description>showing what % of total population each level represents over time; note that report begins from when Groundwire Engage was installed</description>
     <filter>
         <criteriaItems>
             <column>Engagement_Totals__c.First_of_Month__c</column>

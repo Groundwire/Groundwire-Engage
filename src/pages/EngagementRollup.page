@@ -1,4 +1,4 @@
-<apex:page controller="GW_CTRL_EngagementRollup" title="Engagement Tracker Rollup"
+<apex:page controller="GW_CTRL_EngagementRollup" title="Groundwire Engage Rollup"
 	tabStyle="Engagement_Rollup__tab" >
 
 	<!--
@@ -19,7 +19,7 @@
 	}
 	</style>
 
-	<apex:sectionHeader title="Batch Engagement Tracker Rollup" />
+	<apex:sectionHeader title="Batch Groundwire Engage Rollup" />
 	<apex:form >
 		<apex:pageBlock >
 			<apex:pageBlockButtons rendered="{!batching}">

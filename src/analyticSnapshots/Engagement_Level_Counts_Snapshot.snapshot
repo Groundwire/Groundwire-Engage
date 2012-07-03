@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <AnalyticSnapshot xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>This snapshot is used for several important Engagement Tracker reports/dashboards, including the main pyramid graph on the dashboard.  It should be scheduled to run daily.  Please do not delete or modify this snapshot.</description>
+    <description>This snapshot is used for several important Groundwire Engage reports/dashboards, including the main pyramid graph on the dashboard.  It should be scheduled to run daily.  Please do not delete or modify this snapshot.</description>
     <groupColumn>Contact.Engagement_Level__c</groupColumn>
     <mappings>
         <sourceField>ExecutionTime</sourceField>

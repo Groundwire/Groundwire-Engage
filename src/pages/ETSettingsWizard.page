@@ -136,7 +136,7 @@
     
 </script>
 
-    <apex:sectionHeader title="Engagement Tracker Settings" />    
+    <apex:sectionHeader title="Groundwire Engage Settings" />    
   	<apex:pageBlock mode="maindetail" id="pbWizard" >
 		<apex:actionStatus id="statusLoad" onstart="document.getElementById('divLoading').show();" onstop="document.getElementById('divLoading').hide();" />
 		<div class="loading clsLoading" id="divLoading" style="display:none" >

@@ -14,7 +14,7 @@
 				Name each of the levels you wish to use with words that mean something within your organization. 
 				These level names are used extensively in pick lists and reports. 
 				Level names must start with the level number and a dash, e.g. "1 - [level name]."</p>		  				
-		  		<p><i>Engagement Tracker relies on the <b>same levels</b> being defined in this settings page, as well as on
+		  		<p><i>Groundwire Engage relies on the <b>same levels</b> being defined in this settings page, as well as on
 		  				several picklist fields on Contact and Campaign.</i></p>
 				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpLevels').hide();document.getElementById('linkHelpLevels').show();"><br/>Hide</a>  
 	  		</div>
