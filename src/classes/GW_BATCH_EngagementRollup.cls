@@ -205,6 +205,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				'Household__r.OppsClosedLastNDays__c, Household__r.LastMembershipDate__c,';
 			querySOQLmore = addAllNSPrefixET (querySOQLmore,false,true);
 			querySOQL += ',' + querySOQLmore;
+			// and from the other NPSP package...
+			querySOQL += ',' + addNSPrefixET ('Account.SYSTEMIsIndividual__c',false,false);
 		} 
         
         // include any checkbox fields from settings in the query
@@ -508,12 +510,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     
                     // if indicated, give credit for org's gifts too
                     if (con.Award_Engagement_Levels_for_Org_Giving__c == true) {
-                    	Account acct = con.Account;
-                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
-                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
-                    	system.debug(LoggingLevel.WARN,'recentGiftTtl:' + recentGiftTtl + '   acctGiftTtl:' + acctGiftTtl);
-                    	recentGiftTtl += acctGiftTtl;
-                    	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
+                    	// but don't do it if we're in NPSP and this is a 1-to-1 or individual acct, since that will double count
+                    	if ( !(IsNPSPHHInstalled && con.get(addNSPrefixET('Account.SYSTEMIsIndividual__c',false,false))==true) ) {
+	                    	Account acct = con.Account;
+	                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
+	                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
+	                    	system.debug(LoggingLevel.WARN,'recentGiftTtl:' + recentGiftTtl + '   acctGiftTtl:' + acctGiftTtl);
+	                    	recentGiftTtl += acctGiftTtl;
+	                    	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
+                    	}
                     }		
                     
                     double lvlRecent; 
