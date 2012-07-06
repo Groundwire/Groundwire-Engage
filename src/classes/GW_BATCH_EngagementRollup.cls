@@ -37,6 +37,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     // all of these fields will be blanked out on insert (clone)
     static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
 									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
+									   			 'First_Engagement_Level__c,First_Engagement_Level_Date__c,' + 
 									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,';
 	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,'; 								    
     
@@ -591,6 +592,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     	con.Former_Engagement_Level_Numeric__c = con.Engagement_Level_Numeric__c;
                     	con.First_Action_Date_Curr_Level__c = system.today();
                     	updateLevelChangeLog(cw);
+                    	
+                    	// capture first level if that's what this is
+                    	if (cw.OrigLvl==0 && cw.OrigPeakLvl==0) {
+                    		con.First_Engagement_Level__c = cw.CurrLvl;
+                    		con.First_Engagement_Level_Date__c = system.today();
+                    	}
                     	
                     	// also flag as conversion if level is rising
                     	if (cw.CurrLvl > cw.OrigLvl) {
@@ -1581,7 +1588,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // query for all the cons we started with
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
-			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c
+			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Engagement_Level__c,First_Engagement_Level_Date__c
 			// temp disabled for security review ,Engagement_Level_One_Year_Ago__c	 
             FROM Contact WHERE Id IN :ConIDs]);
         system.debug (loggingLevel.WARN, 'conP:' + conP);
@@ -1602,6 +1609,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(null,con0P.Engagement_Override_End_Date__c);
         System.AssertEquals(null,con0P.Former_Engagement_Level_Numeric__c);
         System.AssertEquals(system.today(),DateFromDatetime(con0P.Last_Engagement_Lvl_Chg_Datestamp__c));
+        System.AssertEquals(3,con0P.First_Engagement_Level__c);
+        System.AssertEquals(system.today(),con0P.First_Engagement_Level_Date__c);
         chgs = (list<DateIntegerPair>) JSON.deserialize(con0p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
         system.Assert (chgs.size()==1);
         system.Assert (chgs[0].d == system.today());      
@@ -1617,6 +1626,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         CampaignMember cm1p = [SELECT Id,Engagement_Level_At_Insert__c,Level_Change_Datestamp_At_Insert__c FROM CampaignMember WHERE Id=:cm1.Id LIMIT 1];
         System.AssertEquals(2,cm1p.Engagement_Level_At_Insert__c);  
         System.AssertEquals(startDateOld.addMonths(-3),cm1p.Level_Change_Datestamp_At_Insert__c);
+        // first eng. level & date should both be null since weren't set by the batch
+        System.AssertEquals(null,con1p.First_Engagement_Level__c);
+        System.AssertEquals(null,con1p.First_Engagement_Level_Date__c);
         // should have added this chg to the list of chgs already in the contact  
         chgs = (list<DateIntegerPair>) JSON.deserialize(con1p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
         system.Assert (chgs.size()==3);

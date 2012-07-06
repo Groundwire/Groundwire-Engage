@@ -221,7 +221,7 @@
         <externalId>false</externalId>
         <formula>TODAY() -  First_Action_Date_Curr_Level__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>Days In Current Level</label>
+        <label>Days In Current Engagement Level</label>
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
@@ -461,6 +461,29 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>First_Engagement_Level_Date__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>date the contact received their very first engagement level</inlineHelpText>
+        <label>First Engagement Level Date</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>First_Engagement_Level__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>the very first engagement level received by this contact</inlineHelpText>
+        <label>First Engagement Level</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>Former_Engagement_Level_Numeric__c</fullName>
