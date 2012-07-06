@@ -66,8 +66,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         public integer PeakLvl = 0;
         public integer OrigLvl = 0;
         public integer OrigPeakLvl = 0;
-        public integer YearAgoLvl;
-        public date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
+        public integer FirstLvl, YearAgoLvl;
+        public date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl,FirstLvlDate;
         public boolean isConverting;
         
         // cache of campaign-based data
@@ -87,6 +87,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         //constructor 
         public engTrackConWrapper (id argId) {
             conId = argId;  
+        }
+        
+        public void setLevelTo (integer lvl, date actionDate, boolean removeEarliestActivityDate) {
+            if (lvl > CurrLvl) {
+            	CurrLvl = lvl;
+            	if (removeEarliestActivityDate) {
+            		EarliestActivityDateInLvl = null;
+            	}
+            }
+            if (lvl > PeakLvl) PeakLvl = lvl;
+            if (actionDate != null && actionDate > LastActionDate) LastActionDate = actionDate;
         }   
     }
     
@@ -338,9 +349,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         // temporarily assign this level to the contact (may be raised in later steps)
                         Double lvldbl = (double)r.get('MaxLevel');
                         Integer lvl = lvldbl.intvalue();
-                        cw.CurrLvl = lvl;
-                        if (lvl > cw.PeakLvl) cw.PeakLvl = lvl;
-                        cw.LastActionDate = (date)r.get('LastDate');
+                        cw.setLevelTo (lvl,(date)r.get('LastDate'),false);
                         cw.LvlFromCampaigns = lvl;		// cache this so we know what their campaign level was even if raised later
                     } else if (r.get('subtCon')==0 && r.get('subtLvl')==0 ) {
                         // this is a detail row (which should come after all of the con summary rows)
@@ -417,14 +426,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         // if this is con row, and we meet the frequency criteria, assign lvl to con as appropriate
                         Id conid = (id)row.get('ContactId');
                         engTrackConWrapper cw = conWrapMap.get(conid);
-                        Contact con = cw.con;
-                        if (fqset.Level_To_Assign__c > cw.CurrLvl) {
-                            cw.CurrLvl = fqset.Level_To_Assign__c.intvalue();
-                            // don't worry about dates, should have been assigned in first step above
-                        }
-                        if (fqset.Level_To_Assign__c > cw.PeakLvl) {
-                            cw.PeakLvl = fqset.Level_To_Assign__c.intvalue();
-                        }
+                        cw.setLevelTo(fqset.Level_To_Assign__c.intvalue(), null, false);
                     } else if (row.get('yr')!=null && row.get('subtCon')==0 && count >= fqset.Number_Of_Actions_Required__c) {
                         // if this is a detail row (per con and per yr) then see if constitutes a higher peak
                         Id conid = (id)row.get('ContactId');
@@ -465,24 +467,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                  
                 if (qual==true) {
                     integer fieldlvl = fSet.Level_Value__c.intvalue();
-                    if (fieldlvl > cw.CurrLvl) {
-                        cw.CurrLvl = fieldlvl;
-                        cw.EarliestActivityDateInLvl = null;     // blank out first action date, since no date for a field lvl
-                    }
-                    if (fieldlvl > cw.PeakLvl) {
-                        cw.PeakLvl = fieldlvl;
-                    }                   
+                    cw.setLevelTo(fieldlvl, null, true);
                 }   
                  
             }
             
             // chk override
-            if (con.Engagement_Level_Override_Numeric__c > cw.CurrLvl) {
-                cw.CurrLvl = con.Engagement_Level_Override_Numeric__c.intvalue();
-                cw.EarliestActivityDateInLvl = null;
-            }
-            if (con.Engagement_Level_Override_Numeric__c > cw.PeakLvl) {
-                cw.PeakLvl = con.Engagement_Level_Override_Numeric__c.intvalue();
+            if (con.Engagement_Level_Override_Numeric__c > 0) {
+	            cw.setLevelTo(con.Engagement_Level_Override_Numeric__c.intvalue(), null, true);
             }
 
             // if including opps, calc levels based on donor rollup fields (assumes rollups are up to date)
@@ -531,8 +523,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         	cw.donorTierBreakpoint = brkpt;
                         }
                         if (recentGiftTtl >= brkpt && lvl > cw.CurrLvl) {
-                            cw.CurrLvl = lvl;
-                            cw.LastActionDate = lastCloseDate;
+                        	cw.setLevelTo(lvl, lastCloseDate, false);
                             decimal oppsCount = (useHHTotals) ? cw.OppsClosedLastNDaysHH_c : cw.OppsClosedLastNDays_c;
                             if (oppsCount == 1) {
                                 cw.EarliestActivityDateInLvl = (useHHTotals) ? cw.LastCloseDateHH_c : cw.LastCloseDate_c;     // if only 1 gift, last is also the first
@@ -540,7 +531,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                                 // TBD we could add this con to a list, and then query for the actual first date??
                                 cw.EarliestActivityDateInLvl = cutoffDateRecent;  // b/c level is awarded for entire year, not one gift
                             }
-                            if (lvl > cw.PeakLvl) cw.PeakLvl = lvl;
+                            
 
                         // assign lastaction date even if we don't give the level, as long as they already had a date (i.e. level not due to override or chkbox)
                         //  and this date is more recent
@@ -563,8 +554,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 } else {
                     mbrlvl = NewMbrLvl;
                 }
-                if (cw.LastMembershipDate_c >= cutoffDateRecent && mbrlvl > cw.CurrLvl) cw.CurrLvl = mbrlvl;
-                if (mbrlvl > cw.PeakLvl) cw.PeakLvl = mbrlvl;  
+                if (cw.LastMembershipDate_c >= cutoffDateRecent) {
+                	cw.setLevelTo(mbrLvl, null, false);
+                }
             }   
         }
 		
