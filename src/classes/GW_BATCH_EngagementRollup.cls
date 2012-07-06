@@ -68,7 +68,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         public integer OrigLvl = 0;
         public integer OrigPeakLvl = 0;
         public integer FirstLvl, YearAgoLvl;
-        public date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl,FirstLvlDate;
+        public date LastActionDate,FirstDateInLvl,EarliestActivityDateInLvl;
         public boolean isConverting;
         
         // cache of campaign-based data
@@ -596,6 +596,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     	// capture first level if that's what this is
                     	if (cw.OrigLvl==0 && cw.OrigPeakLvl==0) {
                     		con.First_Engagement_Level__c = cw.CurrLvl;
+                    		cw.FirstLvl = cw.CurrLvl;
                     		con.First_Engagement_Level_Date__c = system.today();
                     	}
                     	
@@ -787,9 +788,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					cm.Engagement_Conversion_To_Level__c = cw.CurrLvl;
 					cm.Engagement_Conversion_Type__c = (cw.OrigPeakLvl < cw.CurrLvl) ? 'New' : 'Returning';
 					if (cw.OrigPeakLvl == 0) cm.Engagement_List_Growth__c = true;
-					// also back-date the "first day in level" on the contact
+					// also back-date the "first day in level" on the contact (and first level date, if this is a list growth situation)
 					cw.EarliestActivityDateInLvl = cm.Effective_Action_Date__c;
                     cw.con.First_Action_Date_Curr_Level__c = cm.Effective_Action_Date__c;
+                    if (cw.FirstLvl > 0) {
+                    	cw.con.First_Engagement_Level_Date__c = cm.Effective_Action_Date__c;
+                    }
 				}
 				update cmConversions;
 				system.debug (LoggingLevel.WARN,'cmConversions list after updates: ' + cmConversions);
@@ -810,6 +814,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 					// also back-date the "first day in level" on the contact
 					cw.EarliestActivityDateInLvl = opp.CloseDate;
 					cw.con.First_Action_Date_Curr_Level__c = opp.CloseDate;
+                    if (cw.FirstLvl > 0) {
+                    	cw.con.First_Engagement_Level_Date__c = opp.CloseDate;
+                    }
 				}
 				update oppConversionsUpd;
 				system.debug (LoggingLevel.WARN,'oppConversionsUpd list after updates: ' + oppConversionsUpd);				
@@ -1348,6 +1355,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[1].Engagement_Level_Change_Log__c = JSON.serialize(chgs);    
         TestCons[2].Engagement_Peak_Numeric__c = 1;
         TestCons[2].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
+        TestCons[2].First_Engagement_Level__c = 1;   
+        TestCons[2].First_Engagement_Level_Date__c = startDateOld.addMonths(-3);   
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
         TestCons[11].Engagement_Peak_Numeric__c = 5;
@@ -1610,7 +1619,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(null,con0P.Former_Engagement_Level_Numeric__c);
         System.AssertEquals(system.today(),DateFromDatetime(con0P.Last_Engagement_Lvl_Chg_Datestamp__c));
         System.AssertEquals(3,con0P.First_Engagement_Level__c);
-        System.AssertEquals(system.today(),con0P.First_Engagement_Level_Date__c);
+        System.AssertEquals(startDateRecent,con0P.First_Engagement_Level_Date__c);
         chgs = (list<DateIntegerPair>) JSON.deserialize(con0p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
         system.Assert (chgs.size()==1);
         system.Assert (chgs[0].d == system.today());      
@@ -1642,6 +1651,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(lvlNameMapTest.get(4),con2P.Engagement_Level__c);       
         System.AssertEquals(startDateRecent,con2P.Last_Leadership_Action_Date__c);          
         System.AssertEquals(startDateMedium,con2P.First_Action_Date_Curr_Level__c); 
+        // these should still be the same as before the batch
+        System.AssertEquals(1,con2P.First_Engagement_Level__c); 
+        System.AssertEquals(startDateOld.addMonths(-3),con2P.First_Engagement_Level_Date__c); 
         // temp disabled for security review	system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
         
         // only peak, nothing recent
