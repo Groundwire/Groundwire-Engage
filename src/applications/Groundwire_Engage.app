@@ -12,4 +12,5 @@
     <tab>Gratitude_Machine</tab>
     <tab>Engagement_Rollup</tab>
     <tab>Engagement_Settings</tab>
+    <tab>About_GW_Engage</tab>
 </CustomApplication>
