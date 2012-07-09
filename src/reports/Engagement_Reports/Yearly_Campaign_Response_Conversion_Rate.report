@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <aggregates>
-        <calculatedFormula>RowCount</calculatedFormula>
-        <datatype>number</datatype>
-        <developerName>FORMULA1</developerName>
-        <isActive>true</isActive>
-        <masterLabel>Nbr of Campaigns</masterLabel>
-        <scale>0</scale>
-    </aggregates>
     <chart>
         <backgroundColor1>#FFFFFF</backgroundColor1>
         <backgroundColor2>#FFFFFF</backgroundColor2>
         <backgroundFadeDir>Diagonal</backgroundFadeDir>
         <chartSummaries>
+            <aggregate>Average</aggregate>
             <axisBinding>y</axisBinding>
-            <column>FORMULA1</column>
+            <column>Campaign.Engagement_Response_Rate__c</column>
         </chartSummaries>
         <chartSummaries>
-            <aggregate>Sum</aggregate>
-            <axisBinding>y2</axisBinding>
-            <column>NUM_RESPONSES</column>
+            <aggregate>Average</aggregate>
+            <axisBinding>y</axisBinding>
+            <column>Campaign.Engagement_Conversion_Rate__c</column>
         </chartSummaries>
-        <chartType>VerticalColumnStackedLine</chartType>
-        <enableHoverLabels>false</enableHoverLabels>
+        <chartType>Line</chartType>
+        <enableHoverLabels>true</enableHoverLabels>
         <expandOthers>true</expandOthers>
         <groupingColumn>START_DATE</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
-        <secondaryGroupingColumn>Campaign.Leadership_Level__c</secondaryGroupingColumn>
         <showAxisLabels>true</showAxisLabels>
         <showPercentage>false</showPercentage>
         <showTotal>false</showTotal>
@@ -40,13 +32,17 @@
         <titleSize>18</titleSize>
     </chart>
     <columns>
-        <aggregateTypes>Sum</aggregateTypes>
-        <field>NUM_RESPONSES</field>
+        <aggregateTypes>Average</aggregateTypes>
+        <field>Campaign.Engagement_Conversion_Rate__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Average</aggregateTypes>
+        <field>Campaign.Engagement_Response_Rate__c</field>
     </columns>
     <columns>
         <field>CAMPAIGN_NAME</field>
     </columns>
-    <description>for each quarter, shows # of campaigns (opportunities) &amp; number of actions taken</description>
+    <description>year-over-year, goes back 3 years</description>
     <filter>
         <criteriaItems>
             <column>Campaign.Leadership_Level__c</column>
@@ -54,30 +50,35 @@
             <value></value>
         </criteriaItems>
         <criteriaItems>
-            <column>START_DATE</column>
-            <operator>greaterThan</operator>
-            <value>N_YEARS_AGO:4</value>
+            <column>Campaign.Engagement_Response_Rate__c</column>
+            <operator>notEqual</operator>
+            <value>100</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Campaign.Engagement_Response_Rate__c</column>
+            <operator>notEqual</operator>
+            <value>0</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Campaign.Engagement_Response_Rate__c</column>
+            <operator>notEqual</operator>
+            <value></value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
-    <groupingsAcross>
-        <dateGranularity>Quarter</dateGranularity>
+    <groupingsDown>
+        <dateGranularity>Year</dateGranularity>
         <field>START_DATE</field>
         <sortOrder>Asc</sortOrder>
-    </groupingsAcross>
-    <groupingsDown>
-        <dateGranularity>Day</dateGranularity>
-        <field>Campaign.Leadership_Level__c</field>
-        <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Campaign Opportunities vs Actions</name>
+    <name>Yearly Campaign Response/Conversion Rate</name>
     <params>
         <name>scopeid</name>
         <value></value>
     </params>
     <params>
         <name>co</name>
-        <value>0</value>
+        <value>1</value>
     </params>
     <reportType>CampaignList</reportType>
     <scope>orgAll</scope>

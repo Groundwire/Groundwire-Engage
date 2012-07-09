@@ -71,6 +71,13 @@
         <field>ACCOUNT.NAME</field>
     </columns>
     <description>counts of supporters by engagement level peak</description>
+    <filter>
+        <criteriaItems>
+            <column>Contact.Engagement_Level__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
     <format>Matrix</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>

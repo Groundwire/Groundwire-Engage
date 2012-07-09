@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
-    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundEndColor>#DDDDDD</backgroundEndColor>
     <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
     <backgroundStartColor>#FFFFFF</backgroundStartColor>
-    <dashboardType>SpecifiedUser</dashboardType>
+    <dashboardType>LoggedInUser</dashboardType>
+    <description>lorem ipsum dfvsdfgsg</description>
     <leftSection>
         <columnSize>Wide</columnSize>
         <components>
             <componentType>VisualforcePage</componentType>
-            <header>Current Engagement Levels</header>
+            <footer>How many people do we have at each level?</footer>
+            <header>Population</header>
             <page>engPyramidDash</page>
             <pageHeightInPixels>325</pageHeightInPixels>
         </components>
@@ -20,7 +22,7 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>count of contacts by highest level reached</footer>
+            <footer>Highest level ever reached by contacts in the pyramid</footer>
             <legendPosition>Bottom</legendPosition>
             <report>Engagement_Reports/Engagement_Peak</report>
             <showPercentage>false</showPercentage>
@@ -37,13 +39,14 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
+            <footer>Where are the donors in the pyramid?</footer>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Fall_from_Peak</report>
+            <report>Engagement_Reports/Donor_Activity_by_Engagement_Level</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Fall from Peak</title>
-            <useReportChart>false</useReportChart>
+            <title>Donors by Level</title>
+            <useReportChart>true</useReportChart>
         </components>
         <components>
             <chartAxisRange>Auto</chartAxisRange>
@@ -53,6 +56,7 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
+            <footer>How long are people staying in their level?</footer>
             <legendPosition>Bottom</legendPosition>
             <report>Engagement_Reports/Time_in_Level</report>
             <showPercentage>false</showPercentage>
@@ -65,21 +69,83 @@
     <middleSection>
         <columnSize>Wide</columnSize>
         <components>
+            <componentType>Table</componentType>
+            <dashboardTableColumn>
+                <column>CAMPAIGN_NAME</column>
+                <sortBy>RowLabelAscending</sortBy>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
+                <column>FORMULA1</column>
+                <showTotal>false</showTotal>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
+                <column>FORMULA2</column>
+                <showTotal>false</showTotal>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
+                <column>FORMULA3</column>
+                <showTotal>false</showTotal>
+            </dashboardTableColumn>
+            <displayUnits>Auto</displayUnits>
+            <footer>How are recent campaigns doing at engaging our people?</footer>
+            <header>Campaigns</header>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <maxValuesDisplayed>8</maxValuesDisplayed>
+            <report>Engagement_Reports_for_Dashboards/Recent_Campaign_Metrics_for_Dashboard</report>
+            <showPicturesOnTables>false</showPicturesOnTables>
+            <title>Recent Campaign Comparison</title>
+        </components>
+        <components>
+            <componentType>Table</componentType>
+            <dashboardTableColumn>
+                <column>CAMPAIGN_NAME</column>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
+                <column>FORMULA2</column>
+                <showTotal>false</showTotal>
+                <sortBy>RowValueDescending</sortBy>
+            </dashboardTableColumn>
+            <displayUnits>Auto</displayUnits>
+            <footer>What recent campaigns have done the best job at moving people up the pyramid?</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <report>Engagement_Reports_for_Dashboards/Top_5_Campaigns_Conversion_Rate</report>
+            <showPicturesOnTables>false</showPicturesOnTables>
+            <title>Top 5 Campaigns - Conversion</title>
+        </components>
+        <components>
             <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Column</componentType>
+            <componentType>ColumnGrouped</componentType>
             <displayUnits>Auto</displayUnits>
             <drillEnabled>false</drillEnabled>
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
-            <header>Recent Engagement Activity</header>
+            <footer>What campaigns are we running at each engagement level?</footer>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Campaign_Actions_Per_Quarter</report>
+            <report>Engagement_Reports/Campaign_Count_by_Level</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Campaign Actions Per Quarter</title>
+            <title>Recent Campaigns by Engagement Level</title>
             <useReportChart>false</useReportChart>
+        </components>
+    </middleSection>
+    <rightSection>
+        <columnSize>Wide</columnSize>
+        <components>
+            <componentType>Metric</componentType>
+            <displayUnits>Auto</displayUnits>
+            <footer>Contacts who received an low engagement level for the first time.</footer>
+            <header>Conversions &amp; List Growth</header>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>NEW LOW-LEVEL SUPPORTERS THIS QUARTER</metricLabel>
+            <report>Engagement_Reports_for_Dashboards/Newly_Engaged_Contacts_This_Quarter</report>
         </components>
         <components>
             <chartAxisRange>Auto</chartAxisRange>
@@ -91,11 +157,11 @@
             <expandOthers>false</expandOthers>
             <footer>people who rose in level by participating in a campaign</footer>
             <legendPosition>Right</legendPosition>
-            <report>Engagement_Reports/Campaign_Engagement_Conversions_by_Month</report>
+            <report>Engagement_Reports/Campaign_Engagement_Conversions_by_Level</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Campaign Conversions</title>
+            <title>Recent Conversions - Campaign</title>
             <useReportChart>true</useReportChart>
         </components>
         <components>
@@ -107,87 +173,18 @@
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
             <footer>people who rose in level by giving a gift etc.</footer>
-            <legendPosition>Right</legendPosition>
-            <report>Engagement_Reports/Opp_Engagement_Conversions_by_Type</report>
+            <legendPosition>Bottom</legendPosition>
+            <report>Engagement_Reports/Opp_Engagement_Conversions_by_Level</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
             <title>Opportunity Conversions</title>
             <useReportChart>true</useReportChart>
         </components>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Column</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>false</enableHover>
-            <expandOthers>false</expandOthers>
-            <footer>colors indicate how many have ever given; line gives avg giving this year and last</footer>
-            <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Donor_Activity_by_Engagement_Level</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Donor Activity by Level</title>
-            <useReportChart>true</useReportChart>
-        </components>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Column</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>false</enableHover>
-            <expandOthers>false</expandOthers>
-            <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/New_In_Level</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>New in Level</title>
-            <useReportChart>false</useReportChart>
-        </components>
-    </middleSection>
-    <rightSection>
-        <columnSize>Wide</columnSize>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Line</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>true</enableHover>
-            <expandOthers>false</expandOthers>
-            <header>Engagement Trends</header>
-            <legendPosition>Right</legendPosition>
-            <report>Engagement_Reports/Engagement_Level_Totals_Trend</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Engagement Level Trend</title>
-            <useReportChart>true</useReportChart>
-        </components>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Column</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>true</enableHover>
-            <expandOthers>false</expandOthers>
-            <legendPosition>Right</legendPosition>
-            <report>Engagement_Reports/Engagement_Level_Percentages_Trend</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Engagement Level Pct. of Whole - Trend</title>
-            <useReportChart>true</useReportChart>
-        </components>
     </rightSection>
     <runningUser>matthew+gwe@groundwire.org</runningUser>
     <textColor>#000000</textColor>
-    <title>Engagement</title>
+    <title>Engagement State of the Union</title>
     <titleColor>#000000</titleColor>
     <titleSize>12</titleSize>
 </Dashboard>
