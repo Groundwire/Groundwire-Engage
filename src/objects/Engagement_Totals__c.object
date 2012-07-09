@@ -87,6 +87,20 @@
         <filterScope>Everything</filterScope>
         <label>All</label>
     </listViews>
+    <listViews>
+        <fullName>Totals_This_Quarter</fullName>
+        <columns>NAME</columns>
+        <columns>As_of_Date__c</columns>
+        <columns>Engagement_Level__c</columns>
+        <columns>Number_of_Contacts__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>As_of_Date__c</field>
+            <operation>equals</operation>
+            <value>THIS_QUARTER</value>
+        </filters>
+        <label>Totals This Quarter</label>
+    </listViews>
     <nameField>
         <displayFormat>{0000000000}</displayFormat>
         <label>Engagement Totals Nbr</label>

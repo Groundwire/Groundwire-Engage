@@ -7,7 +7,7 @@
     <fields>
         <fullName>Level__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>The engagement level to assign if the minimum donation threshold is met.</inlineHelpText>
+        <inlineHelpText>The Engagement Level to assign if the minimum donation threshold is met.</inlineHelpText>
         <label>Engagement Level</label>
         <precision>1</precision>
         <required>true</required>
@@ -18,7 +18,7 @@
     <fields>
         <fullName>Lower_Limit__c</fullName>
         <externalId>false</externalId>
-        <inlineHelpText>Defines the minimum amount a donor must contribute (or pledge) in a year to be assigned the engagement level specified.  Make sure your tiers do not intersect or leave gaps.  You should not assign any setting with a lower limit of $0 or less.</inlineHelpText>
+        <inlineHelpText>Defines the minimum amount a donor must contribute (or pledge) in a year to be assigned the Engagement Level specified.  Make sure your tiers do not intersect or leave gaps.  You should not assign any setting with a lower limit of $0 or less.</inlineHelpText>
         <label>Minimum Donation Threshold</label>
         <precision>14</precision>
         <required>true</required>
