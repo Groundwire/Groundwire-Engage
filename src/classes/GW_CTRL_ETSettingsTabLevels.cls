@@ -9,12 +9,19 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 		ReloadPicklistValues();		
 	}
 
+	// alternate no-arg constructor for use from install script
+	public GW_CTRL_ETSettingsTabLevels () {
+		ReloadPicklistValues();		
+	}
+
 	private GW_CTRL_ETSettingsWizard ctrlWizard { get; set; }
 	
 	
 	public EngagementTrackerSettings__c etSettings {
 		get {
-			if (etSettings == null) etSettings = GW_BATCH_EngagementRollup.settings;
+			if (etSettings == null) {
+				etSettings = GW_BATCH_EngagementRollup.settings;
+			}
 			return etSettings;
 		}
 		set;
@@ -33,6 +40,25 @@ public with sharing class GW_CTRL_ETSettingsTabLevels {
 	public list<string> listStrCELO { get; set; }
 	public list<string> listStrCEP { get; set; }
 	public list<string> listStrCaEL { get; set; }
+	
+	public EngagementTrackerSettings__c setDefaultLevels (EngagementTrackerSettings__c settings) {
+		// first time through, if we are creating a settings rec, and all the picklist fields match, start w/ level names that match the picklists
+		// we did the describe in the constructor, so the picklist data should be available when this is called
+		if (strCELpicklist==strCELOpicklist && strCELOpicklist==strCEPpicklist && strCEPpicklist==strCaELpicklist && listStrCEL.size() > 0) {
+			try {
+				settings.Level_1_Name__c = listStrCEL[0];
+				settings.Level_2_Name__c = listStrCEL[1];
+				settings.Level_3_Name__c = listStrCEL[2];
+				settings.Level_4_Name__c = listStrCEL[3];
+				settings.Level_5_Name__c = listStrCEL[4];
+				settings.Level_6_Name__c = listStrCEL[5];
+				settings.Level_7_Name__c = listStrCEL[6];
+				settings.Level_8_Name__c = listStrCEL[7];
+			} catch(exception ex) {
+			}
+		}
+		return settings;
+	}
 	
 	// using Describe, load up all the picklist values for the Engagement Level fields.
 	private void ReloadPicklistValues() {
