@@ -10,12 +10,12 @@
 			<a class="cssTabHelpLink helpLink" id="linkHelpLevels" onclick="document.getElementById('linkHelpLevels').hide();
 				document.getElementById('divHelpLevels').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpLevels" class="cssHelpText" style="display:none" >
-				<p>Level 1 is the least engaged level for your organization and Level 8 is the most engaged. 
-				Name each of the levels you wish to use with words that mean something within your organization. 
+				<p>You can define between one and eight Engagement Levels for your organization, where Level 1 is the least engaged level.
+				Engagement Levels relate to your organization’s Engagement Pyramid - see the Groundwire Engage Strategy Guide.   
 				These level names are used extensively in pick lists and reports. 
-				Level names must start with the level number and a dash, e.g. "1 - [level name]."</p>		  				
+				Level names must start with the level number.  </p>		  				
 		  		<p><i>Groundwire Engage relies on the <b>same levels</b> being defined in this settings page, as well as on
-		  				several picklist fields on Contact and Campaign.</i></p>
+		  				several picklist fields on Contact and Campaign.  Refer to the Installation Guide for more info.</i></p>
 				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpLevels').hide();document.getElementById('linkHelpLevels').show();"><br/>Hide</a>  
 	  		</div>
    		</apex:outputPanel>

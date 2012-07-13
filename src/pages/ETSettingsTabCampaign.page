@@ -11,6 +11,12 @@
 			<a class="cssTabHelpLink helpLink" id="linkHelpCampaign" onclick="document.getElementById('linkHelpCampaign').hide();
 				document.getElementById('divHelpCampaign').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpCampaign" class="cssHelpText" style="display:none" >
+	   			<p>
+	   			By setting Campaign defaults here, your Campaigns can be autmoatically tagged with the proper Engagement Level upon creation.  
+	   			Note that this will only set the level on new Campaigns, it will not assign levels to existing ones. 
+	   			Note also that you will not see the level appear on the new Campaign until you click Save.
+	   			</p>
+	   			<!-- 
 	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
 	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
 				</apex:outputText>	       					
@@ -18,8 +24,10 @@
 	       		<apex:outputText rendered="IsGWBaseInstalled" >
 	       			<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Campaign_Sub_Type__c.InlineHelpText}</p>
 				</apex:outputText>
-	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>	       			
-	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - The list of Engagement Levels that don't require the Contact to have a Status of Responded on the Campaign.</p>	       			
+				 -->
+	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>
+	       			       			
+	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
 				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>

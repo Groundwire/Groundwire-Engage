@@ -10,6 +10,11 @@
 			<a class="cssTabHelpLink helpLink" id="linkHelpContact" onclick="document.getElementById('linkHelpContact').hide();
 				document.getElementById('divHelpContact').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
 	   		<div id="divHelpContact" class="cssHelpText" style="display:none" >
+	   			<p>
+	   			This feature allows you to award Engagement Levels to Contacts if they have particular field values.  
+	   			You can use this to assign levels based on activity or attributes that aren't easily tracked using Campaigns or Opportunities.
+	   			See the Groundwire Engage Installation Guide for more info.
+	   			</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.InlineHelpText}</p>
