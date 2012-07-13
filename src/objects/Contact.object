@@ -209,6 +209,7 @@
     <fields>
         <fullName>Award_Engagement_Levels_for_Org_Giving__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Check this box if this contact should receive engagement &quot;credit&quot; for gifts made by their organizations.  Generally this is used for owners of small businesses who give via their business.</inlineHelpText>
         <label>Award Engagement Levels for Org&apos;s Giving</label>
@@ -218,6 +219,7 @@
     </fields>
     <fields>
         <fullName>Days_Since_First_Action_at_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>TODAY() -  First_Action_Date_Curr_Level__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -231,6 +233,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Change_Log__c</fullName>
+        <deprecated>false</deprecated>
         <description>Used by engagement metrics to compare year-over-year levels for a contact.  Should be hidden from end users.  Serialized JSON of a list of apex objects w/ two properties.  Date of change, and value changed to.</description>
         <externalId>false</externalId>
         <label>Engagement Level Change Log</label>
@@ -242,6 +245,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Numeric_After_Override__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>MAX (  Engagement_Level_Override_Numeric__c ,  Engagement_Level_Numeric__c )</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -255,6 +259,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <description>set automatically by batch process</description>
         <externalId>false</externalId>
         <label>Engagement Level Numeric</label>
@@ -281,6 +286,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Override_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>VALUE(LEFT(TEXT(Engagement_Level_Override__c ),1))</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -294,6 +300,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Override__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>This will increase the contact&apos;s engagement level, if this level is higher than what they would otherwise get based on their activity/donor history.  It cannot lower their level, only raise it.  It is effective until the override end date specified.</inlineHelpText>
         <label>Engagement Level Override</label>
@@ -330,6 +337,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
         <description>set by batch process</description>
         <externalId>false</externalId>
         <inlineHelpText>Current engagement level, automatically calculated.  If you want to manually change the level, do not attempt to change this field.  Instead, enter a value in Engagement Level Override.</inlineHelpText>
@@ -373,6 +381,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Levels_Below_Peak__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>Engagement_Level_Numeric__c - Engagement_Peak_Numeric__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -387,6 +396,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Override_End_Date__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Override specified is effective until this date.</inlineHelpText>
         <label>Engagement Override End Date</label>
@@ -397,6 +407,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Peak_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <description>set automatically by batch process</description>
         <externalId>false</externalId>
         <label>Engagement Peak Numeric</label>
@@ -410,6 +421,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Peak__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The highest engagement level ever reached by this contact.
 
@@ -454,6 +466,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>First_Action_Date_Curr_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The date this contact moved into their current engagement level (whether up or down)</inlineHelpText>
         <label>In Engagement Level Since</label>
@@ -464,6 +477,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>First_Engagement_Level_Date__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>date the contact received their very first engagement level</inlineHelpText>
         <label>First Engagement Level Date</label>
@@ -474,6 +488,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>First_Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>the very first engagement level received by this contact</inlineHelpText>
         <label>First Engagement Level</label>
@@ -487,6 +502,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>Former_Engagement_Level_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>the previous engagement level for this contact, before they changed to their current level</inlineHelpText>
         <label>Former Engagement Level Numeric</label>
@@ -501,6 +517,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     <fields>
         <fullName>IsDonor__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <description>Used by GW Engage to flag donors, in NPSP environment.  In GWBase environment, we use native GWBase field of same name.</description>
         <externalId>false</externalId>
         <label>Donor?</label>
@@ -510,6 +527,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>Last_Engagement_Change__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>Engagement_Level_Numeric__c -  Former_Engagement_Level_Numeric__c</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -524,6 +542,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>Last_Engagement_Lvl_Chg_Datestamp__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>date this contact&apos;s engagement level was last changed from one level to another</inlineHelpText>
         <label>Last Engagement Lvl Chg Datestamp</label>
@@ -534,6 +553,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>Last_Leadership_Action_Date__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Date of most recent action taken (may include donations if your org includes that in Engagement Level calculations)</inlineHelpText>
         <label>Last Engagement Action Date</label>
@@ -573,6 +593,22 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <fullName>AllContacts</fullName>
         <filterScope>Everything</filterScope>
         <label>All Contacts</label>
+    </listViews>
+    <listViews>
+        <fullName>All_Highly_Engaged_Contacts</fullName>
+        <columns>FULL_NAME</columns>
+        <columns>ACCOUNT.NAME</columns>
+        <columns>CONTACT.PHONE1</columns>
+        <columns>CONTACT.EMAIL</columns>
+        <columns>Engagement_Level__c</columns>
+        <columns>CORE.USERS.ALIAS</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Engagement_Level_Numeric__c</field>
+            <operation>greaterOrEqual</operation>
+            <value>4</value>
+        </filters>
+        <label>All Highly Engaged Contacts</label>
     </listViews>
     <listViews>
         <fullName>BirthdaysThisMonth</fullName>
@@ -647,14 +683,11 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </listViews>
     <listViews>
         <fullName>My_High_Level_Supporters</fullName>
-        <booleanFilter>1 OR 2</booleanFilter>
         <columns>FULL_NAME</columns>
         <columns>ACCOUNT.NAME</columns>
         <columns>CONTACT.PHONE1</columns>
         <columns>CONTACT.EMAIL</columns>
         <columns>Engagement_Level__c</columns>
-        <columns>Engagement_Level_Override__c</columns>
-        <columns>Engagement_Peak__c</columns>
         <columns>CORE.USERS.ALIAS</columns>
         <filterScope>Mine</filterScope>
         <filters>
@@ -662,12 +695,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
             <operation>greaterOrEqual</operation>
             <value>4</value>
         </filters>
-        <filters>
-            <field>Engagement_Level_Override_Numeric__c</field>
-            <operation>greaterOrEqual</operation>
-            <value>4</value>
-        </filters>
-        <label>ENGAGE:My High Level Supporters</label>
+        <label>My Highly Engaged Contacts</label>
     </listViews>
     <listViews>
         <fullName>NewLastWeek</fullName>

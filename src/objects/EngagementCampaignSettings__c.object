@@ -7,8 +7,9 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Campaign_Record_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Record Type of the Campaign to set an Engagement Level for.  This field is optional.</inlineHelpText>
+        <inlineHelpText>New campaigns with this record type will be assigned the specified Level.</inlineHelpText>
         <label>Campaign Record Type</label>
         <length>255</length>
         <required>false</required>
@@ -17,8 +18,9 @@
     </fields>
     <fields>
         <fullName>Campaign_Sub_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Sub Type of the Campaign to set an Engagement Level for.  This field is optional.</inlineHelpText>
+        <inlineHelpText>New campaigns with this sub-type will be assigned the specified Level.</inlineHelpText>
         <label>Campaign Sub Type</label>
         <length>255</length>
         <required>false</required>
@@ -27,6 +29,7 @@
     </fields>
     <fields>
         <fullName>Campaign_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Type of the Campaign to set an Engagement Level for.  This field is optional.</inlineHelpText>
         <label>Campaign Type</label>
@@ -37,8 +40,9 @@
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Engagement Level to set on new Campaigns</inlineHelpText>
+        <inlineHelpText>New campaigns will receive this Level automatically if they meet all of the field values specified in the other columns.</inlineHelpText>
         <label>Engagement Level</label>
         <precision>2</precision>
         <required>true</required>
@@ -46,5 +50,5 @@
         <type>Number</type>
         <unique>false</unique>
     </fields>
-    <label>Engagement Campaign Settings</label>
+    <label>Groundwire Engage Campaign Settings</label>
 </CustomObject>

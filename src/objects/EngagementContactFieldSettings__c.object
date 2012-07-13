@@ -6,6 +6,7 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Field_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The datatype of the Contact field.  Only &quot;checkbox&quot; or &quot;text&quot; is supported.  &quot;text&quot; handles picklists, email, address, etc.</inlineHelpText>
         <label>Field Type</label>
@@ -16,8 +17,9 @@
     </fields>
     <fields>
         <fullName>Field_Value__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>For non-checkbox fields, the value that the field must have to qualify for the level. Enter an asterisk (*) to match any non-empty value. For checkboxes, leave the field blank.</inlineHelpText>
+        <inlineHelpText>The value that the field must have in order to qualify for the level.  Enter an asterisk (*) to match any non-empty value. For checkboxes, leave this blank.</inlineHelpText>
         <label>Field Value</label>
         <length>255</length>
         <required>false</required>
@@ -26,8 +28,9 @@
     </fields>
     <fields>
         <fullName>Fieldname__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The name of a Contact field you want to base an engagement level on.</inlineHelpText>
+        <inlineHelpText>The Contact field.  Only fields on the Contact object (not Account etc.) can be used here.</inlineHelpText>
         <label>Fieldname</label>
         <length>150</length>
         <required>true</required>
@@ -36,8 +39,9 @@
     </fields>
     <fields>
         <fullName>Level_Value__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Engagement Level earned by this field.  For checkboxes, the level is earned if it&apos;s checked.</inlineHelpText>
+        <inlineHelpText>The Engagement Level earned by this contact if they have the field value specified.  For checkboxes, the level is earned if it&apos;s checked.</inlineHelpText>
         <label>Engagement Level</label>
         <precision>2</precision>
         <required>true</required>
@@ -45,5 +49,5 @@
         <type>Number</type>
         <unique>false</unique>
     </fields>
-    <label>Engagement Contact Field Settings</label>
+    <label>Groundwire Engage Contact Field Settings</label>
 </CustomObject>
