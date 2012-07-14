@@ -60,9 +60,9 @@
 				</apex:pageBlockButtons>
     			<apex:pageBlockSection id="panelFilter" columns="1" rendered="{!NOT(hasRecipients)}" >
 			   		<div class="cssHelpText" >
-		    			Let's find some people that you should gratify!<br/><br/>
-		    			<b><i>New Climbers</i></b> are people who are most recently in their level.<br/>  
-		    			<b><i>Old Steadies</i></b> are people who are longest in their level, but have done some action in the last year.
+		    			Make a few phone calls that have a big impact.  You can choose from two audiences:<br/><br/>
+		    			<b><i>New Climbers</i></b> are people who have recently moved up a level.<br/>  
+		    			<b><i>Old Steadies</i></b> are people who have been at the same level for a long time.
 		    		</div>
 		    		
 					<apex:pageBlockSection columns="1">
@@ -89,7 +89,7 @@
 					<apex:pageMessages />		       			
 				</apex:pageBlockSection>
 						       					
-    			<apex:pageBlockSection Title="Recent Gratitude Runs" columns="1" rendered="{!NOT(hasRecipients)}" >
+    			<apex:pageBlockSection Title="Recent Gratitude Lists" columns="1" rendered="{!NOT(hasRecipients)}" >
 					<apex:pageBlockTable value="{!listGratitudeRun}" var="run" >
 						<apex:column styleClass="cssActionColumn" >		 				
 							<apex:facet name="header">Action</apex:facet>
