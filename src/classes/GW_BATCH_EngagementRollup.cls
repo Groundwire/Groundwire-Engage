@@ -1,13 +1,14 @@
-// Written by Matthew Scholtz, copyright (c) 2010 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
-// This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sobject>, Schedulable {
 
 /*******************************************************************************************************
 * @author Matthew Scholtz
 * @date 01/01/2010
 * @description This is the primary class for Groundwire Engage.  This class calculates and assigns engagement levels for contacts based on custom settings and
 *  Campaign, Opp, and Contact data.  Currently this class only runs during batch, not from a trigger, so in general we recommend scheduling it to run nightly.  
+*
+* Written by Matthew Scholtz, copyright (c) 2010, 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
 */
-global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sobject>, Schedulable {
 
     public String Query;
     public boolean isTest; 

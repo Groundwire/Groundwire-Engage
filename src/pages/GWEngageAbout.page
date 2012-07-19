@@ -1,46 +1,52 @@
-<!--
-// Written by Matthew Scholtz, copyright (c) 2010, 2011 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
--->
- 
 <apex:page title="Groundwire Engage Beta">
 
-<p>
-<h1>
-<a href="http://groundwire.org/" target="_new">
-<img src="http://gw-logo.s3.amazonaws.com/groundwire-logo-270-noclear.png" border="0" hspace="5" vspace="5" /></a>
-</h1>
-</p>
+	<!--
+	// Written by Matthew Scholtz, copyright (c) 2012 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
+	// description: about tab
+	//
+	// This program is free software; you can redistribute it and/or modify it under the terms of the
+	// GNU General Public License version 3 as published by the Free Software Foundation. http://www.gnu.org/licenses/gpl.html
+	-->
+	
+	
+	
+	<p>
+		<h1>
+			<a href="http://groundwire.org/" target="_new">
+			<img src="http://gw-logo.s3.amazonaws.com/groundwire-logo-270-noclear.png" border="0" hspace="5" vspace="5" /></a>
+		</h1>
+	</p>
+	
+	<p>
+		<h1>Welcome to the Groundwire Engage beta</h1><br/>
+		<br/>Groundwire Engage was created by <a href="http://groundwire.org/labs" target="_new">Groundwire Labs</a>,
+		the product innovation group at <a href="http://groundwire.org/" target="_new">Groundwire</a>.
+	</p>
+	<br/>
 
-<p>
-<h1>Welcome to the Groundwire Engage beta</h1><br/>
-<br/>Groundwire Engage was created by <a href="http://groundwire.org/labs" target="_new">Groundwire Labs</a>,
-the product innovation group at <a href="http://groundwire.org/" target="_new">Groundwire</a>.
-</p>
+	<h1>Documentation</h1>
+	<p>Strategy, Installation and User Guides for Groundwire Engage are available online:
+		<BR/> <a href="http://bit.ly/gwengage-strategy" target="_new">Strategy Guide</a>
+		<BR/> <a href="http://bit.ly/gwengage-installationguide" target="_new">Installation Guide</a>
+		<BR/> <a href="http://bit.ly/gwengage-usersguide" target="_new">User Guide</a>
+	<br/><br/></p>
+	
+	<h1>Support</h1>
+	<p>If you have a question or need help during the beta, please email us at <a href="mailto:engage@groundwire.org">engage@groundwire.org</a>.</p> 
+	<br/><br/>
 
-<br/>
-<h1>Documentation</h1>
-<p>Installation and user guides for Groundwire Engage are available online:
-<BR/> <a href="http://bit.ly/gwengage-installationguide" target="_new">Installation Guide</a>
-<BR/> <a href="http://bit.ly/gwengage-usersguide" target="_new">User Guide</a>
-<br/><br/></p>
-
-<h1>Support</h1>
-<p>If you have a question or need help during the beta, please email us at <a href="mailto:engage@groundwire.org">engage@groundwire.org</a>.</p>
-<p>If you would like to suggest an improvement or a new feature, please create a <a href="https://github.com/Groundwire/Engagement-Tracker/issues" target="_new">new issue on GitHub</a>.<br/></p>
-
-<br/><br/>
-<h1>Credits</h1>
-<p>Groundwire Engage was made possible through a grant from the Salesforce Foundation and from other foward-thinking foundations and individuals.</p>
-
-<h1>About Groundwire</h1>
-<p>
-	<a href="http://groundwire.org/" target="_new">Groundwire</a> is a nonprofit organization - our mission is to give organizations the power to engage people in solving today's biggest social and environmental challenges.  
-	<br/><a href="http://groundwireconsulting.com/" target="_new">Groundwire Consulting</a> is a mission-driven consulting firm that will help you use the best strategy and technology to deeply engage with the people who matter most.  
-	<br/><a href="http://groundwire.org/labs" target="_new">Groundwire Labs</a> is on a mission to get affordable and innovative online tools and strategies
-into the hands of organizations building a sustainable world. It is funded by a combination of individual gifts and foundation grants. 
-</p>
-
-<p>Please consider a <a href="http://groundwire.org/about/invest" target="_new">donation to Groundwire</a> to support
-future development of this product and more like it.</p>
+	<h1>Credits</h1>
+	<p>Groundwire Engage was made possible through a grant from the Salesforce Foundation and from other foward-thinking foundations and individuals.</p>
+	
+	<h1>About Groundwire</h1>
+	<p>
+		<a href="http://groundwire.org/" target="_new">Groundwire</a> is a nonprofit organization - our mission is to give organizations the power to engage people in solving today's biggest social and environmental challenges.  
+		<br/><a href="http://groundwireconsulting.com/" target="_new">Groundwire Consulting</a> is a mission-driven consulting firm that will help you use the best strategy and technology to deeply engage with the people who matter most.  
+		<br/><a href="http://groundwire.org/labs" target="_new">Groundwire Labs</a> is on a mission to get affordable and innovative online tools and strategies
+	into the hands of organizations building a sustainable world. It is funded by a combination of individual gifts and foundation grants. 
+	</p>
+	
+	<p>Please consider a <a href="http://groundwire.org/about/invest" target="_new">donation to Groundwire</a> to support
+	future development of this product and more like it.</p>
 
 </apex:page>

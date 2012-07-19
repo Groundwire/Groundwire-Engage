@@ -1,5 +1,13 @@
 global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sobject>, Database.Stateful, Schedulable {
 
+/*******************************************************************************************************
+* @author Matthew Scholtz
+* @date 7/1/2012
+* @description Batch class that calculates campaign-based metrics from campaign member records
+*
+* Written by Matthew Scholtz, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+********************************************************************************************************/
 
     string batchQuery;
     

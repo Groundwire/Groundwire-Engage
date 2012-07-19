@@ -1,4 +1,14 @@
 global class GW_gweInstall implements InstallHandler{
+
+/*******************************************************************************************************
+* @author Matthew Scholtz
+* @date 7/1/2012
+* @description Install script for package, creates a default general settings rec
+*
+* Written by Matthew Scholtz, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
+
 	
 	// install script for Groundwire Engage
 	

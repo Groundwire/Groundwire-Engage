@@ -1,4 +1,13 @@
 public with sharing class GW_CTRL_ETGratitude {
+
+/*******************************************************************************************************
+* @author David Habib
+* @date 7/1/2012
+* @description Controller for Gratitude Machine
+*
+* Written by David Habib and Matthew Scholtz, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
 	
 	// constructor
 	public GW_CTRL_ETGratitude() {

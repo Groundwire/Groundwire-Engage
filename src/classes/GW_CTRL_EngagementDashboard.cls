@@ -1,5 +1,14 @@
 public with sharing class GW_CTRL_EngagementDashboard {
 
+/*******************************************************************************************************
+* @author Matthew Scholtz
+* @date 10/1/2011
+* @description Controller for dashboard pyramid chart  
+*
+* Written by Matthew Scholtz, copyright (c) 2011 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
+
 
 	// public list<sobject> aggResults {get;set;}
 	public list<aggEngagementRow> rows {get;set;}
