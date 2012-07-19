@@ -45,7 +45,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
     set<id> oppRollupRectypesExcluded = new set<id>();
     set<string> oppRollupTypesExcluded = new set<string>(); 
-    
+    private boolean fetchedOppRectypes = false;
+    private boolean npspAlwaysRollupPrimaryCon = false;
+        
     // these are static vars so they can be accessed by the tests before instantiating the class
     static decimal[] donorBreakpoints;
     static map<decimal,double> donorLvlMap;  
@@ -505,13 +507,19 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     // if indicated, give credit for org's gifts too
                     if (con.Award_Engagement_Levels_for_Org_Giving__c == true) {
                     	// but don't do it if we're in NPSP and this is a 1-to-1 or individual acct, since that will double count
-                    	if ( !(IsNPSPHHInstalled && con.get(addNSPrefixET('Account.SYSTEMIsIndividual__c',false,false))==true) ) {
-	                    	Account acct = con.Account;
-	                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
-	                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
-	                    	system.debug(LoggingLevel.WARN,'recentGiftTtl:' + recentGiftTtl + '   acctGiftTtl:' + acctGiftTtl);
-	                    	recentGiftTtl += acctGiftTtl;
-	                    	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
+                    	// also don't do it if we're in NPSP and they have the "always rollup to primary contact" option selected in settings
+                    	// so first we have to fetch opp rollup settings if we're in NPSP
+                    	if (IsNPSPHHInstalled) {
+                    		setGiftRectypeVars();
+                    	}
+                    	if ( !(IsNPSPHHInstalled && con.get(addNSPrefixET('Account.SYSTEMIsIndividual__c',false,false))==true)
+                    		&& !npspAlwaysRollupPrimaryCon ) {
+		                    	Account acct = con.Account;
+		                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
+		                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
+		                    	system.debug(LoggingLevel.WARN,'recentGiftTtl:' + recentGiftTtl + '   acctGiftTtl:' + acctGiftTtl);
+		                    	recentGiftTtl += acctGiftTtl;
+		                    	if (acctLastCloseDate > lastCloseDate) lastCloseDate = acctLastCloseDate;
                     	}
                     }		
                     
@@ -828,38 +836,45 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
   
   	private void setGiftRectypeVars() {
 
+		// get lists of rectypes excluded from opp rollups, but only if we haven't already done so 
+
   		Id orgid = UserInfo.getOrganizationId();
   		string rectypesExcludeSetting;
   		string typesExcludeSetting;
   		
-  		if (IsGWBaseInstalled) {
-  			string soql = 'SELECT SetupOwnerId,Id,GWBase__Excluded_Contact_Opp_Types__c,GWBase__Excluded_Contact_Opp_Rectypes__c FROM GWBase__OppRollupSettings__c ';
-  			soql += 		'WHERE SetupOwnerId =: orgid';
-  			sobject[] settingRecs = Database.query (soql);
-  			if (settingRecs != null) {
-	  			rectypesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Rectypes__c');
-	  			typesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Types__c');
-  			}
-  		} else if (IsNPSPHHInstalled) {
-  			string soql = 'SELECT SetupOwnerId,Id,npo02__Excluded_Contact_Opp_Types__c,npo02__Excluded_Contact_Opp_Rectypes__c FROM npo02__Households_Settings__c ';
-  			soql += 		'WHERE SetupOwnerId =: orgid';
-  			sobject[] settingRecs = Database.query (soql);
-  			if (settingRecs != null) {
-	  			rectypesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Rectypes__c');
-	  			typesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Types__c');
-  			}
-  		} else {
-  			// if neither package installed, for now do nothing.. might want to throw an err instead
+  		if (!fetchedOppRectypes) {
+	  		if (IsGWBaseInstalled) {
+	  			string soql = 'SELECT SetupOwnerId,Id,GWBase__Excluded_Contact_Opp_Types__c,GWBase__Excluded_Contact_Opp_Rectypes__c FROM GWBase__OppRollupSettings__c ';
+	  			soql += 		'WHERE SetupOwnerId =: orgid';
+	  			sobject[] settingRecs = Database.query (soql);
+	  			if (settingRecs != null) {
+		  			rectypesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Rectypes__c');
+		  			typesExcludeSetting = (string) settingRecs[0].get('GWBase__Excluded_Contact_Opp_Types__c');
+	  			}
+	  			fetchedOppRectypes = true;
+	  		} else if (IsNPSPHHInstalled) {
+	  			string soql = 'SELECT SetupOwnerId,Id,npo02__Excluded_Contact_Opp_Types__c,npo02__Excluded_Contact_Opp_Rectypes__c,npo02__Always_Rollup_to_Primary_Contact__c FROM npo02__Households_Settings__c ';
+	  			soql += 		'WHERE SetupOwnerId =: orgid';
+	  			sobject[] settingRecs = Database.query (soql);
+	  			if (settingRecs != null) {
+		  			rectypesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Rectypes__c');
+		  			typesExcludeSetting = (string) settingRecs[0].get('npo02__Excluded_Contact_Opp_Types__c');
+		  			// while we're at it, for NPSP also capture the notorious 'always rollup' setting
+		  			npspAlwaysRollupPrimaryCon = (boolean) settingRecs[0].get('npo02__Always_Rollup_to_Primary_Contact__c');
+	  			}
+	  			fetchedOppRectypes = true;
+	  		} else {
+	  			// if neither package installed, for now do nothing.. might want to throw an err instead
+	  		}
+	  		
+	  		if (rectypesExcludeSetting != null) {
+	            set<string> rtNamesToExclude = new set<string>(rectypesExcludeSetting.split(';'));
+	            oppRollupRectypesExcluded = GW_RecTypes.GetRecordTypeIdSet('Opportunity', rtNamesToExclude);  			
+	  		}
+	  		if (typesExcludeSetting != null) {
+	  			oppRollupTypesExcluded = new set<string>(typesExcludeSetting.split(';'));
+	  		}
   		}
-  		
-  		if (rectypesExcludeSetting != null) {
-            set<string> rtNamesToExclude = new set<string>(rectypesExcludeSetting.split(';'));
-            oppRollupRectypesExcluded = GW_RecTypes.GetRecordTypeIdSet('Opportunity', rtNamesToExclude);  			
-  		}
-  		if (typesExcludeSetting != null) {
-  			oppRollupTypesExcluded = new set<string>(typesExcludeSetting.split(';'));
-  		}
-  		
   	}
   
 
