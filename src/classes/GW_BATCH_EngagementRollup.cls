@@ -218,6 +218,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				'Household__r.OppAmountLastNDays__c,' +
 				'Household__r.OppAmountThisYear__c, Household__r.OppAmountLastYear__c, Household__r.OppAmount2YearsAgo__c,' +
 				'Household__r.OppsClosedLastNDays__c, Household__r.LastMembershipDate__c,';
+			if (NPSPHasBestGiftYear) {
+				querySOQLmore += 'Best_Gift_Year__c,Best_Gift_Year_Total__c,Household__r.Best_Gift_Year__c,Household__r.Best_Gift_Year_Total__c,';
+			}
 			querySOQLmore = addAllNSPrefixET (querySOQLmore,false,true);
 			querySOQL += ',' + querySOQLmore;
 			// and from the other NPSP package...
@@ -886,6 +889,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		
 		for (engTrackConWrapper cw : conWrapMap.values()) {
 			Contact con = cw.con;
+			sObject hh;
 			
 			// these fields have the same name in gwbase & npsp, just have to mind the prefix  
 	        cw.OppAmountLastNDays_c = (decimal)con.get( addNSPrefixET('OppAmountLastNDays__c',false,true) );		        
@@ -899,39 +903,44 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        
 	        if (IsGWBaseInstalled) {
 	        	// these fields are only in gwbase (for now) or have different names
-		        cw.Best_Gift_Year_Total_c = (decimal)con.get( addNSPrefixET('Best_Gift_Year_Total__c',false,true) );
 		        cw.OppAmountLastNDaysHH_c = (decimal)con.get( addNSPrefixET('OppAmountLastNDaysHH__c',false,true) );
 		        cw.HouseholdMembershipEndDate_c = (date)con.get( addNSPrefixET('HouseholdMembershipEndDate__c',false,true) );
 		        cw.HHid = (id) con.get(addNSPrefixET('ONEN_Household__c',false,true) );
-				sObject hh = con.getSObject(addNSPrefixET('ONEN_Household__r',false,true) );  
+				hh = con.getSObject(addNSPrefixET('ONEN_Household__r',false,true) );  
 				if (hh != null) {
-		        	cw.Best_Gift_Year_TotalHH_c = (decimal)hh.get(addNSPrefixET('Best_Gift_Year_Total__c',false,true));
 		        	cw.OppsClosedLastNDaysHH_c = (decimal)hh.get(addNSPrefixET('OppsClosedLastNDays__c',false,true));
 				}
 	        } else if (IsNPSPHHInstalled)	{
-		        // estimate this for now, until npsp implements best gift year
-		        decimal d1 = (decimal)con.get('npo02__OppAmountThisYear__c');
-		        decimal d2 = (decimal)con.get('npo02__OppAmountLastYear__c');
-		        decimal d3 = (decimal)con.get('npo02__OppAmount2YearsAgo__c');
-		        cw.Best_Gift_Year_Total_c = math.max(d1 == null ? 0 : d1,
-		        		math.max(d2 == null ? 0 : d2,
-		        			d3 == null ? 0 : d3));
 				cw.HHid = (id) con.get(addNSPrefixET('Household__c',false,true) );
-				sObject hh = con.getSObject('npo02__Household__r');  
+				hh = con.getSObject('npo02__Household__r');  
 				if (hh != null) {
 					// npsp doesn't roll up some HH metrics to the contact
 			        cw.OppAmountLastNDaysHH_c = (decimal)hh.get('npo02__OppAmountLastNDays__c');		        
 			        cw.OppsClosedLastNDaysHH_c = (decimal)hh.get('npo02__OppsClosedLastNDays__c');
 			        cw.HouseholdMembershipEndDate_c = (date)hh.get('npo02__LastMembershipDate__c');
-			        
-			        // estimate this for now.
-			        d1 = (decimal)hh.get('npo02__OppAmountThisYear__c');
-			        d2 = (decimal)hh.get('npo02__OppAmountLastYear__c');
-			        d3 = (decimal)hh.get('npo02__OppAmount2YearsAgo__c');
-			        cw.Best_Gift_Year_TotalHH_c = math.max(d1 == null ? 0 : d1,
-			        		math.max(d2 == null ? 0 : d2,
-			        			d3 == null ? 0 : d3));
 				}	        	
+	        }
+	        
+	        // get best gift year calcs if we're in gwbase or in a NPSP version that has them
+	        if (IsGWBaseInstalled || NPSPHasBestGiftYear) {
+	        	cw.Best_Gift_Year_Total_c = (decimal)con.get( addNSPrefixET('Best_Gift_Year_Total__c',false,true) );
+	        	if (hh != null) {
+	        		cw.Best_Gift_Year_TotalHH_c = (decimal)hh.get(addNSPrefixET('Best_Gift_Year_Total__c',false,true));
+	        	}
+	        } else if (IsNPSPHHInstalled && !NPSPHasBestGiftYear) {
+		        // estimate this if we don't have the best gift year fields
+		        decimal d1 = (decimal)con.get('npo02__OppAmountThisYear__c');
+		        decimal d2 = (decimal)con.get('npo02__OppAmountLastYear__c');
+		        decimal d3 = (decimal)con.get('npo02__OppAmount2YearsAgo__c');
+		        cw.Best_Gift_Year_Total_c = math.max(d1 == null ? 0 : d1,
+		        		math.max(d2 == null ? 0 : d2,
+		        			d3 == null ? 0 : d3));	 
+		        d1 = (decimal)hh.get('npo02__OppAmountThisYear__c');
+		        d2 = (decimal)hh.get('npo02__OppAmountLastYear__c');
+		        d3 = (decimal)hh.get('npo02__OppAmount2YearsAgo__c');
+		        cw.Best_Gift_Year_TotalHH_c = math.max(d1 == null ? 0 : d1,
+		        		math.max(d2 == null ? 0 : d2,
+		        			d3 == null ? 0 : d3));       	
 	        }
 		}
 	} 
@@ -1055,6 +1064,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 				fCheckedForNPSPHH = true;
 			}
 			return IsNPSPHHInstalled;
+		}
+		set;
+	}
+
+	// some older versions of the NPSP package don't have the "Best Gift Year" field
+	// to avoid errs, don't assume that this field is available until we check for it	
+	private static boolean fCheckedForNPSPBestGiftYear = false;
+	public static boolean NPSPHasBestGiftYear {
+		get {
+			if (!fCheckedForNPSPBestGiftYear) {
+				Map<String, Schema.SObjectField> M = Schema.SObjectType.Contact.fields.getMap();
+				NPSPHasBestGiftYear = (M.keyset().contains('npo02__best_gift_year__c'));
+				fCheckedForNPSPBestGiftYear = true;
+			}
+			return 	NPSPHasBestGiftYear;		
 		}
 		set;
 	}
