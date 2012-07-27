@@ -326,7 +326,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			system.debug (Logginglevel.WARN,'consToUpd after conversion calcs:' + consToUpd);
 
 			// and finally update our contacts!
-            update consToUpd;
+			// set the allornothing property to false so that if a record throws a validation err, the rest will still go through
+            // update consToUpd;
+            Database.SaveResult[] SR = database.update(consToUpd, false);
+            
+            /* TBD do error handling on the results of the update, report to user
+            	// the code that follows is for reference, from NPSP, they save errs to a table
+ 	      	List<Opportunity_Rollup_Error__c> elist = new List<Opportunity_Rollup_Error__c>();
+	        integer i = 0;
+	        for(Database.SaveResult s: SR){
+	            if (!s.isSuccess()){
+	                elist.add(OpportunityRollup_Utilities.createError(s, 'Account', accountsToUpdate.values()[i].id));
+	            }
+	            i++;
+        	} 
+        	*/
         }
     }
   
@@ -652,6 +666,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
                     // temp disabled for security review	con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
+                    
+                    // finally, for testing only, cause one to fail validation by inserting a bogus email addy
+                    // this is so we can test that our allornothing=false update is working
+                    if (test.isRunningTest() && con.Name=='Number25 Doppleganger') {
+                    	con.Email = 'bogusemailaddy';
+                    }
                     
                     consToUpd.add(con);
                 }
@@ -1354,7 +1374,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         string txtfield1FV = 'Board Member';
         setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl);  
         
-        integer howMany = 25;
+        integer howMany = 30;
         Date datClose = System.Today();
         string GiftRectype = ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS;
         string MbrRectype = ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS;
@@ -1570,6 +1590,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             ContactId = TestCons[23].Id,
             Status = 'Responded'
         );
+        CampaignMember cm25 = new CampaignMember (
+            CampaignId = camp1.Id,
+            ContactId = TestCons[25].Id,
+            Status = 'Responded'
+        );
         CampaignMember[] onlineCMs = new CampaignMember[0]; 
         for (Campaign c : onlineCamps) {
             CampaignMember cm = new CampaignMember (
@@ -1580,7 +1605,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             onlineCMs.add (cm);      
         }      
 
-        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19,cm23};
+        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19,cm23,cm25};
         cms.AddAll(onlineCMs); 
         insert cms;
         system.debug ('cms inserted: ' + cms);
@@ -1874,6 +1899,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // and one that has nothing!
         Contact con22P = conP.get(TestCons[22].Id);
         System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);     
+
+        // #25 should also have nothing, since we're causing it to fail validation on the insert
+        // but no other records should have been rejected in same batch
+        Contact con25P = conP.get(TestCons[25].Id);
+        System.AssertEquals(null,con25P.Engagement_Level_Numeric__c);     
         
         
         // also test for conversions
