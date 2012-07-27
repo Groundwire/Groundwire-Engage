@@ -227,10 +227,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			querySOQL += ',' + addNSPrefixET ('Account.SYSTEMIsIndividual__c',false,false);
 		} 
         
-        // include any checkbox fields from settings in the query
+        // include any fields from contact field rules in the query
         if (fieldSettingsMap.size()>0) {
             for (EngagementContactFieldSettings__c s : fieldSettingsMap.values() ) {
-                querySOQL += ',' + s.Fieldname__c ; 
+            	// but make sure we don't add the same field twice
+            	if ( !querySOQL.contains(',' + s.Fieldname__c)) {
+                	querySOQL += ',' + s.Fieldname__c ;
+            	} 
             }
         }
         // querySOQL = querySOQL.substring(0,querySOQL.length()-1);   //lop off trailing comma
@@ -1245,7 +1248,15 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             Field_Value__c = '*',
             Level_Value__c = 1
         );
-        insert new EngagementContactFieldSettings__c[] {fset,fset2};
+        // put in another rule on the same field to make sure that's not a problem
+        EngagementContactFieldSettings__c fset3 = new EngagementContactFieldSettings__c (
+            Name = 'baz',
+            Fieldname__c = 'Email',
+            Field_Type__c = 'Text',
+            Field_Value__c = 'algore@internet.com',
+            Level_Value__c = 2
+        );
+        insert new EngagementContactFieldSettings__c[] {fset,fset2,fset3};
         
         // next frequency rules
         EngagementFrequencySettings__c fqset = new EngagementFrequencySettings__c (
