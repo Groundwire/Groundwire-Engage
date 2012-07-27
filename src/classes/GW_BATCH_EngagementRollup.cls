@@ -512,11 +512,16 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     	// but don't do it if we're in NPSP and this is a 1-to-1 or individual acct, since that will double count
                     	// also don't do it if we're in NPSP and they have the "always rollup to primary contact" option selected in settings
                     	// so first we have to fetch opp rollup settings if we're in NPSP
+						boolean skipIt = false;
                     	if (IsNPSPHHInstalled) {
                     		setGiftRectypeVars();
+                    		Account acct = con.Account;	// gotta put account in a separate var cause can't do .get() on a parent field
+                    		boolean bucket = (boolean) acct.get(addNSPrefixET('SYSTEMIsIndividual__c',false,false));
+	                    	if (bucket || npspAlwaysRollupPrimaryCon) {
+	                    		skipIt = true;
+	                    	}
                     	}
-                    	if ( !(IsNPSPHHInstalled && con.get(addNSPrefixET('Account.SYSTEMIsIndividual__c',false,false))==true)
-                    		&& !npspAlwaysRollupPrimaryCon ) {
+                    	if (!skipIt) {
 		                    	Account acct = con.Account;
 		                    	decimal acctGiftTtl = (decimal) acct.get(addNSPrefixET('OppAmountLastNDays__c',false,true));
 		                    	date acctLastCloseDate = (date) acct.get(addNSPrefixET('LastCloseDate__c',false,true));
