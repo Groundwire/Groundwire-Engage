@@ -407,10 +407,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 	@isTest // (SeeAllData=true)
 	static void testCampaignRollup () {
 		
-        string txtfield1 = 'Title';
-        double txtfield1lvl = 6;
-        string txtfield1FV = 'Board Member';
-		GW_BATCH_EngagementRollup.setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl);
+		GW_BATCH_EngagementRollup.setSettingsForTests();
 		
 		// first hierarchy
 		Campaign top1 = new Campaign (name = 'top1');

@@ -139,6 +139,7 @@ public class ONEN_UnitTestData {
 				RecordTypeId = rtid 
 			);	
 			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+				// TBD this doesn't always trigger conrole creation
 				newOpp.put('npe01__Contact_Id_for_Role__c', thisCon.Id);				
 			}
 			OppsToAdd.add (newOpp);
@@ -246,20 +247,30 @@ public class ONEN_UnitTestData {
         	}
         }
 	}
-	static testmethod void TestTheTestData() {
+	
+	@isTest (SeeAllData=true)
+	static void TestTheTestData() {
 		
+		// we want SeeAllData here b/c we want to be able to pull the actual rectyptes from settings
+		// this happens in the setSEttingsForTests method, but the declaration needs to be here
+		
+		// now impose the custom settings we want
+		GW_BATCH_EngagementRollup.setSettingsForTests();
+
+		// get those rectypes from the settings
+		string giftRectypeName = GW_BATCH_EngagementRollup.INCOPPTYPES;
+		string mbrRectypeName = GW_BATCH_EngagementRollup.MBROPPTYPES;
+				
 		test.startTest();
 		list<Contact> listCon = CreateMultipleTestContacts(10); 
 		insert listCon;
 		
-		list<Opportunity> listOpp = OppsForContactList (listCon, null, 'Closed Won', system.today(), 100, 			
-			ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS, null);
+		list<Opportunity> listOpp = OppsForContactList (listCon, null, 'Closed Won', system.today(), 100, giftRectypeName, null);
 		insert listOpp;
-		system.debug(listOpp);
+		// system.debug(listOpp);
 
 		date dtMbr = system.today().addMonths(-11);
-		list<Opportunity> listOppMbr = OppsForContactList (listCon, null, 'Closed Won', dtMbr, 15, 			
-			ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS, null);
+		list<Opportunity> listOppMbr = OppsForContactList (listCon, null, 'Closed Won', dtMbr, 15, mbrRectypeName, null);
 		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
 			for (Opportunity opp : listOppMbr) {
 	        	opp.put('npe01__Membership_Start_Date__c', opp.CloseDate);
@@ -277,7 +288,6 @@ public class ONEN_UnitTestData {
 				
 		// call this to allow future rollups to proceed.
 		test.stopTest();
-		
 		
 		string strSoql = 'SELECT Id, Name,';
 		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {

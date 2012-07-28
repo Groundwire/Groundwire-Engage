@@ -141,17 +141,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	* if one isn't found.
 	*/   
     public static EngagementTrackerSettings__c settings {
+    	// return the org defaults settings rec if we have one, otherwise instantiate a default rec
         get {
             if (settings == null) {
                 settings = EngagementTrackerSettings__c.getValues(UserInfo.getOrganizationId());  
                 
                 if (settings == null) {
-           			// MatthewS felt that if no settings exist, we should give an error to the user,
-           			// but DaveH found that this was too easily hit in GWBase instances that will always have this ET, even if not being used.
-            		//throw(new MyException('Engagement Tracker requires Engagement Tracker Settings to have been created.  Please create these custom settings.'));
             		settings = new EngagementTrackerSettings__c();
             		// set values code assumes exist
-                    // deprecated: settings.Timeframe_Medium__c = 18;
                     settings.Timeframe_Recent__c = 12;
            		}            
             }
@@ -241,9 +238,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         querySOQL += ' FROM Contact';
         
         // this should no longer needed w/ new API that only uses test data by default
-        // but for now we need to set our tests as UseAllData b/c otherwise we run into a bug w/ decimals from settings 
+        // but for now we need to set our tests as seeAllData b/c otherwise we run into a bug w/ decimals from settings 
         // see https://twitter.com/rich_unger/status/215563857656156161
         // once this bug is fixed, we should be able to get rid of this
+        // but note that we have now also starting relying on the seealldata in order to get the "rectype for tests" settings that user has set
+        // we will need to also refactor how that works if we get rid of seealldata
         if (isTest) {
             querySOQL += ' WHERE LastName=\'Doppleganger\'';
         } else if (filterTestConsOnly) {
@@ -1220,13 +1219,21 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     // *** TESTS **********************************************************************
     
     // test constants
-    static integer SMALLGIFTLVL,MAJORGIFTLVL,MONTHS_RECENT,MONTHS_MEDIUM,NEWMBRLVL,RENMBRLVL,OVERDEFDUR;
+    /* not used?
+    static integer SMALLGIFTLVL,MAJORGIFTLVL,MONTHS_RECENT,MONTHS_MEDIUM,OVERDEFDUR;
     static decimal MAJGIFTAMT;
-    static string INCOPPTYPES,MBROPPTYPES;
+    */
+    
+    static integer NEWMBRLVL,RENMBRLVL;
+    public static string INCOPPTYPES,MBROPPTYPES;
     static boolean INCOPPS,INCMBR;
     
     
-    public static void setSettingsForTests(string txtfield1, string txtfield1FV, double txtfield1lvl) {
+    public static void setSettingsForTests() {
+
+        string txtfield1 = 'Title';
+        double txtfield1lvl = 6;
+        string txtfield1FV = 'Board Member';
 
         settings.Include_Opps__c = IsNPSPHHInstalled || IsGWBaseInstalled; 
         settings.Timeframe_Recent__c = 12;
@@ -1323,7 +1330,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         INCOPPS = settings.Include_Opps__c;
         INCMBR = settings.Include_Membership__c;
         NEWMBRLVL = settings.New_Member_Level__c.intvalue();
-        RENMBRLVL = settings.Renewing_Member_Level__c.intvalue();        
+        RENMBRLVL = settings.Renewing_Member_Level__c.intvalue();
+        MBROPPTYPES = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS);        
+        INCOPPTYPES = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS);        
 
 		// also set settings for NPSP households (which drives rollups in NPSP) using dynamic DML
 		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
@@ -1338,46 +1347,39 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			NPSPsettings = token.newSobject();
 			NPSPsettings.put ('npo02__Enable_Opp_Rollup_Triggers__c',true);
 			NPSPsettings.put ('npo02__Household_Rules__c','All New or Edited Contacts');
-			NPSPsettings.put ('npo02__Membership_Record_Types__c',ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS);
+			NPSPsettings.put ('npo02__Membership_Record_Types__c',MBROPPTYPES);
+			
 			NPSPsettings.put ('npo02__Household_Contact_Roles_On__c',true);
+			NPSPsettings.put ('npo02__Excluded_Contact_Opp_Types__c',null);
+			NPSPsettings.put ('npo02__Excluded_Account_Opp_Types__c',null);
 			insert NPSPsettings;
+			
+			// also contact settings, so conroles get created when inserting opps
+			soql = 'SELECT Id FROM npe01__Contacts_And_Orgs_Settings__c';
+			SObject[] settingsRecs2 = Database.query(soql);
+			if (settingsRecs2 != null) delete settingsRecs2;			
+			SObjectType token2 = Schema.getGlobalDescribe().get('npe01__Contacts_And_Orgs_Settings__c');
+			Sobject npspConSettings = token2.newSobject();
+			npspConSettings.put ('npe01__Account_Processor__c' , 'One-to-One');
+			npspConSettings.put ('npe01__Enable_Opportunity_Contact_Role_Trigger__c' , true);
+			insert npspConSettings;
 			
 		}
 
     }
-
-
-	/* not used??
-    static map<integer,string> getLvlNameMapForTests() {
-        map<integer,string> lvlNameMapTest = new map<integer,string>();
-        map<integer,string> lvlNameSettingMap = new map<integer,string>{
-            1 => addNSPrefixET('Level_1_Name__c',true,false) , 
-            2 => addNSPrefixET('Level_2_Name__c',true,false) , 
-            3 => addNSPrefixET('Level_3_Name__c',true,false) , 
-            4 => addNSPrefixET('Level_4_Name__c',true,false) , 
-            5 => addNSPrefixET('Level_5_Name__c',true,false) , 
-            6 => addNSPrefixET('Level_6_Name__c',true,false) , 
-            7 => addNSPrefixET('Level_7_Name__c',true,false) , 
-            8 => addNSPrefixET('Level_8_Name__c',true,false) };
-        
-        return lvlNameMapTest;
-    }
-    */
-    
+  
     
     @isTest (SeeAllData=true)
     public static void testLevelAssignment() { 
 
         // note: in addition to this batch process, this test relies on the GW_ContactTriggerBefore trigger
-        string txtfield1 = 'Title';
-        double txtfield1lvl = 6;
-        string txtfield1FV = 'Board Member';
-        setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl);  
+
+        setSettingsForTests();  
         
         integer howMany = 30;
         Date datClose = System.Today();
-        string GiftRectype = ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS;
-        string MbrRectype = ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS;
+        string GiftRectype = INCOPPTYPES;
+        string MbrRectype = MBROPPTYPES;
         integer monthsRecent = settings.Timeframe_Recent__c.intvalue();
         integer monthsMedium = settings.Timeframe_Medium__c.intvalue();
         date startDateRecent = datClose.addMonths((monthsRecent*-1)+1);
@@ -1747,9 +1749,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
         // this yr, but board member picklist
         Contact con5P = conP.get(TestCons[5].Id);
-        System.AssertEquals(txtfield1lvl,con5P.Engagement_Level_Numeric__c);
-        System.AssertEquals(lvlNameMapTest.get(txtfield1lvl.intvalue()),con5P.Engagement_Level__c);                
-        System.AssertEquals(txtfield1lvl,con5P.Engagement_Peak_Numeric__c);
+        System.AssertEquals(6,con5P.Engagement_Level_Numeric__c);
+        System.AssertEquals(lvlNameMapTest.get(6),con5P.Engagement_Level__c);                
+        System.AssertEquals(6,con5P.Engagement_Peak_Numeric__c);
         System.AssertEquals(startDateRecent,con5P.Last_Leadership_Action_Date__c);  // this doesn't care about the lvl
         System.AssertEquals(system.today(),con5P.First_Action_Date_Curr_Level__c);  // b/c no actions, just chkbox
 
@@ -1901,6 +1903,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);     
 
         // #25 should also have nothing, since we're causing it to fail validation on the insert
+        // in fact, it should be null, since it was never processed
         // but no other records should have been rejected in same batch
         Contact con25P = conP.get(TestCons[25].Id);
         System.AssertEquals(null,con25P.Engagement_Level_Numeric__c);     
@@ -1988,10 +1991,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     public static void testCampaignDefaults() { 
 
         // this test relies on the GW_CampaignTriggerBefore trigger
-        string txtfield1 = 'Title';
-        double txtfield1lvl = 6;
-        string txtfield1FV = 'Board Member';
-        setSettingsForTests(txtfield1, txtfield1FV, txtfield1lvl); 
+
+        setSettingsForTests(); 
         
 		Campaign cmp1 = new Campaign (
 		    Name = 'Campaign 1',

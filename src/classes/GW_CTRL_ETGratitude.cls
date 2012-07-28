@@ -491,7 +491,7 @@ public with sharing class GW_CTRL_ETGratitude {
 		system.assert(ctrl.cmFilter != null);
 		
 		// create some contacts with different engagement levels and dates
-        GW_BATCH_EngagementRollup.setSettingsForTests('Title', 'Board Member', 6);  
+        GW_BATCH_EngagementRollup.setSettingsForTests();  
         list<Contact> listCon = ONEN_UnitTestData.CreateMultipleTestContacts(5);
 		insert listCon;
 
