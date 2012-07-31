@@ -101,7 +101,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             	}
             }
             if (lvl > PeakLvl) PeakLvl = lvl;
-            if (actionDate != null && actionDate > LastActionDate) LastActionDate = actionDate;
+            if (actionDate != null && (actionDate > LastActionDate || LastActionDate==null) ) LastActionDate = actionDate;
         }   
     }
     
@@ -249,7 +249,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             querySOQL += ' WHERE Title=\'testeng\'';
         }
         
-        system.debug (Logginglevel.WARN,'query string: ' + querySOQL);
+        system.debug (Logginglevel.WARN,'GWEngage query string: ' + querySOQL);
         Query = querySOQL;      
     }
 
@@ -300,13 +300,17 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		// calculate levels based on campaign memberships
 		calcCampaignLevels();
 
+		 system.debug (Logginglevel.WARN,'conwrapper map after campaign calcs: ' + conWrapMap);
+
 		// calculate "repeated action" rules
         calcFrequencyLevels();
+        
+        system.debug (Logginglevel.WARN,'conwrapper map after repeated action calcs: ' + conWrapMap);
 
         // apply contact-centric level rules & opp-based rules 
     	calcOppAndContactLevels();
         
-	    //system.debug (Logginglevel.WARN,'conwrapper map after calcs: ' + conWrapMap);
+	    system.debug (Logginglevel.WARN,'conwrapper map after calcs: ' + conWrapMap);
 	    
 	    // do any final custom processing implemented via override
 	    customFinalLvlAssign (conWrapMap, conIDs);
@@ -490,6 +494,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                  
                 if (qual==true) {
                     integer fieldlvl = fSet.Level_Value__c.intvalue();
+                    system.debug (LoggingLevel.WARN,'setting level to ' + fieldlvl + ' based on field value for contact: ' + con);
                     cw.setLevelTo(fieldlvl, null, true);
                 }   
                  
@@ -505,7 +510,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 // first get settings for donor level tiers
                 fetchDonorBreakpoints();
                 if (donorBreakpoints.size() > 0) {
-                    //system.debug(Logginglevel.WARN, 'donorBreakpoints: ' + donorBreakpoints);
+                    // system.debug(Logginglevel.WARN, 'donorBreakpoints: ' + donorBreakpoints);
                     
                     // now use opp rollup fields to figure the donor-derived level
                     decimal recentGiftTtl = cw.OppAmountLastNDays_c; 
@@ -550,17 +555,25 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     double lvlRecent; 
                     double lvlPeak;
                     for (integer i=0;i<donorBreakpoints.size();i++) {
+                    
                         decimal brkpt = donorBreakpoints[i];
                         integer lvl = donorLvlMap.get(brkpt).intvalue();
+                        
+                        system.debug(LoggingLevel.WARN,'opps loop for con ' + cw.con.Name);
+                        system.debug(LoggingLevel.WARN,'brkpt=' + brkpt + '; lvl=' + lvl + '; recentGiftTtl=' + recentGiftTtl + '; CurrLvl=' + cw.CurrLvl + '; lastCloseDate=' + lastCloseDate);
+                        
+                        
                         if (recentGiftTtl >= brkpt) {
                         	cw.LvlFromOpps = lvl;	// we want to know which level our opps would have earned us, even if we already have that lvl
                         	cw.donorTierBreakpoint = brkpt;
                         }
                         if (recentGiftTtl >= brkpt && lvl > cw.CurrLvl) {
+                        	system.debug (LoggingLevel.WARN,'setting level to ' + lvl + ' based on opps for contact: ' + con.Name);
                         	cw.setLevelTo(lvl, lastCloseDate, false);
+                        	system.debug (LoggingLevel.WARN,'cw after level set for opps: ' + cw);
                             decimal oppsCount = (useHHTotals) ? cw.OppsClosedLastNDaysHH_c : cw.OppsClosedLastNDays_c;
                             if (oppsCount == 1) {
-                                cw.EarliestActivityDateInLvl = (useHHTotals) ? cw.LastCloseDateHH_c : cw.LastCloseDate_c;     // if only 1 gift, last is also the first
+                                cw.EarliestActivityDateInLvl = lastCloseDate;     // if only 1 gift, last is also the first
                             } else {
                                 // TBD we could add this con to a list, and then query for the actual first date??
                                 cw.EarliestActivityDateInLvl = cutoffDateRecent;  // b/c level is awarded for entire year, not one gift
@@ -570,7 +583,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                         // assign lastaction date even if we don't give the level, as long as they already had a date (i.e. level not due to override or chkbox)
                         //  and this date is more recent
                         } else if (bestYrTotal > 0 && lastCloseDate > cw.LastActionDate && cw.LastActionDate!=null) {
-                            cw.LastActionDate = cw.LastCloseDate_c;
+                            cw.LastActionDate = lastCloseDate;
                         }
                         // for peak level, look at best year calcs even if we didn't give the curr lvl
                         if ( lvl > cw.PeakLvl && bestYrTotal >= brkpt ) {
@@ -589,6 +602,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     mbrlvl = NewMbrLvl;
                 }
                 if (cw.LastMembershipDate_c >= cutoffDateRecent) {
+                	system.debug (LoggingLevel.WARN,'setting level to ' + mbrLvl + ' based on membership for contact: ' + cw.con.Name);
                 	cw.setLevelTo(mbrLvl, null, false);
                 }
             }   
@@ -985,6 +999,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	            }
 	            donorBreakpoints.sort();
 	        }
+	        system.debug(LoggingLevel.WARN,'donor breakpoints after fetch: ' + donorBreakpoints);
+	        system.debug(LoggingLevel.WARN,'donorLvlMap after fetch: ' + donorLvlMap);
         }
 	}
     
@@ -1332,7 +1348,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         NEWMBRLVL = settings.New_Member_Level__c.intvalue();
         RENMBRLVL = settings.Renewing_Member_Level__c.intvalue();
         MBROPPTYPES = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS);        
-        INCOPPTYPES = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS);        
+        INCOPPTYPES = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS);   
+        system.debug(LOGGINGLEVEL.Warn,'INCOPPTYPES in test: ' + INCOPPTYPES);     
+        system.debug(LOGGINGLEVEL.Warn,'MBROPPTYPES in test: ' + MBROPPTYPES);     
 
 		// also set settings for NPSP households (which drives rollups in NPSP) using dynamic DML
 		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
@@ -1353,6 +1371,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			NPSPsettings.put ('npo02__Excluded_Contact_Opp_Types__c',null);
 			NPSPsettings.put ('npo02__Excluded_Account_Opp_Types__c',null);
 			insert NPSPsettings;
+			system.debug(LOGGINGLEVEL.Warn,'NPSP HH settings in test: ' + NPSPsettings);
 			
 			// also contact settings, so conroles get created when inserting opps
 			soql = 'SELECT Id FROM npe01__Contacts_And_Orgs_Settings__c';
@@ -1363,6 +1382,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			npspConSettings.put ('npe01__Account_Processor__c' , 'One-to-One');
 			npspConSettings.put ('npe01__Enable_Opportunity_Contact_Role_Trigger__c' , true);
 			insert npspConSettings;
+			system.debug(LOGGINGLEVEL.Warn,'NPSP Con settings in test: ' + npspConSettings);
 			
 		}
 
@@ -1621,6 +1641,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         double majAmt = donorBreakpoints[2] - 5;   					// also assumes at least 3 lvls
         Contact[] ConsForSmallOpps = new Contact[]{TestCons[6],TestCons[7],TestCons[8],TestCons[9],TestCons[10],TestCons[12],TestCons[13],TestCons[16],TestCons[23]};
         Opportunity[] recentSmallOpps = ONEN_UnitTestData.OppsForContactList (ConsForSmallOpps,null,'Closed Won',startDateRecent,smallAmt,GiftRectype,null);
+        system.debug (loggingLevel.WARN, 'recentSmallOpps:' + recentSmallOpps);
         Contact[] ConsForMajOpps = new Contact[]{TestCons[7],TestCons[17]};
         Opportunity[] recentMajOpps = ONEN_UnitTestData.OppsForContactList (ConsForMajOpps,null,'Closed Won',startDateRecent,majAmt,GiftRectype,null);
         Contact[] ConsOldMajOpps = new Contact[]{TestCons[8]};
@@ -1654,6 +1675,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         allOpps.addAll(medSmallOpps);
         allOpps.addAll(mbrOpps);
         insert allOpps;
+        system.debug (loggingLevel.WARN, 'allOpps after insert:' + allOpps);
                
         GW_BATCH_EngagementRollup myba = new GW_BATCH_EngagementRollup (true);
         
@@ -1948,7 +1970,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        // and conversions for opps
 	        map<id,Opportunity> oppPmap = new map<id,Opportunity>();
 	        OpportunityContactRole[] conroles = [SELECT OpportunityId,ContactId,Role,Opportunity.Engagement_Conversion__c,
-	        									Opportunity.Engagement_Conversion_To_Level__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_Type__c
+	        									Opportunity.Engagement_Conversion_To_Level__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_Type__c,
+	        									Opportunity.Engagement_List_Growth__c 
 	        									FROM OpportunityContactRole WHERE OpportunityId IN :allOpps AND IsPrimary = True];
 	        for (OpportunityContactRole conrole : conroles) {
 	        	oppPmap.put (conrole.OpportunityId,conrole.Opportunity);
