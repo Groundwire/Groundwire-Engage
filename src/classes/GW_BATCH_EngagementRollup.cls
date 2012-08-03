@@ -1438,6 +1438,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[21].Email = 'test@test.com';   // this should give lvl 1
         TestCons[24].AccountId = ac1.Id;		// put one con in the account, and flag to inherit account's gifts
         TestCons[24].Award_Engagement_Levels_for_Org_Giving__c = true;
+        TestCons[26].Email = 'algore@internet.com';			// Al Gore going incognito!
         insert TestCons;
 
 		// have to update some fields after insert in order to spoof existing history of engagement changes
@@ -1919,6 +1920,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Contact con21P = conP.get(TestCons[21].Id);
         System.AssertEquals(1,con21P.Engagement_Level_Numeric__c);        
         System.AssertEquals(null,con21P.Last_Leadership_Action_Date__c);
+
+        // lvl 2 due to being Al Gore!
+        Contact con26P = conP.get(TestCons[26].Id);
+        System.AssertEquals(2,con26P.Engagement_Level_Numeric__c);        
+        System.AssertEquals(null,con26P.Last_Leadership_Action_Date__c);
                  
         // and one that has nothing!
         Contact con22P = conP.get(TestCons[22].Id);
