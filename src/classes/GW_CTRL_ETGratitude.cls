@@ -172,10 +172,10 @@ public with sharing class GW_CTRL_ETGratitude {
 		
 		// environment specific Household field 
 		string strHHField = null;
-		if (GW_BATCH_EngagementRollup.IsGWBaseInstalled) 
-			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('ONEN_Household__c', false, false);
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) 
-			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('Household__c', false, true);
+		if (GW_GWEngageUtilities.IsGWBaseInstalled) 
+			strHHField = GW_GWEngageUtilities.addNSPrefixET('ONEN_Household__c', false, false);
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) 
+			strHHField = GW_GWEngageUtilities.addNSPrefixET('Household__c', false, true);
 		// to keep track of the Households we've seen
 		set<ID> setHHId = new set<ID>();
 				

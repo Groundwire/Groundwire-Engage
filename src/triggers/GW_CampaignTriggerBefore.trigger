@@ -14,8 +14,8 @@ trigger GW_CampaignTriggerBefore on Campaign (before insert) {
 					if ((ecs.Campaign_Record_Type__c == null || ecs.Campaign_Record_Type__c == '' || ecs.Campaign_Record_Type__c == cmp.get('RecordTypeId')) &&
 						(ecs.Campaign_Type__c == null || ecs.Campaign_Type__c == '' || ecs.Campaign_Type__c == cmp.Type) &&
 						(ecs.Campaign_Sub_Type__c == null || ecs.Campaign_Sub_Type__c == '' || 
-							!GW_BATCH_EngagementRollup.IsGWBaseInstalled || 
-							ecs.Campaign_Sub_Type__c == cmp.get(GW_BATCH_EngagementRollup.addNSPrefixET('Campaign_Sub_Type__c', false, false)))						
+							!GW_GWEngageUtilities.IsGWBaseInstalled || 
+							ecs.Campaign_Sub_Type__c == cmp.get(GW_GWEngageUtilities.addNSPrefixET('Campaign_Sub_Type__c', false, false)))						
 						) {
 						cmp.Leadership_Level__c = cBER.lvlNameMap.get(integer.valueOf(ecs.Engagement_Level__c));
 					}

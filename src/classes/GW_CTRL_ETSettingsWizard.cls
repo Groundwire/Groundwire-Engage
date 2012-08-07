@@ -262,9 +262,9 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 				list<SelectOption> listSO = new list<SelectOption>();
 				listSO.add(new SelectOption('', ''));
 				
-				if (GW_BATCH_EngagementRollup.IsGWBaseInstalled) {
+				if (GW_GWEngageUtilities.IsGWBaseInstalled) {
 					Map<String, Schema.SObjectField> M = Schema.SObjectType.Account.fields.getMap();									
-					Schema.DescribeFieldResult F = M.get(GW_BATCH_EngagementRollup.addNSPrefixET('Campaign_Sub_Type__c', false, false)).getDescribe();
+					Schema.DescribeFieldResult F = M.get(GW_GWEngageUtilities.addNSPrefixET('Campaign_Sub_Type__c', false, false)).getDescribe();
 					for (Schema.PicklistEntry pe : F.getPicklistValues()) {
 						listSO.add(new SelectOption(pe.Value, pe.Label));
 					}
@@ -280,7 +280,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 	// helper used to hide Campaign Sub Type columns when not running with GWBase.
 	public boolean IsGWBaseInstalled {
 		get {
-			return (GW_BATCH_EngagementRollup.IsGWBaseInstalled);
+			return (GW_GWEngageUtilities.IsGWBaseInstalled);
 		}
 	}
 		
@@ -317,7 +317,7 @@ public with sharing class GW_CTRL_ETSettingsWizard {
 		system.assert(ctrl.listSOCampaignSubTypes != null);
 		system.assert(ctrl.setCheckboxFields != null);
 		system.assert(ctrl.hasCampaignRecordTypes == (ctrl.listSOCampaignRecordTypes.size() > 1));
-		system.assert(ctrl.IsGWBaseInstalled == GW_BATCH_EngagementRollup.IsGWBaseInstalled);
+		system.assert(ctrl.IsGWBaseInstalled == GW_GWEngageUtilities.IsGWBaseInstalled);
 		
 		ctrl.nameNewSettings(null, null);
 		list<SObject> listSobj = new list<SObject>();

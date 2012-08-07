@@ -72,7 +72,7 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 
 		if (listFStoDel.size() > 0) delete listFStoDel;
 		try {
-			system.debug(listFreqSettings);
+			// system.debug(listFreqSettings);
 			upsert listFreqSettings;
         } catch (exception ex) {
         	ApexPages.addMessages(ex);

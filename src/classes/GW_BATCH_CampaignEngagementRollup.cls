@@ -22,6 +22,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 	// list of campaign writes 
 	Campaign[] campsToUpdate;
 
+	GW_GWEngageUtilities.debugLogger dlog = new GW_GWEngageUtilities.debugLogger();
 
 	// WRAPPER CLASS
 	public class campTotals {
@@ -37,6 +38,8 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		set<Id> parentCampIDs;						// all direct parents
 		set<Id> eligibleParentCampIDs;				// only those parents that our responses will roll up to for response rate 
 													// i.e. has eng. level, but is same or lower than my level 
+													
+		GW_GWEngageUtilities.debugLogger dlog = new GW_GWEngageUtilities.debugLogger();
 		
 		// constructor
 		public campTotals (Campaign camp) {
@@ -68,7 +71,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			if (camp.Parent.Parent.Parent.Parent.Id != null) parentCampIDs.add(camp.Parent.Parent.Parent.Parent.Id);
 			if (camp.Parent.Parent.Parent.Parent.Engagement_Level_Numeric__c <= engLvl) eligibleParentCampIDs.add(camp.Parent.Parent.Parent.Parent.Id);
 			
-			system.debug (LoggingLevel.WARN,'new wrap obj: ' + this);
+			this.dlog.debug ('new wrap obj: ' + this);
 		}
 		
 		public void SetCurrConFlags (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv, boolean isListGrowth) {
@@ -90,7 +93,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			if (isConv) currConConv = true;
 			if (isConv && respLvl >= engLvl) currConEngConv = true;
 			if (isListGrowth) currConListGrowth = true;
-			system.debug (LoggingLevel.WARN,'set curr con flags for campaign ' + camp.Name + ':  ' + 'currConSent=' + currConSent + '  currConResp=' + currConResp + '  currConEngResp=' + currConEngResp);
+			dlog.debug ('set curr con flags for campaign ' + camp.Name + ':  ' + 'currConSent=' + currConSent + '  currConResp=' + currConResp + '  currConEngResp=' + currConEngResp);
 		}
 		
 		public void SetCurrConFlagsParents (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv , boolean isListGrowth, map <id,campTotals> wrapMap) {
@@ -108,7 +111,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 				if (isConv) parentTotals.currConConv = true;
 				if (isConv && respLvl >= parentTotals.engLvl) parentTotals.currConEngConv = true;
 				if (isListGrowth) parentTotals.currConListGrowth = true;
-				system.debug (LoggingLevel.WARN,'set curr con flags for campaign ' + ParentTotals.camp.Name + ':  ' + 'currConSent=' + ParentTotals.currConSent + '  currConResp=' + ParentTotals.currConResp + '  currConEngResp=' + ParentTotals.currConEngResp);
+				dlog.debug ('set curr con flags for campaign ' + ParentTotals.camp.Name + ':  ' + 'currConSent=' + ParentTotals.currConSent + '  currConResp=' + ParentTotals.currConResp + '  currConEngResp=' + ParentTotals.currConEngResp);
 			}
 		}
 		
@@ -134,7 +137,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			if (currConEngConv) engConvCount += 1;
 			if (currConListGrowth) listGrowthCount += 1;
 			ResetCurrConFlags();
-			system.debug (LoggingLevel.WARN,'wrapper after updating totals: ' + this);
+			dlog.debug('wrapper after updating totals: ' + this);
 		}
 		
 		private void calculateResponseRate () {
@@ -144,9 +147,9 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 				responseRate = (decimal.valueOf(engRespCount) / decimal.valueOf(totalCount) ) * 100;
 				responseRate = responseRate.setScale (1,System.RoundingMode.HALF_UP);				// round to one decimal place
 			} else {
-				system.debug (LoggingLevel.WARN,'skipped calcing response rate for campaign ' + camp.Name);
+				dlog.debug('skipped calcing response rate for campaign ' + camp.Name);
 			}
-			system.debug (LoggingLevel.WARN,'calculated response rate for campaign ' + camp.Name + ': totalCount=' + totalCount + '  engRespCount=' + engRespCount + '  responserate=' + responseRate);
+			dlog.debug('calculated response rate for campaign ' + camp.Name + ': totalCount=' + totalCount + '  engRespCount=' + engRespCount + '  responserate=' + responseRate);
 		}
 		
 		private void calculateConversionRate() {
@@ -155,9 +158,9 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 				conversionRate = (decimal.valueOf(engConvCount) / decimal.valueOf(convCandidateCount) ) * 100;
 				conversionRate = conversionRate.setScale (1,System.RoundingMode.HALF_UP);				// round to one decimal place
 			} else {
-				system.debug (LoggingLevel.WARN,'skipped calcing conversion rate for campaign ' + camp.Name);
+				dlog.debug('skipped calcing conversion rate for campaign ' + camp.Name);
 			}
-			system.debug (LoggingLevel.WARN,'calculated conversion rate for campaign ' + camp.Name + ': candidates=' + convCandidateCount + '  conversionsAtLevel=' + engConvCount + '  convrate=' + conversionRate);
+			dlog.debug('calculated conversion rate for campaign ' + camp.Name + ': candidates=' + convCandidateCount + '  conversionsAtLevel=' + engConvCount + '  convrate=' + conversionRate);
 		}
 		
 		public Campaign getCampaignForUpdate () {
@@ -182,10 +185,10 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 					Engagement_Conversions_in_Hierarchy__c = convCount,
 					Newly_Engaged_Contacts_in_Hierarchy__c = listGrowthCount
 				);
-				system.debug (LoggingLevel.WARN,'returning campaign for write: ' + campForUpdate);
+				dlog.debug('returning campaign for write: ' + campForUpdate);
 				return campForUpdate;
 			} else {
-				system.debug (LoggingLevel.WARN,'no write needed for: ' + camp);
+				dlog.debug('no write needed for: ' + camp);
 				return null;
 			}
 		} 
@@ -227,9 +230,9 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
     	soql +=			' FROM CampaignMember';
     	// soql +=			'WHERE ';
     	soql +=			' ORDER BY Campaign.Top_Hierarchy_Campaign_ID__c,ContactId,LeadId,Campaign.Levels_Below_Top_of_Hierarchy__c DESC,CampaignId';
-    	soql = GW_BATCH_EngagementRollup.addAllNSPrefixET(soql,true,false);
+    	soql = GW_GWEngageUtilities.addAllNSPrefixET(soql,true,false);
     	
-    	system.debug (LoggingLevel.WARN,'soql: ' + soql);
+    	dlog.debug('soql: ' + soql);
     	batchQuery = soql;
     }
     
@@ -242,15 +245,15 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		
         for (sobject s: SBatch) {
             CampaignMember cm = (CampaignMember)s;
-			system.debug (LoggingLevel.WARN,'cm in loop: ' + cm);
-			system.debug (LoggingLevel.WARN,'cm.campaign in loop: ' + cm.Campaign);
+			dlog.debug('cm in loop: ' + cm);
+			dlog.debug('cm.campaign in loop: ' + cm.Campaign);
 			
 			if ((cm.ContactId != conCursor && cm.LeadId != conCursor) || cm.Campaign.Top_Hierarchy_Campaign_ID__c != hierarchyCursor) {
 				// loop thru all campaigns in current hiearchy "group"
 				// and add to totals based on booleans
 				// we also do this when campaign hierarchy cursor turns over b/c although unlikely, it's possible we could end one group
 				// and start the next w/ the same contact
-				system.debug (LoggingLevel.WARN,'starting new contact: ' + cm.Contact.Name);
+				dlog.debug('starting new contact: ' + cm.Contact.Name);
 								
 				// but don't do it for the very first one!
 				if (conCursor != null) { 
@@ -263,7 +266,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 			if (cm.Campaign.Top_Hierarchy_Campaign_ID__c != hierarchyCursor) {
 				// new campaign "group"
-				system.debug (LoggingLevel.WARN,'starting new hierarchy!');
+				dlog.debug('starting new hierarchy!');
 
 				// after the very first one..
 				if (hierarchyCursor != null) {
@@ -279,7 +282,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 			if (cm.CampaignId != campCursor) {
 				// ***NEW CAMPAIGN***
-				system.debug (LoggingLevel.WARN,'starting new campaign: ' + cm.Campaign.Name);
+				dlog.debug('starting new campaign: ' + cm.Campaign.Name);
 
 				// create wrappers (if necessary) for campaign and parents
 				CheckForWrappers(cm);
@@ -301,14 +304,14 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			if (cm.Conversion_Candidate__c == 'True') isConvCandidate = true;
 			boolean isConv = cm.Engagement_Conversion__c;
 			if (isConv) {		
-				system.debug (LoggingLevel.WARN,'contact ' + cm.Contact.Name + ' is conversion in campaign '+ cm.Campaign.Name);
+				dlog.debug('contact ' + cm.Contact.Name + ' is conversion in campaign '+ cm.Campaign.Name);
 			}	
 			boolean isListGrowth = cm.Engagement_List_Growth__c;
 			campTotals totals = wrapMap.get(cm.Campaign.Id);
-			// system.debug (LoggingLevel.WARN,'wrapper before setting currCon flags: ' + totals);		
-			// system.debug (LoggingLevel.WARN,'campaignID for cm: ' + cm.Campaign.Id);
+			// dlog.debug('wrapper before setting currCon flags: ' + totals);		
+			// dlog.debug('campaignID for cm: ' + cm.Campaign.Id);
 			if (isListGrowth) {		
-				system.debug (LoggingLevel.WARN,'contact ' + cm.Contact.Name + ' is list growth in campaign '+ cm.Campaign.Name);
+				dlog.debug('contact ' + cm.Contact.Name + ' is list growth in campaign '+ cm.Campaign.Name);
 			}		
 			totals.SetCurrConFlags(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth);
 			totals.SetCurrConFlagsParents(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth, wrapMap);
@@ -338,7 +341,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		// collect any campaign writes and add to list
 		// we'll actually do the update at the end of each batch
 		// b/c if the batch spans multiple hierarchies, we don't want to do a bunch of separate writes
-		system.debug (LoggingLevel.WARN,'hierarchy cursor changed, getting campaign writes');	
+		dlog.debug('hierarchy cursor changed, getting campaign writes');	
 		for (campTotals totals : wrapMap.values()) {
 			Campaign camp = totals.getCampaignForUpdate();
 			if (camp != null) campsToUpdate.add (camp);
@@ -347,7 +350,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 
 	private void doCampaignWrites () {
-        system.debug (LoggingLevel.WARN,'campaigns for update at end of batch: ' + campsToUpdate);
+        dlog.debug('campaigns for update at end of batch: ' + campsToUpdate);
         if (campsToUpdate != null) {
         	update campsToUpdate;
         	campsToUpdate.clear();
@@ -395,7 +398,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			wrapMap.put(cm.Campaign.Parent.Parent.Parent.Parent.Id,totals);					
 		}
 		
-		// system.debug (LoggingLevel.WARN,'wrapMap after additions: ' + wrapMap);		
+		// dlog.debug('wrapMap after additions: ' + wrapMap);		
 	}
 
 
