@@ -1,7 +1,7 @@
 trigger GW_ContactTriggerBefore on Contact (before insert, before update) {
     
     // when engagement lvl override gets set, apply the default time limit unless user has specified otherwise
-    GW_BATCH_EngagementRollup.ContactEngagementLvlOverride();
+    GW_GWEngageUtilities.ContactEngagementLvlOverride();
     
     // if peak level or any of the other "persistent" engagement cals are present on insert, blank them out
     if (trigger.isInsert) {
@@ -14,9 +14,7 @@ trigger GW_ContactTriggerBefore on Contact (before insert, before update) {
     	}
     	*/
 
-    	GW_BATCH_EngagementRollup.BlankETConFields(trigger.new);
-    	
-
+    	GW_GWEngageUtilities.BlankETConFields(trigger.new);
     }
     
     // if we're in NPSP, set the Donor flag if Total Lifetime giving goes to > 0

@@ -36,7 +36,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     
     // these fieldlists are static so that static methods called from triggers can access them
     // all of these fields will be blanked out on insert (clone)
-    static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
+    public static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
 									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
 									   			 'First_Engagement_Level__c,First_Engagement_Level_Date__c,' + 
 									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,';
@@ -1004,6 +1004,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        // dlog.debug('donorLvlMap after fetch: ' + donorLvlMap);
         }
 	}
+
     
     /*******************************************************************************************************
 	* @description an empty hook method intended for overriding - this will get called once all of the regular logic has been run and all contacts in the batch have been asssigned
@@ -1015,7 +1016,6 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
     }
     
-
     
 
     /*******************************************************************************************************
@@ -1032,80 +1032,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         }		        
     }
 
-
-
-	
-	public static void BlankETConFields (list<Contact> cons) {
-		// called from before insert trigger
-		// blank out all ET fields on contact on insert
-		// this is done to prevent problems when contact is cloned, since some fields are semi-persistent
-		// e.g. peak level won't drop once it's set
-		// and as long as we're nulling some it's less confusing for user if we null them all
-		string fieldList = GW_GWEngageUtilities.addAllNSPrefixET(CON_FIELDS_ET_EDITABLE,true,false);
-		string[] fieldnames = fieldList.split(',');
-		for (Contact con : cons) {
-			for (string fieldname : fieldnames) {
-				con.put(fieldname , null);
-			}
-		}
-	}
-	
-	
-    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
-
-    
-
-
-    // called from the Contact before trigger
-    public static void ContactEngagementLvlOverride() {    
-        // when engagement lvl override gets set, apply the default time limit unless user has specified otherwise
-        // can't do this w/ workflow due to limitations in date arithmetic
-        
-        Contact[] cons = new Contact[0];
-        integer months = (settings.Override_Default_Duration__c==null) ? settings.Timeframe_Recent__c.intvalue() : 
-        	settings.Override_Default_Duration__c.intvalue();
-        
-        date defDate;
-        
-        for (SObject obj : trigger.new) {
-            Contact con = (Contact)obj;
-            if (con.Engagement_Level_Override__c!=null) {
-                Contact oldCon;
-                boolean dateChgd = false;
-                boolean lvlChgd = false;
-                if (trigger.isUpdate) {
-                    oldCon = (Contact)trigger.oldMap.get(con.Id);
-                    dateChgd = (con.Engagement_Override_End_Date__c!=oldCon.Engagement_Override_End_Date__c ? true : false );
-                    lvlChgd = (con.Engagement_Level_Override__c!=oldCon.Engagement_Level_Override__c ? true : false );
-                }
-                if ( (trigger.isInsert && con.Engagement_Override_End_Date__c==null) || (trigger.isUpdate && lvlChgd && !dateChgd) ) {
-                    cons.add(con);
-                }           
-            }         
-        }
-        
-        if (cons.size() > 0) {
-            // optimization: do date math after first loop
-            defDate = system.today().addMonths(months);
-            for (Contact con:cons) {
-                con.Engagement_Override_End_Date__c = defDate;
-            }
-        }
-    }
     
 
     // *** TESTS **********************************************************************
     
     // test constants
-    /* not used?
-    static integer SMALLGIFTLVL,MAJORGIFTLVL,MONTHS_RECENT,MONTHS_MEDIUM,OVERDEFDUR;
-    static decimal MAJGIFTAMT;
-    */
-    
     static integer NEWMBRLVL,RENMBRLVL;
     public static string INCOPPTYPES,MBROPPTYPES;
     static boolean INCOPPS,INCMBR;
-    
     
     public static void setSettingsForTests() {
 
