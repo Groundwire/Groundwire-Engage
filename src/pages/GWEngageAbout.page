@@ -13,8 +13,13 @@
 	<p>
 		<h1>
 			<a href="http://groundwire.org/" target="_new">
-			<img src="http://gw-logo.s3.amazonaws.com/groundwire-logo-270-noclear.png" border="0" hspace="5" vspace="5" /></a>
+			<!-- 
+			<img src="http://gw-logo.s3.amazonaws.com/groundwire-logo-270-noclear.png" border="0" hspace="5" vspace="5" />
+			 -->
+			 <apex:image id="GWlogo" value="{!$Resource.GroundwireLogo270noclear}"/>
+			 </a>
 		</h1>
+		<br/><br/>
 	</p>
 	
 	<p>
