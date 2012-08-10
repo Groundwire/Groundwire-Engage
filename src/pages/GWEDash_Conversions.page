@@ -1,0 +1,103 @@
+<apex:page controller="GW_CTRL_DashMetrics" readOnly="true" showHeader="false" sidebar="false">
+
+    <style>
+	    .bigs {
+	        width: 1150px;
+	    }
+	    
+	    .stat {
+	        display: inline-block;
+	        border: 1px solid #d8d8d8;
+	        /* margin-left: 20px; */
+	        height: 120px;
+	        /* box-shadow: 3px 3px 5px rgba(0,0,0,0.2); */
+	        text-align: right;
+	        
+	        /*
+	        transition: box-shadow .5s;
+			-moz-transition: box-shadow .5s;
+			-webkit-transition: box-shadow .5s;
+			-o-transition: box-shadow .5s;
+			*/
+	    }
+	    .stat-well {
+	        padding: 10px;
+	
+	        }
+	    .stat:hover {
+	    	box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+	    }
+	    .metric-footer {
+	        border-top: 1px solid #f8f8f8;  
+	        padding-top: 5px;
+	        font-size: 9px;
+	        text-align: center;
+	        
+	    }
+	    .ministat {
+	        width: 60px;
+	        float: right;
+	    }
+	    .span1 {
+	        width: 398px;
+	        }
+	    .metricLabel {
+	    	font-size: 24px;
+	    }
+	    .label {
+	        color: #777;
+	        text-transform: uppercase;
+	        }
+	    .metric {
+	        display: block;
+	        font-size: 32px;
+	        line-height: 50px;
+	        font-weight: bold;
+	        }
+	    .ministat .metric {
+	        font-size: 13px;
+	        line-height: 20px;
+	    }
+	    .warn-false .metric {
+	        color: green;
+	        }
+	    .warn-true .metric {
+	        color: red;
+	        }
+	    .metric small {
+	        font-size: 12px;
+	        color: #666;
+	    }
+	    .dash-title {
+		    background-color: #dcdcdc;
+		    font-family: arial,helvetica,sans-serif;
+		    font-size: 12px;
+		    font-weight: bold;
+		    line-height: 2;
+		    margin: 0;
+		    padding: 0;
+		    text-align: center;
+		}
+    </style>
+    
+    <div class="span1 stat">
+    	<div class="stat-well">
+    		<h2 class="dash-title">Conversions</h2>
+    		<span class="metricLabel label">Total Conversions</span>
+    		<span class="metric">
+    			{!ttlConversions}<small></small>
+    		</span>
+    		<div class="metric-footer">
+    			<div class="ministat ministat-campaign">
+    				<span class="label">Campaigns</span>
+    				<span class="metric">{!campConversions}</span>
+    			</div>
+    			<div class="ministat ministat-opportunities">
+    				<span class="label">Donations</span>
+    				<span class="metric">{!oppConversions}</span>
+    			</div>
+    		</div>
+    	</div>
+   	</div>
+
+</apex:page>
