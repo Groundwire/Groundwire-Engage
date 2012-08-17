@@ -19,7 +19,6 @@
     <enableFeeds>true</enableFeeds>
     <fields>
         <fullName>Engagement_Conversion_From_Level__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion From Level</label>
         <precision>1</precision>
@@ -31,7 +30,6 @@
     </fields>
     <fields>
         <fullName>Engagement_Conversion_To_Level__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion To Level</label>
         <precision>1</precision>
@@ -43,7 +41,6 @@
     </fields>
     <fields>
         <fullName>Engagement_Conversion_Type__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion Type</label>
         <picklist>
@@ -63,7 +60,6 @@
     <fields>
         <fullName>Engagement_Conversion__c</fullName>
         <defaultValue>false</defaultValue>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion</label>
         <trackFeedHistory>false</trackFeedHistory>
@@ -72,7 +68,6 @@
     <fields>
         <fullName>Engagement_List_Growth__c</fullName>
         <defaultValue>false</defaultValue>
-        <deprecated>false</deprecated>
         <description>if checked indicates that this campaign membership was responsible for giving the contact their very first level above 0</description>
         <externalId>false</externalId>
         <label>Engagement List Growth</label>
