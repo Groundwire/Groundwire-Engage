@@ -1,17 +1,13 @@
 public with sharing class GW_CTRL_EngagementRollup {
-/*-----------------------------------------------------------------------------------------------
-* Written by Evan Callahan, copyright (c) 2010 Groundwire, 1402 3rd Avenue, Suite 1000, Seattle, WA 98101
+	
+/*******************************************************************************************************
+* @author Matthew Scholtz
+* @date 7/1/2012
+* @description Controller for "Engagement Rollup" tab that manually launches Engage rollup batch processes
+*
+* Written by Matthew Scholtz and Evan Callahan, copyright (c) 2012 Groundwire
 * This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
-* 
-* controller for Engagement Rollup visualforce page
-* allows rolling up opps for all accounts, contacts, and households, or just one
-*
-* page can be called with or without optional parameter as follows:
-*   /apex/OpportunityRollup?id=[target-object-id]
-*
-* which will roll up opps for a single account, contact, or household
-*
------------------------------------------------------------------------------------------------*/
+*/
 
     // properties for page
     public boolean batching { get; set; }

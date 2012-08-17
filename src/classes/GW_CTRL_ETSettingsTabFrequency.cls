@@ -1,5 +1,14 @@
 public with sharing class GW_CTRL_ETSettingsTabFrequency {
 
+/*******************************************************************************************************
+* @author David Habib
+* @date 7/1/2012
+* @description Controller for settings wizard, repeated actions tab
+*
+* Written by David Habib, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
+
 	// constructor
 	public GW_CTRL_ETSettingsTabFrequency(GW_CTRL_ETSettingsWizard cWiz) {
 		ctrlWizard = cWiz;
@@ -63,7 +72,7 @@ public with sharing class GW_CTRL_ETSettingsTabFrequency {
 
 		if (listFStoDel.size() > 0) delete listFStoDel;
 		try {
-			system.debug(listFreqSettings);
+			// system.debug(listFreqSettings);
 			upsert listFreqSettings;
         } catch (exception ex) {
         	ApexPages.addMessages(ex);

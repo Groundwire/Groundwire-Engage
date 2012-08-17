@@ -76,7 +76,7 @@ public class ONEN_UnitTestData {
 		
 		list<contact> ContactsToAdd = New list<contact> ();
 		list<contact> SourceContacts = firstContactList;		
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {	
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) {	
 			SourceContacts = database.query('select Id, npo02__Household__c, npo02__Household__r.Id from contact where Id in :firstContactList');
 		}
 		
@@ -87,7 +87,7 @@ public class ONEN_UnitTestData {
 				OtherCity = 'Seattle'
 				//DH ,ONEN_Household__c = firstContactList[i].ONEN_Household__c
 			);
-			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {	
+			if (GW_GWEngageUtilities.IsNPSPHHInstalled) {	
 				
 				sObject hh = SourceContacts[i].getSObject('npo02__Household__r');
 				system.assert(hh != null);  
@@ -138,7 +138,8 @@ public class ONEN_UnitTestData {
 				type = oppType,
 				RecordTypeId = rtid 
 			);	
-			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+			if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
+				// TBD this doesn't always trigger conrole creation
 				newOpp.put('npe01__Contact_Id_for_Role__c', thisCon.Id);				
 			}
 			OppsToAdd.add (newOpp);
@@ -246,30 +247,40 @@ public class ONEN_UnitTestData {
         	}
         }
 	}
-	static testmethod void TestTheTestData() {
+	
+	@isTest (SeeAllData=true)
+	static void TestTheTestData() {
 		
+		// we want SeeAllData here b/c we want to be able to pull the actual rectyptes from settings
+		// this happens in the setSEttingsForTests method, but the declaration needs to be here
+		
+		// now impose the custom settings we want
+		GW_BATCH_EngagementRollup.setSettingsForTests();
+
+		// get those rectypes from the settings
+		string giftRectypeName = GW_BATCH_EngagementRollup.INCOPPTYPES;
+		string mbrRectypeName = GW_BATCH_EngagementRollup.MBROPPTYPES;
+				
 		test.startTest();
 		list<Contact> listCon = CreateMultipleTestContacts(10); 
 		insert listCon;
 		
-		list<Opportunity> listOpp = OppsForContactList (listCon, null, 'Closed Won', system.today(), 100, 			
-			ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS, null);
+		list<Opportunity> listOpp = OppsForContactList (listCon, null, 'Closed Won', system.today(), 100, giftRectypeName, null);
 		insert listOpp;
-		system.debug(listOpp);
+		// system.debug(listOpp);
 
 		date dtMbr = system.today().addMonths(-11);
-		list<Opportunity> listOppMbr = OppsForContactList (listCon, null, 'Closed Won', dtMbr, 15, 			
-			ONEN_Constants.OPP_MEMBER_RECTYPE_FORTESTS, null);
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+		list<Opportunity> listOppMbr = OppsForContactList (listCon, null, 'Closed Won', dtMbr, 15, mbrRectypeName, null);
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
 			for (Opportunity opp : listOppMbr) {
 	        	opp.put('npe01__Membership_Start_Date__c', opp.CloseDate);
 	        	opp.put('npe01__Membership_End_Date__c', opp.CloseDate.AddYears(1)); 
 			}
 		}
 		insert listOppMbr;
-		system.debug(listOppMbr);		
+		// system.debug(listOppMbr);		
 
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
 			list<OpportunityContactRole> listOCR = [SELECT Id, IsPrimary, Role, OpportunityId, ContactId FROM OpportunityContactRole
 				WHERE  OpportunityId in :listOpp or OpportunityId in :listOppMbr];
 			system.assertEquals(listOpp.size() + listOppMbr.size(), listOCR.size());
@@ -278,9 +289,8 @@ public class ONEN_UnitTestData {
 		// call this to allow future rollups to proceed.
 		test.stopTest();
 		
-		
 		string strSoql = 'SELECT Id, Name,';
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
 			strSoql += 'npo02__OppAmountLastNDays__c, npo02__LastCloseDate__c, npo02__TotalOppAmount__c, npo02__Household__c, ' +
 				'npo02__LastCloseDateHH__c, npo02__OppsClosedLastNDays__c, npo02__Household__r.npo02__OppAmountLastNDays__c, ' +
 				'npo02__Household__r.npo02__OppsClosedLastNDays__c, npo02__Household__r.npo02__LastMembershipDate__c, ' +
@@ -292,7 +302,7 @@ public class ONEN_UnitTestData {
 
         listCon = Database.query(strSoql);
         for (Contact con : listCon) {
-			if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) {
+			if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
 				// we don't know if membership is included in donation rollups or not.
 				system.assert(con.get('npo02__OppAmountLastNDays__c') == 100 ||
 					con.get('npo02__OppAmountLastNDays__c') == 115);

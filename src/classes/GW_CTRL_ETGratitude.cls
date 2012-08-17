@@ -1,4 +1,13 @@
 public with sharing class GW_CTRL_ETGratitude {
+
+/*******************************************************************************************************
+* @author David Habib
+* @date 7/1/2012
+* @description Controller for Gratitude Machine
+*
+* Written by David Habib and Matthew Scholtz, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
 	
 	// constructor
 	public GW_CTRL_ETGratitude() {
@@ -163,10 +172,10 @@ public with sharing class GW_CTRL_ETGratitude {
 		
 		// environment specific Household field 
 		string strHHField = null;
-		if (GW_BATCH_EngagementRollup.IsGWBaseInstalled) 
-			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('ONEN_Household__c', false, false);
-		if (GW_BATCH_EngagementRollup.IsNPSPHHInstalled) 
-			strHHField = GW_BATCH_EngagementRollup.addNSPrefixET('Household__c', false, true);
+		if (GW_GWEngageUtilities.IsGWBaseInstalled) 
+			strHHField = GW_GWEngageUtilities.addNSPrefixET('ONEN_Household__c', false, false);
+		if (GW_GWEngageUtilities.IsNPSPHHInstalled) 
+			strHHField = GW_GWEngageUtilities.addNSPrefixET('Household__c', false, true);
 		// to keep track of the Households we've seen
 		set<ID> setHHId = new set<ID>();
 				
@@ -482,7 +491,7 @@ public with sharing class GW_CTRL_ETGratitude {
 		system.assert(ctrl.cmFilter != null);
 		
 		// create some contacts with different engagement levels and dates
-        GW_BATCH_EngagementRollup.setSettingsForTests('Title', 'Board Member', 6);  
+        GW_BATCH_EngagementRollup.setSettingsForTests();  
         list<Contact> listCon = ONEN_UnitTestData.CreateMultipleTestContacts(5);
 		insert listCon;
 

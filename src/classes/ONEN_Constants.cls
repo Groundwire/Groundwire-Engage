@@ -1,5 +1,14 @@
 public with sharing class ONEN_Constants {
 
+/*******************************************************************************************************
+* @author Matthew Scholtz and David Habib
+* @date 7/1/2012
+* @description helper class to return actual or default values from custom settings
+*
+* Written by Matthew Scholtz and David Habib, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
+
 	/*******************************************************************************************************
 	* @description Returns the custom setting Opp_Rectype_For_Tests_Default__c, a record type for 
 	* Opportunities. Defaults to 'Donation'.

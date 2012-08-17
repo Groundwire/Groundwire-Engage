@@ -1,4 +1,14 @@
 public with sharing class GW_CTRL_ETSettingsTabGeneral {
+
+/*******************************************************************************************************
+* @author David Habib
+* @date 7/1/2012
+* @description Controller for settings wizard, general tab
+*
+* Written by David Habib, copyright (c) 2012 Groundwire
+* This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
+*/
+
 	
 	// constructor
 	public GW_CTRL_ETSettingsTabGeneral(GW_CTRL_ETSettingsWizard cWiz) {

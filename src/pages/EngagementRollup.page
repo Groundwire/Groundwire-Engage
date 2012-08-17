@@ -30,7 +30,7 @@
 			<apex:messages styleClass="err" />
 			<apex:outputText rendered="{!batching}">
 				<p>Engagement Rollup runs two batch processes.  The first will recalculate every contact's engagement level based on campaign and opportunity history, and other info.
-				The second will update response rates and related info on Campaigns.  You will see two progress bars below for each of these processes.
+				The second will update response rates and related info on Campaigns.  You will see a progress bar below for each of these processes.
 				 The processes may take some time; it will take longer the more data you have in your database.  You can close this page 
 				and the process will continue in the background.   Go to Setup > Monitoring > Apex Jobs for more detailed info.</p>			
 			

@@ -156,6 +156,25 @@ public class GW_RecTypes {
    	 	return recordTypesOptions;
     }
 
+
+	public static string oppRectypeIfExists (string tryFirst) {
+		// first try to find the rectype given in the param
+		// if not found, just take the first opp rectype we do find, at random
+		string rectypeName;
+		id tryID = GW_RecTypes.GetRecordTypeId('Opportunity', tryFirst);
+		if (tryID == null) {
+			Map<String, Id> rectypeMap = GW_RecTypes.GetRecordTypeIdMap('Opportunity');
+			// can't take first element of a set, so cast to a list
+			list<string> allRectypeNames = new list<string>();
+			allRectypeNames.addAll(rectypeMap.keyset());
+			rectypeName = allRectypeNames[0];
+		} else {
+			rectypeName = tryFirst;
+		}
+		return rectypeName;
+	}
+
+
 	// TEST
 	static testmethod void testRecTypes() {
 		// try bogus values
