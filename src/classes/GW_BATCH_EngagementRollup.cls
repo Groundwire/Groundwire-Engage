@@ -630,7 +630,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 
             if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
                 peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c 
-                // temp disabled for security review	|| cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c 
+                || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c 
                 ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
@@ -679,7 +679,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     con.Engagement_Level__c = lvlStr; 
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
-                    // temp disabled for security review	con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
+                    con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
                     
                     // finally, for testing only, cause one to fail validation by inserting a bogus email addy
                     // this is so we can test that our allornothing=false update is working
@@ -1502,7 +1502,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
 			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Engagement_Level__c,First_Engagement_Level_Date__c
-			// temp disabled for security review ,Engagement_Level_One_Year_Ago__c	 
+			,Engagement_Level_One_Year_Ago__c	 
             FROM Contact WHERE Id IN :ConIDs]);
         dlog.debug('conP:' + conP);
         
@@ -1547,7 +1547,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.Assert (chgs.size()==3);
         system.Assert (chgs[0].d < system.today());      
         system.Assert (chgs[2].d == system.today());
-        // temp disabled for security review	system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
+        system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
         
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
@@ -1558,7 +1558,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // these should still be the same as before the batch
         System.AssertEquals(1,con2P.First_Engagement_Level__c); 
         System.AssertEquals(startDateOld.addMonths(-3),con2P.First_Engagement_Level_Date__c); 
-        // temp disabled for security review	system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
+        system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
         
         // only peak, nothing recent
         Contact con3P = conP.get(TestCons[3].Id);
