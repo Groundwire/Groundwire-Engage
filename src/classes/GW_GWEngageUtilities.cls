@@ -230,5 +230,73 @@ public class GW_GWEngageUtilities {
             }
         }
     }	
+
+
+    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+    
+	// ERROR HANDLING
+	
+	public class contactValidationErr {
+		public Database.SaveResult saveResult;
+		public string conName;
+		public id conId;
+	}
+	
+	 public static void sendValidationErrEmail (List<contactValidationErr> errList){
+
+		// if we got validation errs while attempting to write to contacts, send an email to notify
+		// currently this sends one email per batch 
+
+     	datetime thisDay = system.now();
+        
+		Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setToAddresses(new String[] {'matthew@groundwire.org'});		// tbd get from setting
+        // mail.setReplyTo('batch@mycompany.com');
+        //mail.setSenderDisplayName('Groundwire Engage');
+        mail.setSubject('Groundwire Engage - Contact Validation Error');
+		string msg = 'Groundwire Engage encountered one or more errors attempting to save changes to Contact record. ' + 
+						'Generally this is due to existing data that does not meet custom validation rules or custom required fields. ' +
+						'Please correct any invalid data on the following records:<BR/><BR/>';
+		for (contactValidationErr err : errList) {
+			string conURL = URL.getSalesforceBaseUrl().toExternalForm() + '/' + err.conId;
+			string errDescrip = err.saveResult.getErrors()[0].getMessage();
+			msg += 'Contact: <a href="' + conURL + '">' + err.conName + '</a>  Error: ' + errDescrip + '<BR/>';	
+		}
+		mail.setHTMLBody(msg);
+
+		debugLogger dlog = new debugLogger();
+		dlog.debug('validation err email msg: ' + msg);
+
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        /*
+        ore.Name = objid + '-' + thisDay.month() + thisDay.day() + thisDay.hour() + thisDay.minute() + thisDay.second();
+        ore.Error_Datetime__c = thisDay;
+        ore.Error_Object_Type__c = objecttype;
+      
+        string recordURL = URL.getSalesforceBaseUrl().toExternalForm() + '/' + objid;
+        if (recordURL.startsWith('http:')){
+            recordURL = recordURL.replaceFirst('http:', 'https:');
+        }
+        ore.Error_Record_Link__c = recordURL;
+         
+        if (s.getErrors()[0].getStatusCode() == system.Statuscode.REQUIRED_FIELD_MISSING){
+            ore.Error_Type__c = 'Required Field Missing';
+        }
+        else if (s.getErrors()[0].getStatusCode() == system.Statuscode.FIELD_CUSTOM_VALIDATION_EXCEPTION){
+            ore.Error_Type__c = 'Custom Validation Rule Failed';
+        }
+        else{
+            ore.Error_Type__c = 'Other';
+        }
+                 
+        //trim error message
+        if (s.getErrors()[0].getMessage().length() > 255)
+            ore.Error_Message__c = s.getErrors()[0].getMessage().substring(0, 254);
+        else
+            ore.Error_Message__c = s.getErrors()[0].getMessage();
+     return ore;
+     */
+    }
 	
 }

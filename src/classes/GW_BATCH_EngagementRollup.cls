@@ -330,21 +330,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			dlog.debug('consToUpd after conversion calcs:' + consToUpd);
 
 			// and finally update our contacts!
-			// set the allornothing property to false so that if a record throws a validation err, the rest will still go through
-            // update consToUpd;
-            Database.SaveResult[] SR = database.update(consToUpd, false);
-            
-            /* TBD do error handling on the results of the update, report to user
-            	// the code that follows is for reference, from NPSP, they save errs to a table
- 	      	List<Opportunity_Rollup_Error__c> elist = new List<Opportunity_Rollup_Error__c>();
-	        integer i = 0;
-	        for(Database.SaveResult s: SR){
-	            if (!s.isSuccess()){
-	                elist.add(OpportunityRollup_Utilities.createError(s, 'Account', accountsToUpdate.values()[i].id));
-	            }
-	            i++;
-        	} 
-        	*/
+			updateContacts(consToUpd);
+
         }
     }
   
@@ -878,6 +865,37 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		
 	}
 	
+
+	public void updateContacts (list<Contact> cons) {
+		// set the allornothing property to false so that if a record throws a validation err, the rest will still go through
+        // update consToUpd;
+        Database.SaveResult[] SR = database.update(cons, false);
+            
+       	// check to see if any records failed validation, and send a notification email if so
+ 	    List<GW_GWEngageUtilities.contactValidationErr> elist = new List<GW_GWEngageUtilities.contactValidationErr>();
+ 	    integer i = 0;
+        for(Database.SaveResult s: SR){
+            if (!s.isSuccess()){
+            	dlog.debug ('saveResult for validation err:' + s);
+            	// if we found an err, save it to a wrapper obj (because can't get contact id out of the saveresult)
+            	GW_GWEngageUtilities.contactValidationErr err = new GW_GWEngageUtilities.contactValidationErr();
+            	err.saveResult = s;
+            	id conId = cons[i].id;
+            	err.conId = conId;
+            	if (test.IsRunningTest() && conWrapMap==null) {
+					// for the test, fake the name as we're not really going to run the batch
+					err.ConName = 'Number2 Doppelganger';
+            	} else {
+	            	engTrackConWrapper cw = conWrapMap.get(conId);
+		        	err.conName = cw.con.Name;
+				}
+                elist.add(err);
+            }
+            i++;
+    	}
+    	if (elist.size() > 0) GW_GWEngageUtilities.sendValidationErrEmail(elist);		
+	}
+
   
   	private void setGiftRectypeVars() {
 
@@ -1813,6 +1831,38 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.assertEquals (null,CloneConP.Last_Engagement_Lvl_Chg_Datestamp__c);
         system.assertEquals (null,CloneConP.First_Action_Date_Curr_Level__c);
     }
+
+
+	public static testmethod void testValidationErrHandling() {
+		setSettingsForTests();	
+		
+		// create a few contacts
+		Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(3);
+		insert TestCons;
+		
+		GW_BATCH_EngagementRollup engRollup = new GW_BATCH_EngagementRollup (true);
+		
+		// now spoof engagement levels, and give one an invalid email addy
+		TestCons[0].Engagement_Level__c = settings.Level_1_Name__c;
+		TestCons[1].Engagement_Level__c = settings.Level_2_Name__c;
+		TestCons[2].Engagement_Level__c = settings.Level_2_Name__c;
+		TestCons[2].Email = 'nota valid email';
+		
+		// now call the batch's update method, and make sure that two of the cons are updated, while the 3rd fails gracefully
+		// it's ok that we didn't actually execute the batch, since we're just testing the update methods ability to deal w/ validation errs
+		engRollup.updateContacts(TestCons);
+		
+		map<Id,Contact> consMap = new map<Id,Contact> ( [SELECT Id,Name,Engagement_Level__c,Email FROM Contact WHERE Id IN :TestCons]);
+		Contact con0 = consMap.get(TestCons[0].Id);
+		Contact con1 = consMap.get(TestCons[1].Id);
+		Contact con2 = consMap.get(TestCons[2].Id);
+		system.assertEquals (settings.Level_1_Name__c,con0.Engagement_Level__c,'valid record not updated con0');
+		system.assert (settings.Level_1_Name__c != null && settings.Level_1_Name__c != '','level names not set correctly in test');
+		system.assertEquals (settings.Level_2_Name__c,con1.Engagement_Level__c,'valid record not updated con1');
+		system.assertEquals (null,con2.Engagement_Level__c,'invalid con updated even though should fail validation');
+		system.assertEquals (null,con2.Email,'invalid con updated even though should fail validation');
+	}
+
     
 	@isTest (SeeAllData=true)
     public static void testCampaignDefaults() { 

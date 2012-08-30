@@ -39,6 +39,9 @@
 		.cssTbx {
 			width: 80px;
 		}
+		.cssTbxWide {
+			width: 200px;
+		}
 		select:disabled {
 			color: gray;
 			// transparent doesn't work on Chrome!  
