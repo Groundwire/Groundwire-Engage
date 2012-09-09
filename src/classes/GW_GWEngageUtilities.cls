@@ -232,6 +232,36 @@ public class GW_GWEngageUtilities {
     }	
 
 
+
+	public static list<Opportunity> insertTestOppsForContactList (list<Contact> Cons, id CampId, string Stage, date Close, double Amt, string rectype, string oppType) {
+
+		// for tests, insert opps & conroles
+		// calls the method on UnitTestData to build the opps
+		// but also inserts them, and creates conroles as needed if we're not in gwbase or NPSP
+
+		List<Opportunity> opps = ONEN_UnitTestData.OppsForContactList(Cons, CampId, Stage, Close, Amt, rectype, oppType);
+		insert opps;
+
+		// if we're not in GWBase or NPSP, then add conroles by hand..
+		// tbd this doesn't do households 
+		if (! GW_GWEngageUtilities.IsNPSPHHInstalled && ! GW_GWEngageUtilities.IsGWBaseInstalled) {
+			list<OpportunityContactRole> conroles = new list<OpportunityContactRole>();
+			integer i=0; 
+			for (Opportunity opp:opps) {
+				OpportunityContactRole conrole = new OpportunityContactRole (
+					OpportunityId = opp.Id,
+					ContactId = Cons[i].Id,
+					IsPrimary = true 
+				);
+				conroles.add(conrole);
+				i++;
+			}
+			if (conroles.size() > 0) insert conroles;
+		}
+		
+		return opps;
+	}
+
     /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
     
 	// ERROR HANDLING
