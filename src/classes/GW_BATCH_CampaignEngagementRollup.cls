@@ -26,6 +26,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 	map <id, map<id,OpportunityContactRole>> conCampOppMap; 
 
 	GW_GWEngageUtilities.debugLogger dlog = new GW_GWEngageUtilities.debugLogger();
+	Id cronTriggerId;
 
 	// WRAPPER CLASS
 	public class campTotals {
@@ -201,16 +202,27 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 
     global GW_BATCH_CampaignEngagementRollup() {
-    	// construtor
-  		wrapMap = new map <id,campTotals>();
-  		campsToUpdate = new Campaign[0];
-  		constructQuery();  
+    	// no-arg construtor
+    	this.initialize();
     }
     
+    global GW_BATCH_CampaignEngagementRollup (id cronId) {
+    	// this constructor takes the id of the cron trigger that launched this batch process
+    	// we will try to delete it as part of the finish method
+    	this.cronTriggerId = cronId;
+    	this.initialize();
+    }
+    
+    private void initialize() {
+  		wrapMap = new map <id,campTotals>();
+  		campsToUpdate = new Campaign[0];
+  		constructQuery();      	
+    }
     
     global void execute(SchedulableContext SC) {
     	// tbd get batch size from settings?
-        GW_BATCH_CampaignEngagementRollup myBatch = new GW_BATCH_CampaignEngagementRollup();
+    	id cronId = (id) SC.getTriggerId(); 
+        GW_BATCH_CampaignEngagementRollup myBatch = new GW_BATCH_CampaignEngagementRollup(cronId);
         id batchinstanceid = database.executeBatch (myBatch, 50);      
     }
     
@@ -321,6 +333,17 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		// then get our last writes, and do them
 		getCampaignWrites();
 		doCampaignWrites();
+		
+		// if we used a cron to launch this, now abort it so it doesn't show up on the scheduled jobs list
+		if (cronTriggerId != null) {
+			try {
+				system.abortJob(cronTriggerId);
+				
+			} catch (exception e) {
+				system.debug ('Groundwire Engage: failed to abort crontrigger job for CampaignEngagementRollup after batch completed');
+			}
+			
+		}
     }
 
 

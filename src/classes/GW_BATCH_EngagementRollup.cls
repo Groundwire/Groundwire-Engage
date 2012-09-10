@@ -1046,7 +1046,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        Datetime sysTime = System.Now().addSeconds(30);
 	        String chron_exp = '' + sysTime.second() + ' ' + sysTime.minute() + ' ' + sysTime.hour() + ' ' + sysTime.day() + ' ' + sysTime.month() + ' ? ' + sysTime.year();
 	        GW_BATCH_CampaignEngagementRollup batch = new GW_BATCH_CampaignEngagementRollup();  
-	        System.schedule('GW Engage Campaign Rollup ' + sysTime.getTime(), chron_exp, batch);               
+	        System.schedule('Groundwire Engage Campaign Rollup ' + sysTime.getTime(), chron_exp, batch);               
         }		        
     }
 
