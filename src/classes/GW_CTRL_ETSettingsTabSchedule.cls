@@ -45,7 +45,7 @@ public with sharing class GW_CTRL_ETSettingsTabSchedule {
         String strSch = '0 0 2 ? * Sun-Sat';	// run every day at 2am.
         GW_BATCH_EngagementRollup cls = new GW_BATCH_EngagementRollup();
         try {
-        	jobId = system.schedule('Scheduled Engagement Rollup', strSch, cls);
+        	jobId = system.schedule('Groundwire Engage Daily Rollup', strSch, cls);
         } catch (exception ex) {
         	ApexPages.addMessages(ex);
         }	
