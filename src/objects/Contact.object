@@ -230,6 +230,18 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Level_Before_First_Donation__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>If this contact is a donor (and became a donor while Groundwire Engage was in use) this field will give the Engagement Level they had before becoming a donor.</inlineHelpText>
+        <label>Engagement Level Before First Donation</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Engagement_Level_Change_Log__c</fullName>
         <description>Used by engagement metrics to compare year-over-year levels for a contact.  Should be hidden from end users.  Serialized JSON of a list of apex objects w/ two properties.  Date of change, and value changed to.</description>
         <externalId>false</externalId>
@@ -386,6 +398,19 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Engagement_Lvl_Before_1st_Gift_Numeric__c</fullName>
+        <externalId>false</externalId>
+        <formula>VALUE ( LEFT ( Engagement_Level_Before_First_Donation__c , 1 ) )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Engagement Lvl Before 1st Gift Numeric</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Engagement_Override_End_Date__c</fullName>
         <externalId>false</externalId>
         <inlineHelpText>Override specified is effective until this date.</inlineHelpText>
@@ -457,6 +482,16 @@ NOTE: This does not take into account any past overrides or formerly-checked che
         <externalId>false</externalId>
         <inlineHelpText>The date this contact moved into their current engagement level (whether up or down)</inlineHelpText>
         <label>In Engagement Level Since</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>First_Donation_Date__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>This field is used by Groundwire Engage to identify new donors.  If you are using Non Profit Starter Pack or GWBase, this value is obtained from one of those systems.</inlineHelpText>
+        <label>First Donation Date</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
@@ -603,13 +638,14 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     <listViews>
         <fullName>Cons_w_Engagement</fullName>
         <columns>FULL_NAME</columns>
-        <columns>ACCOUNT.NAME</columns>
-        <columns>CONTACT.TITLE</columns>
         <columns>CONTACT.EMAIL</columns>
         <columns>Engagement_Level__c</columns>
         <columns>Engagement_Level_Numeric__c</columns>
         <columns>Engagement_Level_Override__c</columns>
         <columns>Engagement_Peak__c</columns>
+        <columns>Engagement_Level_One_Year_Ago__c</columns>
+        <columns>First_Engagement_Level__c</columns>
+        <columns>First_Engagement_Level_Date__c</columns>
         <columns>CORE.USERS.ALIAS</columns>
         <filterScope>Everything</filterScope>
         <label>Cons w Engagement</label>
