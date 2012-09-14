@@ -7,6 +7,7 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Campaign_Record_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>New campaigns with this record type will be assigned the specified Level.</inlineHelpText>
         <label>Campaign Record Type</label>
@@ -17,6 +18,7 @@
     </fields>
     <fields>
         <fullName>Campaign_Sub_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>New campaigns with this sub-type will be assigned the specified Level.</inlineHelpText>
         <label>Campaign Sub Type</label>
@@ -27,6 +29,7 @@
     </fields>
     <fields>
         <fullName>Campaign_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Type of the Campaign to set an Engagement Level for.  This field is optional.</inlineHelpText>
         <label>Campaign Type</label>
@@ -37,6 +40,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>New campaigns will receive this Level automatically if they meet all of the field values specified in the other columns.</inlineHelpText>
         <label>Engagement Level</label>

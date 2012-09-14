@@ -7,6 +7,7 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Campaign_Record_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Record Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
         <label>Campaign Record Type</label>
@@ -17,6 +18,7 @@
     </fields>
     <fields>
         <fullName>Campaign_Sub_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Sub Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
         <label>Campaign Sub Type</label>
@@ -27,6 +29,7 @@
     </fields>
     <fields>
         <fullName>Campaign_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
         <label>Campaign Type</label>
@@ -37,6 +40,7 @@
     </fields>
     <fields>
         <fullName>Field_Value_1__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>This field is no longer used.</inlineHelpText>
         <label>Field Value 1 - DEPRECATED</label>
@@ -47,6 +51,7 @@
     </fields>
     <fields>
         <fullName>Fieldname_1__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>This field is no longer used.</inlineHelpText>
         <label>Campaign Fieldname 1 - DEPRECATED</label>
@@ -57,6 +62,7 @@
     </fields>
     <fields>
         <fullName>Level_Required__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>if populated, requires that all qualifying actions be of this level (in addition to any field requirements, if any)</inlineHelpText>
         <label>Level Required</label>
@@ -68,6 +74,7 @@
     </fields>
     <fields>
         <fullName>Level_To_Assign__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Engagement Level to set.</inlineHelpText>
         <label>Engagement Level</label>
@@ -79,6 +86,7 @@
     </fields>
     <fields>
         <fullName>Number_of_Actions_Required__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>only assigns the level if this many actions of the required specification have been taken during the usual timeframe</inlineHelpText>
         <label>Number of Actions Required</label>

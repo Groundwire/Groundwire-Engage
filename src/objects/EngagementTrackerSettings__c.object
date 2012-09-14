@@ -7,6 +7,7 @@
     <fields>
         <fullName>Batch_Size__c</fullName>
         <defaultValue>50</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The number of records processed per batch. Defaults to 50. The default should only be lowered if custom code is causing malfunctioning in the batch processing.</inlineHelpText>
         <label>Batch Size</label>
@@ -19,6 +20,7 @@
     <fields>
         <fullName>Gratitude_Machine_Days_To_Exclude__c</fullName>
         <defaultValue>365</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Exclude contacts in the Gratitude Machine that have already been on a Gratitude Machine campaign within this number of days.</inlineHelpText>
         <label>Gratitude Machine Days To Exclude</label>
@@ -31,6 +33,7 @@
     <fields>
         <fullName>Gratitude_Machine_Minimum_Days_in_Level__c</fullName>
         <defaultValue>90</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>When finding &quot;Old Steadies&quot;, only include contacts who have been in their level at least this number of days.</inlineHelpText>
         <label>Gratitude Machine Minimum Days in Level</label>
@@ -43,6 +46,7 @@
     <fields>
         <fullName>Gratitude_Machine_Minumum_Level__c</fullName>
         <defaultValue>3</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The minum Engagement Level of contacts to include in the Gratitude Machine.</inlineHelpText>
         <label>Gratitude Machine Minimum Level</label>
@@ -55,6 +59,7 @@
     <fields>
         <fullName>Gratitude_Machine_Recent_Activity_Days__c</fullName>
         <defaultValue>365</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>For &quot;Old Steadies&quot; the number of days they must have done some engagement related action in.</inlineHelpText>
         <label>Gratitude Machine Recent Activity Days</label>
@@ -67,6 +72,7 @@
     <fields>
         <fullName>Householded_Donor_Levels__c</fullName>
         <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>If checked, assigns engagement levels to everyone in the household based on the total donations from the household.</inlineHelpText>
         <label>Householded Donor Levels</label>
@@ -75,6 +81,7 @@
     <fields>
         <fullName>Include_Membership__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Specifies whether the Contact&apos;s membership should count toward engagement level. Current members are given an engagement level based on New Member Level and Renewing Member Level settings below.</inlineHelpText>
         <label>Include Membership</label>
@@ -83,6 +90,7 @@
     <fields>
         <fullName>Include_Opps__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>If checked, will consider Donation history as part of engagement rating.</inlineHelpText>
         <label>Include Donations</label>
@@ -91,6 +99,7 @@
     <fields>
         <fullName>Level_1_Name__c</fullName>
         <defaultValue>&quot;1 - Following&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 1 Name</label>
         <length>40</length>
@@ -101,6 +110,7 @@
     <fields>
         <fullName>Level_2_Name__c</fullName>
         <defaultValue>&quot;2 - Endorsing&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 2 Name</label>
         <length>40</length>
@@ -111,6 +121,7 @@
     <fields>
         <fullName>Level_3_Name__c</fullName>
         <defaultValue>&quot;3 - Contributing&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 3 Name</label>
         <length>40</length>
@@ -121,6 +132,7 @@
     <fields>
         <fullName>Level_4_Name__c</fullName>
         <defaultValue>&quot;4 - Owning&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 4 Name</label>
         <length>40</length>
@@ -131,6 +143,7 @@
     <fields>
         <fullName>Level_5_Name__c</fullName>
         <defaultValue>&quot;5 - Leading&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 5 Name</label>
         <length>40</length>
@@ -140,6 +153,7 @@
     </fields>
     <fields>
         <fullName>Level_6_Name__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 6 Name</label>
         <length>40</length>
@@ -149,6 +163,7 @@
     </fields>
     <fields>
         <fullName>Level_7_Name__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 7 Name</label>
         <length>40</length>
@@ -158,6 +173,7 @@
     </fields>
     <fields>
         <fullName>Level_8_Name__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Level 8 Name</label>
         <length>40</length>
@@ -167,6 +183,7 @@
     </fields>
     <fields>
         <fullName>Levels_Don_t_Require_Responded__c</fullName>
+        <deprecated>false</deprecated>
         <description>If any apply, enter as numbers separated by semi-colons,  (Most of the time, campaign mbrship will only count toward level if the mbrship is flagged as Responded.  However, for some (receiving newsletter) etc we want it to count even if not responded.)</description>
         <externalId>false</externalId>
         <inlineHelpText>Campaigns with these levels are considered Passive.  This means that contacts in these campaigns don&apos;t require a Responded-type status in order to receive the level.  See Installation Guide for more info.</inlineHelpText>
@@ -178,6 +195,7 @@
     </fields>
     <fields>
         <fullName>New_Member_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Level to assign to active members with a Last Membership Origin of New.</inlineHelpText>
         <label>New Member Engagement Level</label>
@@ -190,6 +208,7 @@
     <fields>
         <fullName>Opp_Rectype_For_Tests_Default__c</fullName>
         <defaultValue>&quot;Donation&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The default Opportunity Record Type for donations to be used in unit tests.</inlineHelpText>
         <label>Opp Rectype For Tests Default</label>
@@ -201,6 +220,7 @@
     <fields>
         <fullName>Opp_Rectype_For_Tests_Member__c</fullName>
         <defaultValue>&quot;Membership&quot;</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Opportunity Record Type for membership to be used in unit tests.</inlineHelpText>
         <label>Opp Rectype For Tests Member</label>
@@ -212,6 +232,7 @@
     <fields>
         <fullName>Override_Default_Duration__c</fullName>
         <defaultValue>12</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Default duration in Months that the Engagement level is overridden when the Contact&apos;s Engagement Level Override field is set.</inlineHelpText>
         <label>Contact Override Default Time (Months)</label>
@@ -223,6 +244,7 @@
     </fields>
     <fields>
         <fullName>Renewing_Member_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Level to assign to active members with Last Membership Origin of Renewal.</inlineHelpText>
         <label>Renewing Member Engagement Level</label>
@@ -245,6 +267,7 @@
     <fields>
         <fullName>Testing_Mode__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>if checked, will only operate on contacts that include the string &apos;testeng&apos; in the Title field.  Otherwise will operate on all contacts</inlineHelpText>
         <label>Testing Mode</label>
@@ -253,6 +276,7 @@
     <fields>
         <fullName>Timeframe_Medium__c</fullName>
         <defaultValue>18</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>number of months to go back for moderately-recent activity</inlineHelpText>
         <label>DEPRECATED Timeframe Medium</label>
@@ -265,6 +289,7 @@
     <fields>
         <fullName>Timeframe_Recent__c</fullName>
         <defaultValue>12</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The length of time in months that Campaign actions earn an Engagement Level.</inlineHelpText>
         <label>Engagement Timeframe (Months)</label>

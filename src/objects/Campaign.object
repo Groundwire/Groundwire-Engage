@@ -3,6 +3,7 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Engagement_Conversion_Rate__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>What pct. of possible conversions were converted to this engagement level or higher, by this campaign and any sub-campaigns.</inlineHelpText>
         <label>Engagement Conversion Rate</label>
@@ -13,6 +14,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Conversions__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversions</label>
         <summaryFilterItems>
@@ -26,6 +28,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Conversions_in_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Number of contacts that were moved up an engagement level due to this campaign or one of its sub-campaigns.</inlineHelpText>
         <label>Engagement Conversions in Hierarchy</label>
@@ -37,6 +40,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>VALUE(LEFT(TEXT( Leadership_Level__c ),1))</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -49,6 +53,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Response_Rate__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>includes sub-campaigns in hierarchy that have same or higher engagement level</inlineHelpText>
         <label>Engagement Response Rate</label>
@@ -60,6 +65,7 @@
     <fields>
         <fullName>Gratitude_Machine__c</fullName>
         <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>True if this campaign for tracking contacts with the Gratitude Machine</inlineHelpText>
         <label>Gratitude Machine Campaign</label>
@@ -76,6 +82,7 @@
     </fields>
     <fields>
         <fullName>Leadership_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Level of leadership: 1-organizing, 2-consistent leader, 3-inconsistent leader, 4-activist, 5-donor/member</inlineHelpText>
         <label>Campaign Engagement Level</label>
@@ -111,6 +118,7 @@
     </fields>
     <fields>
         <fullName>Levels_Below_Top_of_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>IF ( Parent.Parent.Parent.Parent.Id != null , 4 ,
 IF (Parent.Parent.Parent.Id != null, 3,
@@ -127,6 +135,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Newly_Engaged_Contacts__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Count of how many contacts in this campaign got their very first engagement level because of this campaign.  List growth metric.</inlineHelpText>
         <label>Total New Supporters</label>
@@ -146,6 +155,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Newly_Engaged_Contacts_in_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Number of contacts in hierarchy who got an engagement level for the first time because of the campaign.</inlineHelpText>
         <label>Total New Supporters in Hierarchy</label>
@@ -157,6 +167,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Number_Removed__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The number of Campaign Members on a Gratitude Machine campaign that have been marked as Removed.</inlineHelpText>
         <label>Gratitude Machine Number Removed</label>
@@ -171,6 +182,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Number_of_Opp_Engagement_Conversions__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Opp Engagement Conversions</label>
         <precision>8</precision>
@@ -204,6 +216,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Top_Hierarchy_Campaign_ID__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>IF ( Parent.Parent.Parent.Parent.Id != null , Parent.Parent.Parent.Parent.Id ,
   IF (Parent.Parent.Parent.Id != null, Parent.Parent.Parent.Id, 
@@ -218,6 +231,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Total_Unique_Contacts_In_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Total Unique Contacts In Hierarchy</label>
         <precision>18</precision>
@@ -228,6 +242,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Total_Unique_Leads_in_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Total Unique Leads in Hierarchy</label>
         <precision>18</precision>
@@ -238,6 +253,7 @@ IF (Parent.Id != null, 1 , 0)
     </fields>
     <fields>
         <fullName>Total_Unique_Responses_in_Hierarchy__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Total Unique Responses in Hierarchy</label>
         <precision>18</precision>

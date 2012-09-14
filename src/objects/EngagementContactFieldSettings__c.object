@@ -6,6 +6,7 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Field_Type__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The datatype of the Contact field.  Only &quot;checkbox&quot; or &quot;text&quot; is supported.  &quot;text&quot; handles picklists, email, address, etc.</inlineHelpText>
         <label>Field Type</label>
@@ -16,6 +17,7 @@
     </fields>
     <fields>
         <fullName>Field_Value__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The value that the field must have in order to qualify for the level.  Enter an asterisk (*) to match any non-empty value. For checkboxes, leave this blank.</inlineHelpText>
         <label>Field Value</label>
@@ -26,6 +28,7 @@
     </fields>
     <fields>
         <fullName>Fieldname__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Contact field.  Only fields on the Contact object (not Account etc.) can be used here.</inlineHelpText>
         <label>Fieldname</label>
@@ -36,6 +39,7 @@
     </fields>
     <fields>
         <fullName>Level_Value__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The Engagement Level earned by this contact if they have the field value specified.  For checkboxes, the level is earned if it&apos;s checked.</inlineHelpText>
         <label>Engagement Level</label>

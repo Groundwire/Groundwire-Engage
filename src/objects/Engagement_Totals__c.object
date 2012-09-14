@@ -33,6 +33,7 @@
         <type>Default</type>
     </actionOverrides>
     <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
     <enableActivities>false</enableActivities>
     <enableEnhancedLookup>false</enableEnhancedLookup>
     <enableFeeds>false</enableFeeds>
@@ -40,6 +41,7 @@
     <enableReports>true</enableReports>
     <fields>
         <fullName>As_of_Date__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>As of Date</label>
         <required>false</required>
@@ -47,6 +49,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Level</label>
         <length>255</length>
@@ -56,6 +59,7 @@
     </fields>
     <fields>
         <fullName>First_of_Month__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>IF (  DAY(As_of_Date__c ) = 1 , &quot;True&quot; , &quot;False&quot;)</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -67,6 +71,7 @@
     </fields>
     <fields>
         <fullName>Number_of_Contacts__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Number of Contacts</inlineHelpText>
         <label>Number of Contacts</label>
