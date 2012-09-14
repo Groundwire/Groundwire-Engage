@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aggregates>
+        <calculatedFormula>Campaign.Engagement_Response_Rate__c:MAX * 100</calculatedFormula>
+        <datatype>number</datatype>
+        <description>response rate, renamed</description>
+        <developerName>FORMULA1</developerName>
+        <isActive>false</isActive>
+        <masterLabel>Response %</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <aggregates>
+        <calculatedFormula>Campaign.Engagement_Conversion_Rate__c:MAX * 100</calculatedFormula>
+        <datatype>number</datatype>
+        <description>conversion rate, renamed and turned into number</description>
+        <developerName>FORMULA2</developerName>
+        <isActive>false</isActive>
+        <masterLabel>Conversion %</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <aggregates>
+        <calculatedFormula>Campaign.Newly_Engaged_Contacts__c:SUM</calculatedFormula>
+        <datatype>number</datatype>
+        <description># of newly engaged contacts, renamed</description>
+        <developerName>FORMULA3</developerName>
+        <isActive>true</isActive>
+        <masterLabel>New Supporters</masterLabel>
+        <scale>0</scale>
+    </aggregates>
+    <aggregates>
+        <calculatedFormula>Campaign.Engagement_Conversions__c:SUM</calculatedFormula>
+        <datatype>number</datatype>
+        <description># of engagement conversions</description>
+        <developerName>FORMULA4</developerName>
+        <isActive>false</isActive>
+        <masterLabel>Conversions</masterLabel>
+        <scale>0</scale>
+    </aggregates>
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <axisBinding>y</axisBinding>
+            <column>FORMULA3</column>
+        </chartSummaries>
+        <chartType>VerticalColumn</chartType>
+        <enableHoverLabels>false</enableHoverLabels>
+        <expandOthers>true</expandOthers>
+        <groupingColumn>CAMPAIGN_NAME</groupingColumn>
+        <location>CHART_BOTTOM</location>
+        <showAxisLabels>true</showAxisLabels>
+        <showPercentage>false</showPercentage>
+        <showTotal>false</showTotal>
+        <showValues>false</showValues>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <titleColor>#000000</titleColor>
+        <titleSize>18</titleSize>
+    </chart>
+    <columns>
+        <field>START_DATE</field>
+    </columns>
+    <columns>
+        <field>Campaign.Leadership_Level__c</field>
+    </columns>
+    <description>shows which campaigns in the last 90 days have brought in the greatest number of new supporters (i.e. added new people to the engagement pyramid)</description>
+    <filter>
+        <booleanFilter>1 AND 2 AND ((3 AND 4) OR (5 AND 6))</booleanFilter>
+        <criteriaItems>
+            <column>Campaign.Leadership_Level__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Campaign.Newly_Engaged_Contacts__c</column>
+            <operator>greaterThan</operator>
+            <value>0</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>START_DATE</column>
+            <operator>lessOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>greaterOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>START_DATE</column>
+            <operator>equals</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>equals</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
+    <format>Matrix</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>CAMPAIGN_NAME</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Top Recent Campaigns - New Supporters</name>
+    <params>
+        <name>scopeid</name>
+        <value></value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>0</value>
+    </params>
+    <reportType>CampaignList</reportType>
+    <scope>orgAll</scope>
+    <showDetails>true</showDetails>
+</Report>

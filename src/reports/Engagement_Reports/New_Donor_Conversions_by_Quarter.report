@@ -2,21 +2,21 @@
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <buckets>
         <bucketType>number</bucketType>
-        <developerName>BucketField_75218563</developerName>
-        <masterLabel>Engagement Level Now</masterLabel>
+        <developerName>BucketField_33448630</developerName>
+        <masterLabel>Engagement Status Prior to Donating</masterLabel>
         <nullTreatment>z</nullTreatment>
-        <sourceColumnName>Contact.Engagement_Level_Numeric__c</sourceColumnName>
+        <sourceColumnName>Contact.Engagement_Lvl_Before_1st_Gift_Numeric__c</sourceColumnName>
         <values>
             <sourceValues>
-                <to>3</to>
+                <to>0</to>
             </sourceValues>
-            <value>Less Engaged: 3 or Less</value>
+            <value>Not Engaged (Level 0)</value>
         </values>
         <values>
             <sourceValues>
-                <from>3</from>
+                <from>0</from>
             </sourceValues>
-            <value>Still Highly Engaged: 4 or Higher</value>
+            <value>Engaged (Level 1 or Higher)</value>
         </values>
     </buckets>
     <chart>
@@ -27,15 +27,16 @@
             <axisBinding>y</axisBinding>
             <column>RowCount</column>
         </chartSummaries>
-        <chartType>Donut</chartType>
+        <chartType>LineGrouped</chartType>
         <enableHoverLabels>true</enableHoverLabels>
         <expandOthers>true</expandOthers>
-        <groupingColumn>BucketField_75218563</groupingColumn>
+        <groupingColumn>Contact.First_Donation_Date__c</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
+        <secondaryGroupingColumn>BucketField_33448630</secondaryGroupingColumn>
         <showAxisLabels>true</showAxisLabels>
-        <showPercentage>true</showPercentage>
-        <showTotal>true</showTotal>
+        <showPercentage>false</showPercentage>
+        <showTotal>false</showTotal>
         <showValues>false</showValues>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>
@@ -50,33 +51,34 @@
     <columns>
         <field>LAST_NAME</field>
     </columns>
-    <columns>
-        <field>Contact.Engagement_Level__c</field>
-    </columns>
-    <description>Gives retention rate of highly engaged constituents.  Based on comparing their level one year ago to their level now.</description>
     <filter>
         <criteriaItems>
-            <column>Contact.Engagement_Level_One_Year_Ago__c</column>
-            <operator>greaterOrEqual</operator>
-            <value>4</value>
+            <column>Contact.First_Donation_Date__c</column>
+            <operator>notEqual</operator>
+            <value></value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
+    <groupingsAcross>
+        <dateGranularity>Quarter</dateGranularity>
+        <field>Contact.First_Donation_Date__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsAcross>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>BucketField_75218563</field>
+        <field>BucketField_33448630</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Retention Rate - Highly Engaged</name>
+    <name>New Donor Conversions by Quarter</name>
     <params>
         <name>co</name>
         <value>1</value>
     </params>
     <reportType>ContactList</reportType>
     <scope>organization</scope>
-    <showDetails>false</showDetails>
+    <showDetails>true</showDetails>
     <timeFrameFilter>
-        <dateColumn>CREATED_DATE</dateColumn>
+        <dateColumn>Contact.First_Donation_Date__c</dateColumn>
         <interval>INTERVAL_CUSTOM</interval>
     </timeFrameFilter>
 </Report>

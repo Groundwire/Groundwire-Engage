@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <buckets>
-        <bucketType>number</bucketType>
-        <developerName>BucketField_75218563</developerName>
-        <masterLabel>Engagement Level Now</masterLabel>
-        <nullTreatment>z</nullTreatment>
-        <sourceColumnName>Contact.Engagement_Level_Numeric__c</sourceColumnName>
-        <values>
-            <sourceValues>
-                <to>3</to>
-            </sourceValues>
-            <value>Less Engaged: 3 or Less</value>
-        </values>
-        <values>
-            <sourceValues>
-                <from>3</from>
-            </sourceValues>
-            <value>Still Highly Engaged: 4 or Higher</value>
-        </values>
-    </buckets>
     <chart>
         <backgroundColor1>#FFFFFF</backgroundColor1>
         <backgroundColor2>#FFFFFF</backgroundColor2>
@@ -30,7 +11,7 @@
         <chartType>Donut</chartType>
         <enableHoverLabels>true</enableHoverLabels>
         <expandOthers>true</expandOthers>
-        <groupingColumn>BucketField_75218563</groupingColumn>
+        <groupingColumn>Contact.Engagement_Level_Before_First_Donation__c</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
         <showAxisLabels>true</showAxisLabels>
@@ -50,33 +31,35 @@
     <columns>
         <field>LAST_NAME</field>
     </columns>
-    <columns>
-        <field>Contact.Engagement_Level__c</field>
-    </columns>
-    <description>Gives retention rate of highly engaged constituents.  Based on comparing their level one year ago to their level now.</description>
+    <description>for new donors in the past 3 years, what engagement level were they before their first donation?</description>
     <filter>
         <criteriaItems>
-            <column>Contact.Engagement_Level_One_Year_Ago__c</column>
-            <operator>greaterOrEqual</operator>
-            <value>4</value>
+            <column>Contact.Engagement_Level_Before_First_Donation__c</column>
+            <operator>notEqual</operator>
+            <value></value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
+    <groupingsAcross>
+        <dateGranularity>Quarter</dateGranularity>
+        <field>Contact.First_Donation_Date__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsAcross>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>BucketField_75218563</field>
+        <field>Contact.Engagement_Level_Before_First_Donation__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Retention Rate - Highly Engaged</name>
+    <name>New Donors - Level Before First Donation</name>
     <params>
         <name>co</name>
         <value>1</value>
     </params>
     <reportType>ContactList</reportType>
     <scope>organization</scope>
-    <showDetails>false</showDetails>
+    <showDetails>true</showDetails>
     <timeFrameFilter>
-        <dateColumn>CREATED_DATE</dateColumn>
-        <interval>INTERVAL_CUSTOM</interval>
+        <dateColumn>Contact.First_Donation_Date__c</dateColumn>
+        <interval>INTERVAL_PREVCUR2Y</interval>
     </timeFrameFilter>
 </Report>

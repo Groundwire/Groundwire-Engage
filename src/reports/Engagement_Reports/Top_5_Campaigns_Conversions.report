@@ -14,7 +14,7 @@
         <datatype>number</datatype>
         <description>conversion rate, renamed and turned into number</description>
         <developerName>FORMULA2</developerName>
-        <isActive>true</isActive>
+        <isActive>false</isActive>
         <masterLabel>Conversion %</masterLabel>
         <scale>1</scale>
     </aggregates>
@@ -27,13 +27,22 @@
         <masterLabel>Newly Engaged</masterLabel>
         <scale>0</scale>
     </aggregates>
+    <aggregates>
+        <calculatedFormula>Campaign.Engagement_Conversions__c:SUM</calculatedFormula>
+        <datatype>number</datatype>
+        <description># of engagement conversions</description>
+        <developerName>FORMULA4</developerName>
+        <isActive>true</isActive>
+        <masterLabel>Conversions</masterLabel>
+        <scale>0</scale>
+    </aggregates>
     <chart>
         <backgroundColor1>#FFFFFF</backgroundColor1>
         <backgroundColor2>#FFFFFF</backgroundColor2>
         <backgroundFadeDir>Diagonal</backgroundFadeDir>
         <chartSummaries>
             <axisBinding>y</axisBinding>
-            <column>FORMULA2</column>
+            <column>FORMULA4</column>
         </chartSummaries>
         <chartType>VerticalColumn</chartType>
         <enableHoverLabels>false</enableHoverLabels>
@@ -55,36 +64,39 @@
         <field>START_DATE</field>
     </columns>
     <columns>
-        <field>CAMPAIGN_TYPE</field>
-    </columns>
-    <columns>
         <field>Campaign.Leadership_Level__c</field>
     </columns>
-    <description>showing top 5 campaigns in past year in conversion rate (excludes 100%)</description>
+    <description>top campaigns in the last 90 days by number of engagement conversions</description>
     <filter>
-        <criteriaItems>
-            <column>START_DATE</column>
-            <operator>equals</operator>
-            <value>LAST_N_DAYS:365</value>
-        </criteriaItems>
+        <booleanFilter>1 AND 2 AND ((3 AND 4) OR  (5 AND 6))</booleanFilter>
         <criteriaItems>
             <column>Campaign.Leadership_Level__c</column>
             <operator>notEqual</operator>
             <value></value>
         </criteriaItems>
         <criteriaItems>
-            <column>Campaign.Engagement_Conversion_Rate__c</column>
-            <operator>notEqual</operator>
-            <value>100</value>
-        </criteriaItems>
-        <criteriaItems>
-            <column>Campaign.Engagement_Conversion_Rate__c</column>
-            <operator>notEqual</operator>
+            <column>Campaign.Engagement_Conversions__c</column>
+            <operator>greaterThan</operator>
             <value>0</value>
         </criteriaItems>
         <criteriaItems>
-            <column>Campaign.Engagement_Conversion_Rate__c</column>
-            <operator>notEqual</operator>
+            <column>START_DATE</column>
+            <operator>lessOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>greaterOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>START_DATE</column>
+            <operator>equals</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>equals</operator>
             <value></value>
         </criteriaItems>
     </filter>
@@ -94,7 +106,7 @@
         <field>CAMPAIGN_NAME</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Top 5 Campaigns Conversion Rate</name>
+    <name>Top Recent Campaigns - Conversions</name>
     <params>
         <name>scopeid</name>
         <value></value>

@@ -2,21 +2,28 @@
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <buckets>
         <bucketType>number</bucketType>
-        <developerName>BucketField_75218563</developerName>
-        <masterLabel>Engagement Level Now</masterLabel>
+        <developerName>BucketField_94300705</developerName>
+        <masterLabel>Previous Level</masterLabel>
         <nullTreatment>z</nullTreatment>
-        <sourceColumnName>Contact.Engagement_Level_Numeric__c</sourceColumnName>
+        <sourceColumnName>Contact.Former_Engagement_Level_Numeric__c</sourceColumnName>
         <values>
             <sourceValues>
-                <to>3</to>
+                <to>0</to>
             </sourceValues>
-            <value>Less Engaged: 3 or Less</value>
+            <value>0 - Not Engaged</value>
         </values>
         <values>
             <sourceValues>
-                <from>3</from>
+                <from>0</from>
+                <to>1</to>
             </sourceValues>
-            <value>Still Highly Engaged: 4 or Higher</value>
+            <value>Level 1</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>1</from>
+            </sourceValues>
+            <value>Level 2 or Higher</value>
         </values>
     </buckets>
     <chart>
@@ -28,14 +35,14 @@
             <column>RowCount</column>
         </chartSummaries>
         <chartType>Donut</chartType>
-        <enableHoverLabels>true</enableHoverLabels>
-        <expandOthers>true</expandOthers>
-        <groupingColumn>BucketField_75218563</groupingColumn>
+        <enableHoverLabels>false</enableHoverLabels>
+        <expandOthers>false</expandOthers>
+        <groupingColumn>BucketField_94300705</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
         <showAxisLabels>true</showAxisLabels>
-        <showPercentage>true</showPercentage>
-        <showTotal>true</showTotal>
+        <showPercentage>false</showPercentage>
+        <showTotal>false</showTotal>
         <showValues>false</showValues>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>
@@ -53,30 +60,45 @@
     <columns>
         <field>Contact.Engagement_Level__c</field>
     </columns>
-    <description>Gives retention rate of highly engaged constituents.  Based on comparing their level one year ago to their level now.</description>
+    <columns>
+        <field>ACCOUNT.NAME</field>
+    </columns>
+    <columns>
+        <field>TITLE</field>
+    </columns>
+    <columns>
+        <field>EMAIL</field>
+    </columns>
+    <columns>
+        <field>ADDRESS2_CITY</field>
+    </columns>
+    <columns>
+        <field>ADDRESS2_STATE</field>
+    </columns>
+    <description>for contacts who moved up a level in the last 90 days, what was their level prior to their most recent jump</description>
     <filter>
         <criteriaItems>
-            <column>Contact.Engagement_Level_One_Year_Ago__c</column>
-            <operator>greaterOrEqual</operator>
-            <value>4</value>
+            <column>Contact.Last_Engagement_Change__c</column>
+            <operator>greaterThan</operator>
+            <value>0</value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>BucketField_75218563</field>
+        <field>BucketField_94300705</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Retention Rate - Highly Engaged</name>
+    <name>Recent Conversions by Previous Level</name>
     <params>
         <name>co</name>
         <value>1</value>
     </params>
     <reportType>ContactList</reportType>
     <scope>organization</scope>
-    <showDetails>false</showDetails>
+    <showDetails>true</showDetails>
     <timeFrameFilter>
-        <dateColumn>CREATED_DATE</dateColumn>
-        <interval>INTERVAL_CUSTOM</interval>
+        <dateColumn>Contact.Last_Engagement_Lvl_Chg_Datestamp__c</dateColumn>
+        <interval>INTERVAL_LAST90</interval>
     </timeFrameFilter>
 </Report>
