@@ -35,12 +35,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     private integer RetMbrLvl;
     
     // these fieldlists are static so that static methods called from triggers can access them
-    // all of these fields will be blanked out on insert (clone)
+    // all of these "editable" fields will be blanked out on insert (clone)
     public static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
 									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
 									   			 'First_Engagement_Level__c,First_Engagement_Level_Date__c,' + 
-									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,';
-	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,'; 
+									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Donation_Date__c,';
+	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,IsDonor__c,'; 
     
     // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
     set<id> oppRollupRectypesExcluded = new set<id>();
@@ -195,7 +195,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         // then fields w/ same name in gwbase & NPSP
         if (GW_GWEngageUtilities.IsGWBaseInstalled || GW_GWEngageUtilities.IsNPSPHHInstalled) {
-	        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,' +
+	        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,TotalOppAmount__c,FirstCloseDate__c,' +
 	        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,Account.Name,Account.OppAmountLastNDays__c,Account.LastCloseDate__c,' +
 		        					'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
 	        querySOQLmore = GW_GWEngageUtilities.addAllNSPrefixET(querySOQLmore,false,true);
@@ -615,9 +615,29 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			// update our year ago level from the log of changes
 			updateYearAgoLevelFromLog(cw);
 
+			// see if we need to update fields we're copying from NPSP/GWBase fields (to avoid dependent pkg)
+			boolean copiedFieldMod = false;
+			if (GW_GWEngageUtilities.IsGWBaseInstalled || GW_GWEngageUtilities.IsNPSPHHInstalled) {
+				date conFirstCloseDate = (date) con.get(GW_GWEngageUtilities.addNSPrefixET('FirstCloseDate__c',false,true));
+				if (conFirstCloseDate != con.First_Donation_Date__c) {
+					con.First_Donation_Date__c = conFirstCloseDate;
+					copiedFieldMod = true;
+				}
+				decimal conLifetimeOppTtl = (decimal) con.get(GW_GWEngageUtilities.addNSPrefixET('TotalOppAmount__c',false,true));
+				if (conLifetimeOppTtl > 0 && con.IsDonor__c==false) {
+					con.IsDonor__c = true;
+					copiedFieldMod = true;
+				}
+				if ( (!(conLifetimeOppTtl > 0)) && con.IsDonor__c==true) {
+					con.IsDonor__c = false;
+					copiedFieldMod = true;
+				}
+			}
+
             if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
                 peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c 
-                || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c 
+                || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c
+                || copiedFieldMod 
                 ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
@@ -1255,6 +1275,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[24].AccountId = ac1.Id;		// put one con in the account, and flag to inherit account's gifts
         TestCons[24].Award_Engagement_Levels_for_Org_Giving__c = true;
         TestCons[26].Email = 'algore@internet.com';			// Al Gore going incognito!
+        dlog.debug ('first con for insert: ' + TestCons[0]);
         insert TestCons;
 
 		// have to update some fields after insert in order to spoof existing history of engagement changes

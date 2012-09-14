@@ -7,7 +7,8 @@ trigger GW_ContactTriggerBefore on Contact (before insert, before update) {
     if (trigger.isInsert) {
     	GW_GWEngageUtilities.BlankETConFields(trigger.new);
     }
-    
+
+	/* don't really want to do this in trigger, doesn't accommodate legacy data    
     // if we're in NPSP, set the Donor flag if Total Lifetime giving goes to > 0
     if (trigger.isUpdate && GW_GWEngageUtilities.IsNPSPHHInstalled) {
     	for (Contact con:trigger.new) {
@@ -18,5 +19,6 @@ trigger GW_ContactTriggerBefore on Contact (before insert, before update) {
     			con.put(donorFieldname,true);
     		}
     	}
-    }    
+    }
+    */    
 }
