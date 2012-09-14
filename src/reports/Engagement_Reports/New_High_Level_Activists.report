@@ -69,7 +69,7 @@
         </criteriaItems>
     </filter>
     <format>Tabular</format>
-    <name>New High-Level Activists</name>
+    <name>New High-Level Supporters</name>
     <params>
         <name>co</name>
         <value>1</value>

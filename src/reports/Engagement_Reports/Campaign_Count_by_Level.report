@@ -3,7 +3,7 @@
     <columns>
         <field>CAMPAIGN_NAME</field>
     </columns>
-    <description>Number of campaigns in last year at each engagement level</description>
+    <description>Number of campaigns in last 90 days at each engagement level</description>
     <filter>
         <criteriaItems>
             <column>Campaign.Leadership_Level__c</column>
@@ -13,12 +13,12 @@
         <criteriaItems>
             <column>START_DATE</column>
             <operator>equals</operator>
-            <value>LAST_N_MONTHS:12</value>
+            <value>LAST_90_DAYS</value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
     <groupingsAcross>
-        <dateGranularity>Quarter</dateGranularity>
+        <dateGranularity>Month</dateGranularity>
         <field>START_DATE</field>
         <sortOrder>Asc</sortOrder>
     </groupingsAcross>
@@ -27,7 +27,7 @@
         <field>Campaign.Leadership_Level__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Campaign Count by Level</name>
+    <name>Recent Campaign Count by Level</name>
     <params>
         <name>scopeid</name>
         <value></value>

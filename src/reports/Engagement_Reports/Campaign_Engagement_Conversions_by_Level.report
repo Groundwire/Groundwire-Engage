@@ -34,12 +34,17 @@
         <titleColor>#000000</titleColor>
         <titleSize>18</titleSize>
     </chart>
-    <description>conversions in past year totaled by which level the contact was converted to</description>
+    <description>conversions in last 90 days totaled by which level the contact was converted to</description>
     <filter>
         <criteriaItems>
             <column>CampaignMember.Engagement_Conversion__c</column>
             <operator>equals</operator>
             <value>1</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>CampaignMember.Effective_Action_Date__c</column>
+            <operator>equals</operator>
+            <value>LAST_90_DAYS</value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
@@ -53,7 +58,7 @@
         <field>CampaignMember.Engagement_Conversion_To_Level__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Campaign Engagement Conversions by Level</name>
+    <name>Recent Campaign Conversions by Level</name>
     <params>
         <name>scopeid</name>
         <value></value>

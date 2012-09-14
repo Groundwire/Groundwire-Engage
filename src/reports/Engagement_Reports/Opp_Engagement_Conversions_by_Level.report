@@ -36,7 +36,7 @@
         <criteriaItems>
             <column>CLOSE_DATE</column>
             <operator>equals</operator>
-            <value>LAST_N_MONTHS:12</value>
+            <value>LAST_90_DAYS</value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
@@ -50,7 +50,7 @@
         <field>Opportunity.Engagement_Conversion_To_Level__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Opp Engagement Conversions by Level</name>
+    <name>Recent Opp Conversions</name>
     <params>
         <name>open</name>
         <value>closedwon</value>
