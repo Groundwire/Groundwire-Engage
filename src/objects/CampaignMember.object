@@ -274,48 +274,4 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         </picklist>
         <type>Picklist</type>
     </fields>
-    <fields>
-        <fullName>TEST_MONTH_MATH_2__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF (  
-
-(
-  Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
-  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
-  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
-  &amp;&amp; NOT(ISBLANK(ContactId))  
-)  
-/*
-|| (
-  NOT(ISBLANK(LeadId))  
-) 
-*/
-/* (1=1 || 2=2) */
-&amp;&amp; 
- ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) )
-&amp;&amp; ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
-, &quot;True&quot; , &quot;False&quot; )</formula>
-        <label>TEST MONTH MATH 2</label>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>TEST_MONTH_MATH__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF (
-
- ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
-
-/*  ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c = 12 &amp;&amp;   ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; 365) || ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c * 31)
-*/
-
- , &quot;OK&quot; , &quot;too long&quot; )
-&amp; &quot; - &quot; &amp; TEXT (ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)))</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>zzTEST MONTH MATH</label>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
 </CustomObject>
