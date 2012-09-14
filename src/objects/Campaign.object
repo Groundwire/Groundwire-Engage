@@ -88,27 +88,28 @@
         <label>Campaign Engagement Level</label>
         <picklist>
             <picklistValues>
-                <fullName>1 - Observing</fullName>
+                <fullName>1 - Following</fullName>
+                <color>#FFFF66</color>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>2 - Following</fullName>
+                <fullName>2 - Endorsing</fullName>
+                <color>#FFCC66</color>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>3 - Endorsing</fullName>
+                <fullName>3 - Contributing</fullName>
+                <color>#FF9900</color>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>4 - Contributing</fullName>
+                <fullName>4 - Owning</fullName>
+                <color>#FF6600</color>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
-                <fullName>5 - Owning</fullName>
-                <default>false</default>
-            </picklistValues>
-            <picklistValues>
-                <fullName>6 - Leading</fullName>
+                <fullName>5 - Leading</fullName>
+                <color>#FF0000</color>
                 <default>false</default>
             </picklistValues>
             <sorted>false</sorted>
@@ -136,8 +137,8 @@ IF (Parent.Id != null, 1 , 0)
         <fullName>Newly_Engaged_Contacts__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>List growth metric.  Count of how many contacts in this campaign got their very first engagement level because of this campaign.</inlineHelpText>
-        <label>Newly Engaged Contacts</label>
+        <inlineHelpText>Count of how many contacts in this campaign got their very first engagement level because of this campaign.  List growth metric.</inlineHelpText>
+        <label>Total New Supporters</label>
         <summaryFilterItems>
             <field>CampaignMember.Engagement_Conversion__c</field>
             <operation>equals</operation>
@@ -157,7 +158,7 @@ IF (Parent.Id != null, 1 , 0)
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Number of contacts in hierarchy who got an engagement level for the first time because of the campaign.</inlineHelpText>
-        <label>Newly Engaged Contacts in Hierarchy</label>
+        <label>Total New Supporters in Hierarchy</label>
         <precision>18</precision>
         <required>false</required>
         <scale>0</scale>
@@ -381,27 +382,23 @@ IF (Parent.Id != null, 1 , 0)
         <picklistValues>
             <picklist>Leadership_Level__c</picklist>
             <values>
-                <fullName>1 - Observing</fullName>
+                <fullName>1 - Following</fullName>
                 <default>false</default>
             </values>
             <values>
-                <fullName>2 - Following</fullName>
+                <fullName>2 - Endorsing</fullName>
                 <default>false</default>
             </values>
             <values>
-                <fullName>3 - Endorsing</fullName>
+                <fullName>3 - Contributing</fullName>
                 <default>false</default>
             </values>
             <values>
-                <fullName>4 - Contributing</fullName>
+                <fullName>4 - Owning</fullName>
                 <default>false</default>
             </values>
             <values>
-                <fullName>5 - Owning</fullName>
-                <default>false</default>
-            </values>
-            <values>
-                <fullName>6 - Leading</fullName>
+                <fullName>5 - Leading</fullName>
                 <default>false</default>
             </values>
         </picklistValues>
@@ -510,5 +507,17 @@ IF (Parent.Id != null, 1 , 0)
         <showsStatus>false</showsStatus>
         <url>/00O?rt=117&amp;break0=CAN&amp;scope=1&amp;scopeid_lkid={!Campaign.Id}&amp;scopeid={!Campaign_Name}&amp;c=CAN&amp;c=MR&amp;c=PCS&amp;c=CFN&amp;c=RN&amp;c=ON&amp;c=OA&amp;c=OS&amp;c=OCD&amp;c=AN&amp;s=OA&amp;duel0=CAN%2CMR%2CCFN%2CRN%2CAN%2CON%2CPCS%2COS%2COCD%2COA&amp;details=yes&amp;format=t</url>
         <width>500</width>
+    </webLinks>
+    <webLinks>
+        <fullName>npo02__Household_Mailing_List</fullName>
+        <availability>online</availability>
+        <description>Deduplicated mailing list of Households</description>
+        <displayType>button</displayType>
+        <height>600</height>
+        <linkType>page</linkType>
+        <masterLabel>Household Mailing List</masterLabel>
+        <openType>sidebar</openType>
+        <page>npo02__BTNCampaignHHDedupe</page>
+        <protected>false</protected>
     </webLinks>
 </CustomObject>
