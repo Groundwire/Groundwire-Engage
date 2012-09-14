@@ -21,8 +21,12 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 	// list of campaign writes 
 	Campaign[] campsToUpdate;
+	
+	// nested map for opps that correspond to CMs
+	map <id, map<id,OpportunityContactRole>> conCampOppMap; 
 
 	GW_GWEngageUtilities.debugLogger dlog = new GW_GWEngageUtilities.debugLogger();
+	Id cronTriggerId;
 
 	// WRAPPER CLASS
 	public class campTotals {
@@ -31,6 +35,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		public integer engLvl;
 		public long conCount,leadCount,respCount,engRespCount,convCandidateCount,convCount,engConvCount,listGrowthCount;		// overall totals
 		boolean currConSent,currConSentLead,currConResp,currConEngResp,currConConvCandidate,currConConv,currConEngConv,currConListGrowth;		// temporary flags for each contact in loop
+		boolean currConOppResp,currConOppConv,currConOppListGrowth;		// more temporary flags, for opps
 		decimal responseRate,conversionRate;
 		string campName;
 		boolean doConversionRate;
@@ -74,7 +79,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			this.dlog.debug ('new wrap obj: ' + this);
 		}
 		
-		public void SetCurrConFlags (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv, boolean isListGrowth) {
+		public void SetCurrConFlags (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv, boolean isListGrowth, boolean isOppResp, boolean isOppConv, boolean isOppListGrowth) {
 			// based on a campaign membership being considered by the main process, set boolean flags 
 			// which indicate whether we have a send/response/etc for the current contact
 			// in every case we don't need to check what the current value of flag is, setting it to true twice doesn't hurt anything
@@ -84,19 +89,19 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 				currConSent = true;
 			}
 			if (isResp) currConResp = true;
-			if (isResp && respLvl >= engLvl) currConEngResp = true;
+			if (isResp && (respLvl >= engLvl || isOppResp)) currConEngResp = true;
 			// count actual conversions as potential conversions even if not flagged as such (due to data migration timing etc.)
 			// but still only run the conversion rate if we have one or more flagged as potential
 			//  which means that at least one CM was entered post-migration 
 			if (isConvCandidate) doConversionRate = true;
 			if (isConvCandidate || isConv) currConConvCandidate = true;			
 			if (isConv) currConConv = true;
-			if (isConv && respLvl >= engLvl) currConEngConv = true;
+			if (isConv && (respLvl >= engLvl || isOppConv)) currConEngConv = true;
 			if (isListGrowth) currConListGrowth = true;
 			dlog.debug ('set curr con flags for campaign ' + camp.Name + ':  ' + 'currConSent=' + currConSent + '  currConResp=' + currConResp + '  currConEngResp=' + currConEngResp);
 		}
 		
-		public void SetCurrConFlagsParents (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv , boolean isListGrowth, map <id,campTotals> wrapMap) {
+		public void SetCurrConFlagsParents (boolean isLead, boolean isResp, integer respLvl, boolean isConvCandidate, boolean isConv , boolean isListGrowth, boolean isOppResp, boolean isOppConv, boolean isOppListGrowth, map <id,campTotals> wrapMap) {
 			// set the flags (as in the SetCurrConFlags method) but for all appropriate parents of this campaign
 			for (Id parentCampId : parentCampIDs) {
 				campTotals parentTotals = wrapMap.get(parentCampId);
@@ -106,10 +111,10 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 					parentTotals.currConSent = true;
 				}
 				if (isResp) parentTotals.currConResp = true;
-				if (isResp && respLvl >= parentTotals.engLvl) parentTotals.currConEngResp = true;
+				if (isResp && (respLvl >= parentTotals.engLvl || isOppResp)) parentTotals.currConEngResp = true;
 				if (isConvCandidate || isConv) ParentTotals.currConConvCandidate = true;
 				if (isConv) parentTotals.currConConv = true;
-				if (isConv && respLvl >= parentTotals.engLvl) parentTotals.currConEngConv = true;
+				if (isConv && (respLvl >= parentTotals.engLvl || isOppConv)) parentTotals.currConEngConv = true;
 				if (isListGrowth) parentTotals.currConListGrowth = true;
 				dlog.debug ('set curr con flags for campaign ' + ParentTotals.camp.Name + ':  ' + 'currConSent=' + ParentTotals.currConSent + '  currConResp=' + ParentTotals.currConResp + '  currConEngResp=' + ParentTotals.currConEngResp);
 			}
@@ -197,16 +202,27 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 
     global GW_BATCH_CampaignEngagementRollup() {
-    	// construtor
-  		wrapMap = new map <id,campTotals>();
-  		campsToUpdate = new Campaign[0];
-  		constructQuery();  
+    	// no-arg construtor
+    	this.initialize();
     }
     
+    global GW_BATCH_CampaignEngagementRollup (id cronId) {
+    	// this constructor takes the id of the cron trigger that launched this batch process
+    	// we will try to delete it as part of the finish method
+    	this.cronTriggerId = cronId;
+    	this.initialize();
+    }
+    
+    private void initialize() {
+  		wrapMap = new map <id,campTotals>();
+  		campsToUpdate = new Campaign[0];
+  		constructQuery();      	
+    }
     
     global void execute(SchedulableContext SC) {
     	// tbd get batch size from settings?
-        GW_BATCH_CampaignEngagementRollup myBatch = new GW_BATCH_CampaignEngagementRollup();
+    	id cronId = (id) SC.getTriggerId(); 
+        GW_BATCH_CampaignEngagementRollup myBatch = new GW_BATCH_CampaignEngagementRollup(cronId);
         id batchinstanceid = database.executeBatch (myBatch, 50);      
     }
     
@@ -243,14 +259,19 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
     global void execute(Database.BatchableContext BC, List<Sobject> SBatch){
 		
+		// query for opps associated w/ same contacts/campaigns as the CM's, for use later 
+		this.getOppsForCMs(SBatch);
+		
+    	// loop through each CM and start tallying totals
+    	// this loop relies very much on the ORDER BY in the batch soql, 
+    	// in order for each campaign, contact etc to be grouped in the right way in this list
         for (sobject s: SBatch) {
-            CampaignMember cm = (CampaignMember)s;
+            CampaignMember cm = (CampaignMember) s;
 			dlog.debug('cm in loop: ' + cm);
 			dlog.debug('cm.campaign in loop: ' + cm.Campaign);
 			
 			if ((cm.ContactId != conCursor && cm.LeadId != conCursor) || cm.Campaign.Top_Hierarchy_Campaign_ID__c != hierarchyCursor) {
-				// loop thru all campaigns in current hiearchy "group"
-				// and add to totals based on booleans
+				// if we've started a new contact/lead, then update the campaign "group" based on the previous contact/lead
 				// we also do this when campaign hierarchy cursor turns over b/c although unlikely, it's possible we could end one group
 				// and start the next w/ the same contact
 				dlog.debug('starting new contact: ' + cm.Contact.Name);
@@ -293,35 +314,14 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 
 
 			// then always flag which metrics this CM will increment (writes to wrapper for current campaign and all eligible parents)
-			// first figure out which metrics this qualifies for
-			boolean isResp = false;
-			boolean isLead = false;
-			boolean isConvCandidate = false;
-			integer respLvl = 0;
-			if (cm.LeadId != null) isLead = true;
-			if (cm.HasResponded == true) isResp = true;
-			if (cm.Campaign.Engagement_Level_Numeric__c != null) respLvl = cm.Campaign.Engagement_Level_Numeric__c.intvalue();
-			if (cm.Conversion_Candidate__c == 'True') isConvCandidate = true;
-			boolean isConv = cm.Engagement_Conversion__c;
-			if (isConv) {		
-				dlog.debug('contact ' + cm.Contact.Name + ' is conversion in campaign '+ cm.Campaign.Name);
-			}	
-			boolean isListGrowth = cm.Engagement_List_Growth__c;
-			campTotals totals = wrapMap.get(cm.Campaign.Id);
-			// dlog.debug('wrapper before setting currCon flags: ' + totals);		
-			// dlog.debug('campaignID for cm: ' + cm.Campaign.Id);
-			if (isListGrowth) {		
-				dlog.debug('contact ' + cm.Contact.Name + ' is list growth in campaign '+ cm.Campaign.Name);
-			}		
-			totals.SetCurrConFlags(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth);
-			totals.SetCurrConFlagsParents(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth, wrapMap);
-			         	   
+			setCMFlags(cm);         	   
         }
         
         // after the loop is done, do any writes we've collected during this batch
         // which will only happen if we completed that campaign hierarchy during this batch
 		doCampaignWrites();		
     }  
+
 
 
     global void finish(Database.BatchableContext BC){
@@ -333,8 +333,114 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		// then get our last writes, and do them
 		getCampaignWrites();
 		doCampaignWrites();
+		
+		// if we used a cron to launch this, now abort it so it doesn't show up on the scheduled jobs list
+		if (cronTriggerId != null) {
+			try {
+				system.abortJob(cronTriggerId);
+				
+			} catch (exception e) {
+				system.debug ('Groundwire Engage: failed to abort crontrigger job for CampaignEngagementRollup after batch completed');
+			}
+			
+		}
     }
-    
+
+
+	private void setCMFlags (CampaignMember cm) {
+			// flag which metrics this CM will increment (writes to wrapper for current campaign and all eligible parents)
+			// first figure out which metrics this qualifies for
+			boolean isResp = false;
+			boolean isLead = false;
+			boolean isConvCandidate = false;
+			boolean isOppResp = false;
+			boolean isOppConv = false;
+			boolean isOppListGrowth = false;
+			integer respLvl = 0;
+			if (cm.LeadId != null) isLead = true;
+			if (cm.HasResponded == true) isResp = true;
+			if (cm.Campaign.Engagement_Level_Numeric__c != null) respLvl = cm.Campaign.Engagement_Level_Numeric__c.intvalue();
+			if (cm.Conversion_Candidate__c == 'True') isConvCandidate = true;
+			boolean isConv = cm.Engagement_Conversion__c;
+			if (isConv) {		
+				dlog.debug('contact ' + cm.Contact.Name + ' is conversion in campaign '+ cm.Campaign.Name);
+			}	
+			boolean isListGrowth = cm.Engagement_List_Growth__c;
+			if (isListGrowth) {		
+				dlog.debug('contact ' + cm.Contact.Name + ' is list growth in campaign '+ cm.Campaign.Name);
+			}		
+
+			// now also look if there's an opp for this same contact & campaign, only for contacts not leads
+			if (cm.ContactId != null) {
+				OpportunityContactRole opp;
+				map<Id,OpportunityContactRole> campOppMapThisCon = conCampOppMap.get(cm.ContactId);
+				if (campOppMapThisCon != null) opp = campOppMapThisCon.get(cm.CampaignId);
+				if (opp != null) {
+					dlog.debug('found matching opp for CM: ' + opp);
+					isResp = true;
+					isOppResp = true;
+					if (opp.Opportunity.Engagement_Conversion__c == true) {
+						isConv = true;
+						isOppConv = true;
+					}
+					if (opp.Opportunity.Engagement_List_Growth__c == true) {
+						isListGrowth = true;
+						isOppListGrowth = true;
+					}
+				}
+			}
+
+			campTotals totals = wrapMap.get(cm.Campaign.Id);
+			// dlog.debug('wrapper before setting currCon flags: ' + totals);		
+			// dlog.debug('campaignID for cm: ' + cm.Campaign.Id);
+			totals.SetCurrConFlags(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth, isOppResp, isOppConv, isOppListGrowth);
+			totals.SetCurrConFlagsParents(isLead, isResp, respLvl, isConvCandidate, isConv, isListGrowth, isOppResp, isOppConv, isOppListGrowth, wrapMap);
+		
+	}
+
+
+	private void getOppsForCMs (List<Sobject> SBatch) {
+		// before we do our real batch process, find all the opps that correspond to the CM's in the batch (i.e. same campaign, same contact)
+		// and throw them into a map for later use
+		
+		if (conCampOppMap == null) {
+			conCampOppMap = new map <id, map<id,OpportunityContactRole>>();
+		} else {
+			// garbage collect the map for each batch
+			conCampOppMap.clear();
+		}
+		
+		// first loop through the CM's we have and capture which campaign and contact ID's we have
+		set<Id> conIDs = new set<id>(); 
+		set<Id> campIDs = new set<id>();
+		for (Sobject s : SBatch) {
+			CampaignMember cm = (CampaignMember) s;
+			conIDs.add (cm.ContactId);
+			campIDs.add (cm.CampaignId);
+		}
+		
+		// then find all opps that correspond to those 2 groups
+		// this will generally be a slightly larger set returned than we actually need
+		// but should always be within goveronr limits
+		// note we don't need to filter by rectypes here, as we don't care if these are rolling up to donor stats
+		// if they're linked to the campaign, it's a response (although not necessarily a conversion or list growth)
+		OpportunityContactRole[] opps = [SELECT OpportunityId,ContactId,Opportunity.Name,Opportunity.Amount,Opportunity.StageName,Opportunity.CloseDate,Opportunity.CampaignId,
+											Opportunity.Engagement_Conversion__c,Opportunity.Engagement_List_Growth__c,Opportunity.Engagement_Conversion_From_Level__c,Opportunity.Engagement_Conversion_To_Level__c   
+											FROM OpportunityContactRole
+											WHERE ContactId IN :ConIDs AND Opportunity.CampaignId IN :campIDs AND IsPrimary = True 
+											AND Opportunity.IsWon = True
+											ORDER BY ContactId, Opportunity.CampaignId];
+		dlog.debug ('opps queried: ' + opps);
+		
+		// throw the opps into a 2-level map, first by contact, then by campaign
+		for (OpportunityContactRole opp : opps) {
+			map<id,OpportunityContactRole> campMap = conCampOppMap.get(opp.ContactId);
+			if (campMap == null) campMap = new map<id,OpportunityContactRole>();
+			campMap.put (opp.Opportunity.CampaignId,opp);
+			conCampOppMap.put (opp.ContactId,campMap);
+		}
+		dlog.debug('opps map:' + conCampOppMap);
+	}    
     
     	
 	private void getCampaignWrites () {
@@ -440,7 +546,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		Id[] allCampIds = new Id[] {top1.Id,child_1a.Id,grandchild_1aa.Id,grandchild_1ab.Id,top2.Id,child_1b.Id,grandchild_1ba.Id,greatgrand_1baa.Id,greatgrand_1bab.Id,greatgreatgrand_1baaa.Id};
 		
 		// create cons
-        Contact[] cons = ONEN_UnitTestData.CreateMultipleTestContacts(20);
+        Contact[] cons = ONEN_UnitTestData.CreateMultipleTestContacts(21);
         insert cons;
         
         // spoof history for several cons, for conversion rate
@@ -475,8 +581,12 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         
         // first few cons responded on parent, all but 1 is conversion
         set<id> con0thru2 = new set<id> {cons[0].Id,cons[1].Id,cons[2].Id} ;
+        set<id> con4and20 = new set<id> {cons[4].Id,cons[20].Id} ;
         set<id> con1nonConv = new set<id> {cons[1].Id} ;
         insert testCMs(child_1a.Id,con0thru2,'Responded',con1nonConv);
+        // also add cons 4 & 20 to this, as non-converted
+        // tbd this is temporary, until we get the batch process worked out to handle opps from contacts who don't have a CM
+        insert testCMs(child_1a.Id,con4and20,'Sent',con4and20);
         
         // and one lead on the parent (unrealistic, but tests that leads are unduped)
         set<id> leads3 = new set<id> {lead3.Id} ;
@@ -485,6 +595,7 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 		// one of those plus 4 new ones responded on child that counts
         set<id> con2thru6 = new set<id> {cons[2].Id,cons[3].Id,cons[4].Id,cons[5].Id,cons[6].Id} ;
         set<id> con6nonConv = new set<id> {cons[6].Id} ;
+		insert testCM(grandchild_1aa.Id,cons[0].Id,'Sent',false);
         list<CampaignMember> CMgrandchild_1aa = testCMs(grandchild_1aa.Id,con2thru6,'Responded',con6nonConv);
         system.debug(LoggingLevel.WARN,'CMgrandchild_1aa before:' + CMgrandchild_1aa); 
         // but change # 5 to not be list growth
@@ -543,6 +654,36 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         insert testCMs(top2.Id,con15thru17,'Responded',nullSet);
         
         
+        // now add some opps
+        string oppRectype = GW_Rectypes.oppRectypeIfExists(ONEN_Constants.OPP_DEFAULT_RECTYPE_FORTESTS);
+        // first for child 1a
+        list<Contact> con2and4 = new list<Contact> {cons[2],cons[4]};
+        list<Contact> con20 = new list<Contact> {cons[20]};
+        list<Contact> con0 = new list<Contact> {cons[0]};
+        list<Contact> con12 = new list<Contact> {cons[12]};
+        // gotta insert the opps first, so we get conroles when NPSP/GWBase not installed
+        // the last param in the methods below is whether to spoof the opp as a conversion
+        list<Opportunity> opps_child1a_2and4 = GW_GWEngageUtilities.insertTestOppsForContactList(con2and4, child_1a.Id,'Closed Won',system.today(),25,oppRectype,null,false);
+        list<Opportunity> opps_child1a_20 = GW_GWEngageUtilities.insertTestOppsForContactList(con20, child_1a.Id,'Closed Won',system.today(),25,oppRectype,null,true);
+        list<Opportunity> opps_grandchild1aa = GW_GWEngageUtilities.insertTestOppsForContactList(con0, grandchild_1aa.Id,'Closed Won',system.today(),25,oppRectype,null,false);
+        list<Opportunity> opps_grandchild1ab = GW_GWEngageUtilities.insertTestOppsForContactList(con12, grandchild_1ab.Id,'Closed Won',system.today(),25,oppRectype,null,true);
+        
+        /* refactored to method
+        // set conversion fields on opps for child1a
+        integer i=0;
+        for (Opportunity opp : opps_child1a) {
+        	opp.Engagement_Conversion__c = (i < 2) ? false : true;
+        	opp.Engagement_List_Growth__c = (i < 2) ? false : true;
+        	if (i==2) {
+        		opp.Engagement_Conversion_From_Level__c = 0;
+        		opp.Engagement_Conversion_To_Level__c = 2;
+        		opp.Engagement_Conversion_Type__c = 'New';
+        	}
+        	i++;
+        }
+        update opps_child1a;
+        */
+        
         // run batch
         // we'd like to do this w/ a small batch size to test spanning of batches, but SF only lets you run one batch from w/in test
         Test.StartTest();
@@ -557,42 +698,42 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
         					FROM Campaign WHERE Id IN :allCampIds]);
         					
         Campaign top1p = campMap.get(top1.Id);
-        system.assertEquals (20,top1p.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (21,top1p.Total_Unique_Contacts_In_Hierarchy__c);
         system.assertEquals (3,top1p.Total_Unique_Leads_in_Hierarchy__c);
-        system.assertEquals (14,top1p.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (16,top1p.Total_Unique_Responses_in_Hierarchy__c);
         system.assertEquals (null,top1p.Engagement_Response_Rate__c);
         system.assertEquals (null,top1p.Engagement_Conversion_Rate__c);
         system.assertEquals (null,top1p.Engagement_Conversion_Rate__c);
-        system.assertEquals (10,top1p.Engagement_Conversions_in_Hierarchy__c);
-        system.assertEquals (9,top1p.Newly_Engaged_Contacts_in_Hierarchy__c);
+        system.assertEquals (12,top1p.Engagement_Conversions_in_Hierarchy__c);
+        system.assertEquals (11,top1p.Newly_Engaged_Contacts_in_Hierarchy__c);
         					
         Campaign sub1aP = campMap.get(child_1a.Id);
-        system.assertEquals (15,sub1aP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (16,sub1aP.Total_Unique_Contacts_In_Hierarchy__c);
         system.assertEquals (3,sub1aP.Total_Unique_Leads_in_Hierarchy__c);
-        system.assertEquals (12,sub1aP.Total_Unique_Responses_in_Hierarchy__c);
-        system.assertEquals (38.9,sub1aP.Engagement_Response_Rate__c);
-        system.assertEquals (35.7,sub1aP.Engagement_Conversion_Rate__c);
-        system.assertEquals (8,sub1aP.Engagement_Conversions_in_Hierarchy__c);
-        system.assertEquals (7,sub1aP.Newly_Engaged_Contacts_in_Hierarchy__c);
+        system.assertEquals (14,sub1aP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (47.4,sub1aP.Engagement_Response_Rate__c);
+        system.assertEquals (10,sub1aP.Engagement_Conversions_in_Hierarchy__c);
+        system.assertEquals (46.7,sub1aP.Engagement_Conversion_Rate__c);
+        system.assertEquals (9,sub1aP.Newly_Engaged_Contacts_in_Hierarchy__c);
         					
-        Campaign subsub1aaP = campMap.get(grandchild_1aa.Id);
-        system.assertEquals (5,subsub1aaP.Total_Unique_Contacts_In_Hierarchy__c);
-        system.assertEquals (0,subsub1aaP.Total_Unique_Leads_in_Hierarchy__c);
-        system.assertEquals (5,subsub1aaP.Total_Unique_Responses_in_Hierarchy__c);
-        system.assertEquals (100,subsub1aaP.Engagement_Response_Rate__c);
-        system.assertEquals (100,subsub1aaP.Engagement_Conversion_Rate__c);
-        system.assertEquals (4,subsub1aaP.Engagement_Conversions_in_Hierarchy__c);
-        system.assertEquals (3,subsub1aaP.Newly_Engaged_Contacts_in_Hierarchy__c);
+        Campaign grandchild_1aaP = campMap.get(grandchild_1aa.Id);
+        system.assertEquals (6,grandchild_1aaP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (0,grandchild_1aaP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (6,grandchild_1aaP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (100,grandchild_1aaP.Engagement_Response_Rate__c);
+        system.assertEquals (80,grandchild_1aaP.Engagement_Conversion_Rate__c);
+        system.assertEquals (4,grandchild_1aaP.Engagement_Conversions_in_Hierarchy__c);
+        system.assertEquals (3,grandchild_1aaP.Newly_Engaged_Contacts_in_Hierarchy__c);
         
         					
-        Campaign subsub1abP = campMap.get(grandchild_1ab.Id);
-        system.assertEquals (13,subsub1abP.Total_Unique_Contacts_In_Hierarchy__c);
-        system.assertEquals (3,subsub1abP.Total_Unique_Leads_in_Hierarchy__c);
-        system.assertEquals (10,subsub1abP.Total_Unique_Responses_in_Hierarchy__c);
-        system.assertEquals (62.5,subsub1abP.Engagement_Response_Rate__c);
-        system.assertEquals (53.8,subsub1abP.Engagement_Conversion_Rate__c);
-        system.assertEquals (7,subsub1abP.Engagement_Conversions_in_Hierarchy__c);
-        system.assertEquals (6,subsub1abP.Newly_Engaged_Contacts_in_Hierarchy__c);
+        Campaign grandchild_1abP = campMap.get(grandchild_1ab.Id);
+        system.assertEquals (13,grandchild_1abP.Total_Unique_Contacts_In_Hierarchy__c);
+        system.assertEquals (3,grandchild_1abP.Total_Unique_Leads_in_Hierarchy__c);
+        system.assertEquals (11,grandchild_1abP.Total_Unique_Responses_in_Hierarchy__c);
+        system.assertEquals (68.8,grandchild_1abP.Engagement_Response_Rate__c);
+        system.assertEquals (61.5,grandchild_1abP.Engagement_Conversion_Rate__c);
+        system.assertEquals (8,grandchild_1abP.Engagement_Conversions_in_Hierarchy__c);
+        system.assertEquals (7,grandchild_1abP.Newly_Engaged_Contacts_in_Hierarchy__c);
 
         Campaign child_1bP = campMap.get(child_1b.Id);
         system.assertEquals (9,child_1bP.Total_Unique_Contacts_In_Hierarchy__c);
@@ -659,6 +800,15 @@ global class GW_BATCH_CampaignEngagementRollup implements Database.Batchable<Sob
 			cms.add (cm);
 		}
 		return cms;
+ 	}
+ 	
+ 	static CampaignMember testCM (Id CampId, Id ConId, string statusStr, boolean isConversion) {
+ 		set<id> conIDs = new set<id> {ConId};
+ 		set<id> conIDsNotConversions;
+ 		if (!isConversion) conIDsNotConversions = new set<id> {ConId};
+ 		list<CampaignMember> CMs = testCMs (CampId,conIDs,statusStr,conIDsNotConversions);
+ 		CampaignMember cm = CMs[0];
+ 		return cm;
  	}
  	
  	static list<CampaignMember> testLeadCMs (Id CampId, Set<id> LeadIds, string statusStr) {

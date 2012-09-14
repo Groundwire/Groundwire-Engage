@@ -1,0 +1,29 @@
+<apex:page controller="GW_CTRL_DashMetrics" readOnly="true" showHeader="false" sidebar="false">
+
+    <c:GWE_DashboardSingleMetric />
+    
+    <a href="{!ReportLinkCampaignConversions}" target="_top">
+	    <div class="span1 dash-item">
+	    	<h2 class="dash-title">Recent Engagement Conversions</h2>
+	    	<div class="stat-well">
+	    		<div class="stat">
+		    		<span class="label">Engagement Conversions</span>
+		    		<span class="metric">
+		    			{!ttlConversions}
+		    		</span>
+		    	</div>
+	    		<div class="metric-footer">
+	    			<div class="ministat ministat-campaign">
+	    				<span class="label">Campaigns</span>
+	    				<span class="metric">{!campConversions}</span>
+	    			</div>
+	    			<div class="ministat ministat-opportunities">
+	    				<span class="label">Donations</span>
+	    				<span class="metric">{!oppConversions}</span>
+	    			</div>
+	    		</div>
+	    	</div>
+	   	</div>
+   	</a>
+
+</apex:page>

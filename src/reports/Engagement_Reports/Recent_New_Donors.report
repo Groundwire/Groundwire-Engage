@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <buckets>
+        <bucketType>number</bucketType>
+        <developerName>BucketField_33448630</developerName>
+        <masterLabel>Engagement Status Prior to Donating</masterLabel>
+        <nullTreatment>z</nullTreatment>
+        <sourceColumnName>Contact.Engagement_Lvl_Before_1st_Gift_Numeric__c</sourceColumnName>
+        <values>
+            <sourceValues>
+                <to>0</to>
+            </sourceValues>
+            <value>Not Engaged (Level 0)</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>0</from>
+            </sourceValues>
+            <value>Engaged (Level 1 or Higher)</value>
+        </values>
+    </buckets>
+    <columns>
+        <field>FIRST_NAME</field>
+    </columns>
+    <columns>
+        <field>LAST_NAME</field>
+    </columns>
+    <columns>
+        <field>ACCOUNT.NAME</field>
+    </columns>
+    <columns>
+        <field>EMAIL</field>
+    </columns>
+    <columns>
+        <field>PHONE1</field>
+    </columns>
+    <columns>
+        <field>PHONE4</field>
+    </columns>
+    <columns>
+        <field>Contact.Engagement_Level__c</field>
+    </columns>
+    <columns>
+        <field>Contact.First_Donation_Date__c</field>
+    </columns>
+    <description>list of donors who gave first gift in last 90 days</description>
+    <filter>
+        <criteriaItems>
+            <column>Contact.First_Donation_Date__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>Recent New Donors</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>ContactList</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <sortColumn>Contact.First_Donation_Date__c</sortColumn>
+    <sortOrder>Asc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>Contact.First_Donation_Date__c</dateColumn>
+        <interval>INTERVAL_LAST90</interval>
+    </timeFrameFilter>
+</Report>

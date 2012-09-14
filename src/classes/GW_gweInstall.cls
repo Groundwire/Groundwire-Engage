@@ -9,11 +9,15 @@ global class GW_gweInstall implements InstallHandler{
 * This program is released under the GNU Affero General Public License, Version 3. http://www.gnu.org/licenses/
 */
 
-	
 	// install script for Groundwire Engage
 	
+	private InstallContext icontext;
+	
 	global void onInstall (InstallContext context) {
+		this.icontext = context; 
+
 		defaultSettingsRec();
+		defaultErrEmailAddy();
 	}
 	
 	
@@ -38,10 +42,24 @@ global class GW_gweInstall implements InstallHandler{
 		}		
 	} 
 	
+	public void defaultErrEmailAddy() {
+		// set the "send error emails to" address to the installing user by default
+		if (icontext != null) {
+			User u = [SELECT Id,Email From User WHERE Id = :icontext.installerID() LIMIT 1];
+			if (u != null) {
+				EngagementTrackerSettings__c settings = EngagementTrackerSettings__c.getOrgDefaults();
+				if (settings.Send_Error_Emails_To__c == null) {
+					settings.Send_Error_Emails_To__c = u.Email;
+					update settings;
+				}
+			}
+		}
+	}
 	
 	static testmethod void testIt() {
 		GW_gweInstall script = new GW_gweInstall();
-		script.defaultSettingsRec(); 
+		script.defaultSettingsRec();
+		script.defaultErrEmailAddy(); 
 	}
 	
 	static testmethod void testItAsInstall() {

@@ -3,7 +3,6 @@
     <enableFeeds>false</enableFeeds>
     <fields>
         <fullName>Conversion_Candidate__c</fullName>
-        <deprecated>false</deprecated>
         <description>Indicates whether this campaign membership is/was a possible conversion.  In order to qualify, contact must have started out at a lower engagement level than this campaign would give them, and the campaign must occur (start or end date) after the last time the 
 contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&apos;t really know what their engagement level was at the time of the campaign.)  Also can&apos;t have been entered more than x months after the effective date of the campaign, where x is the engagement timeframe.  Used in conversion rate metrics.</description>
         <externalId>false</externalId>
@@ -43,7 +42,6 @@ contact&apos;s engagement level was changed.  (The latter b/c otherwise we don&a
     </fields>
     <fields>
         <fullName>Effective_Action_Date__c</fullName>
-        <deprecated>false</deprecated>
         <description>If campaign has start &amp; end date &amp; response logged within that span, use FirstRespondedDate of CM.  Otherwise:
 * if campaign has start &amp; End date, use end date
 * if campaign has start date but no end date, and response logged within a month of the start date, use FirstRespondedDate
@@ -72,7 +70,6 @@ NOT(ISBLANK(Campaign.StartDate)) ,
     </fields>
     <fields>
         <fullName>Engagement_Conversion_From_Level__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion From Level</label>
         <precision>1</precision>
@@ -83,7 +80,6 @@ NOT(ISBLANK(Campaign.StartDate)) ,
     </fields>
     <fields>
         <fullName>Engagement_Conversion_To_Level__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion To Level</label>
         <precision>1</precision>
@@ -94,7 +90,6 @@ NOT(ISBLANK(Campaign.StartDate)) ,
     </fields>
     <fields>
         <fullName>Engagement_Conversion_Type__c</fullName>
-        <deprecated>false</deprecated>
         <description>New = First time this high up the pyramid
 Returning = Was at this level or higher in the past, but had since dropped to a lower level</description>
         <externalId>false</externalId>
@@ -115,14 +110,12 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
     <fields>
         <fullName>Engagement_Conversion__c</fullName>
         <defaultValue>false</defaultValue>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Engagement Conversion</label>
         <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>Engagement_Level_At_Insert__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The contact&apos;s engagement level at the time this campaign membership was created.  Set by trigger.</inlineHelpText>
         <label>Engagement Level At Insert</label>
@@ -135,7 +128,6 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
     <fields>
         <fullName>Engagement_List_Growth__c</fullName>
         <defaultValue>false</defaultValue>
-        <deprecated>false</deprecated>
         <description>if checked indicates that this campaign membership was responsible for giving the contact their very first level above 0</description>
         <externalId>false</externalId>
         <label>Engagement List Growth</label>
@@ -170,7 +162,6 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
     </fields>
     <fields>
         <fullName>Level_Change_Datestamp_At_Insert__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>At the time of insert of this campaign membership, the datestamp of last engagement level change of the contact.  Used for Conversion metrics.</inlineHelpText>
         <label>Engagement Lvl Chg Datestamp At Insert</label>
@@ -179,7 +170,6 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
     </fields>
     <fields>
         <fullName>New_Since_Last_Engagement_Chg__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>IF (  
   NOT (ISNULL (ContactId )) &amp;&amp; 
@@ -194,7 +184,6 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
     </fields>
     <fields>
         <fullName>Responded_Since_Last_Engagement_Chg__c</fullName>
-        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>IF (  
   NOT (ISNULL (ContactId )) &amp;&amp; 
@@ -284,49 +273,5 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
             <sorted>true</sorted>
         </picklist>
         <type>Picklist</type>
-    </fields>
-    <fields>
-        <fullName>TEST_MONTH_MATH_2__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF (  
-
-(
-  Engagement_Level_At_Insert__c &lt;  Campaign.Engagement_Level_Numeric__c 
-  &amp;&amp; ( Campaign.StartDate &gt;=  DATEVALUE(Level_Change_Datestamp_At_Insert__c) || Campaign.EndDate &gt;=    DATEVALUE(Level_Change_Datestamp_At_Insert__c) || ISBLANK (Level_Change_Datestamp_At_Insert__c) )
-  &amp;&amp; NOT(ISBLANK(Engagement_Level_At_Insert__c))
-  &amp;&amp; NOT(ISBLANK(ContactId))  
-)  
-/*
-|| (
-  NOT(ISBLANK(LeadId))  
-) 
-*/
-/* (1=1 || 2=2) */
-&amp;&amp; 
- ( NOT(ISBLANK(Campaign.Engagement_Level_Numeric__c)) )
-&amp;&amp; ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
-, &quot;True&quot; , &quot;False&quot; )</formula>
-        <label>TEST MONTH MATH 2</label>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>TEST_MONTH_MATH__c</fullName>
-        <externalId>false</externalId>
-        <formula>IF (
-
- ( ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.EngagementTrackerSettings__c.Timeframe_Recent__c * 31))
-
-/*  ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c = 12 &amp;&amp;   ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; 365) || ABS ( gwe__Effective_Action_Date__c -  DATEVALUE(CreatedDate)) &lt; ($Setup.gwe__EngagementTrackerSettings__c.gwe__Timeframe_Recent__c * 31)
-*/
-
- , &quot;OK&quot; , &quot;too long&quot; )
-&amp; &quot; - &quot; &amp; TEXT (ABS ( Effective_Action_Date__c -  DATEVALUE(CreatedDate)))</formula>
-        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-        <label>zzTEST MONTH MATH</label>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
     </fields>
 </CustomObject>

@@ -35,12 +35,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
     private integer RetMbrLvl;
     
     // these fieldlists are static so that static methods called from triggers can access them
-    // all of these fields will be blanked out on insert (clone)
+    // all of these "editable" fields will be blanked out on insert (clone)
     public static final string CON_FIELDS_ET_EDITABLE = 'Engagement_Level__c,Engagement_Peak__c,Engagement_Level_Numeric__c,Engagement_Peak_Numeric__c,First_Action_Date_Curr_Level__c,' +
 									   			 'Engagement_Level_Override__c,Engagement_Override_End_Date__c,Last_Leadership_Action_Date__c,' + 
 									   			 'First_Engagement_Level__c,First_Engagement_Level_Date__c,' + 
-									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,';
-	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,'; 
+									 			 'Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Donation_Date__c,';
+	static final string CON_FIELDS_ET_READONLY = 'Engagement_Level_Override_Numeric__c,IsDonor__c,'; 
     
     // these properties will be fetched from the appropriate package (gwbase or npsp) to indicate which opp types are not included in rollups
     set<id> oppRollupRectypesExcluded = new set<id>();
@@ -195,7 +195,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         
         // then fields w/ same name in gwbase & NPSP
         if (GW_GWEngageUtilities.IsGWBaseInstalled || GW_GWEngageUtilities.IsNPSPHHInstalled) {
-	        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,' +
+	        string querySOQLmore = 'OppAmountLastNDays__c,LastCloseDate__c,LastCloseDateHH__c,OppsClosedLastNDays__c,TotalOppAmount__c,FirstCloseDate__c,' +
 	        						'OppAmountThisYear__c, OppAmountLastYear__c, OppAmount2YearsAgo__c,Account.Name,Account.OppAmountLastNDays__c,Account.LastCloseDate__c,' +
 		        					'MembershipJoinDate__c,MembershipEndDate__c,LastMembershipLevel__c,LastMembershipOrigin__c,LastMembershipDate__c,LastMembershipAmount__c,';
 	        querySOQLmore = GW_GWEngageUtilities.addAllNSPrefixET(querySOQLmore,false,true);
@@ -330,21 +330,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			dlog.debug('consToUpd after conversion calcs:' + consToUpd);
 
 			// and finally update our contacts!
-			// set the allornothing property to false so that if a record throws a validation err, the rest will still go through
-            // update consToUpd;
-            Database.SaveResult[] SR = database.update(consToUpd, false);
-            
-            /* TBD do error handling on the results of the update, report to user
-            	// the code that follows is for reference, from NPSP, they save errs to a table
- 	      	List<Opportunity_Rollup_Error__c> elist = new List<Opportunity_Rollup_Error__c>();
-	        integer i = 0;
-	        for(Database.SaveResult s: SR){
-	            if (!s.isSuccess()){
-	                elist.add(OpportunityRollup_Utilities.createError(s, 'Account', accountsToUpdate.values()[i].id));
-	            }
-	            i++;
-        	} 
-        	*/
+			updateContacts(consToUpd);
+
         }
     }
   
@@ -628,9 +615,29 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 			// update our year ago level from the log of changes
 			updateYearAgoLevelFromLog(cw);
 
+			// see if we need to update fields we're copying from NPSP/GWBase fields (to avoid dependent pkg)
+			boolean copiedFieldMod = false;
+			if (GW_GWEngageUtilities.IsGWBaseInstalled || GW_GWEngageUtilities.IsNPSPHHInstalled) {
+				date conFirstCloseDate = (date) con.get(GW_GWEngageUtilities.addNSPrefixET('FirstCloseDate__c',false,true));
+				if (conFirstCloseDate != con.First_Donation_Date__c) {
+					con.First_Donation_Date__c = conFirstCloseDate;
+					copiedFieldMod = true;
+				}
+				decimal conLifetimeOppTtl = (decimal) con.get(GW_GWEngageUtilities.addNSPrefixET('TotalOppAmount__c',false,true));
+				if (conLifetimeOppTtl > 0 && con.IsDonor__c==false) {
+					con.IsDonor__c = true;
+					copiedFieldMod = true;
+				}
+				if ( (!(conLifetimeOppTtl > 0)) && con.IsDonor__c==true) {
+					con.IsDonor__c = false;
+					copiedFieldMod = true;
+				}
+			}
+
             if (cw.CurrLvl != cw.OrigLvl || cw.PeakLvl != con.Engagement_Peak_Numeric__c || lvlStr!=con.Engagement_Level__c || 
                 peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c 
-                // temp disabled for security review	|| cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c 
+                || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c
+                || copiedFieldMod 
                 ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
@@ -679,7 +686,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     con.Engagement_Level__c = lvlStr; 
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
-                    // temp disabled for security review	con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
+                    con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
                     
                     // finally, for testing only, cause one to fail validation by inserting a bogus email addy
                     // this is so we can test that our allornothing=false update is working
@@ -878,6 +885,37 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		
 	}
 	
+
+	public void updateContacts (list<Contact> cons) {
+		// set the allornothing property to false so that if a record throws a validation err, the rest will still go through
+        // update consToUpd;
+        Database.SaveResult[] SR = database.update(cons, false);
+            
+       	// check to see if any records failed validation, and send a notification email if so
+ 	    List<GW_GWEngageUtilities.contactValidationErr> elist = new List<GW_GWEngageUtilities.contactValidationErr>();
+ 	    integer i = 0;
+        for(Database.SaveResult s: SR){
+            if (!s.isSuccess()){
+            	dlog.debug ('saveResult for validation err:' + s);
+            	// if we found an err, save it to a wrapper obj (because can't get contact id out of the saveresult)
+            	GW_GWEngageUtilities.contactValidationErr err = new GW_GWEngageUtilities.contactValidationErr();
+            	err.saveResult = s;
+            	id conId = cons[i].id;
+            	err.conId = conId;
+            	if (test.IsRunningTest() && conWrapMap==null) {
+					// for the test, fake the name as we're not really going to run the batch
+					err.ConName = 'Number2 Doppelganger';
+            	} else {
+	            	engTrackConWrapper cw = conWrapMap.get(conId);
+		        	err.conName = cw.con.Name;
+				}
+                elist.add(err);
+            }
+            i++;
+    	}
+    	if (elist.size() > 0) GW_GWEngageUtilities.sendValidationErrEmail(elist);		
+	}
+
   
   	private void setGiftRectypeVars() {
 
@@ -1028,7 +1066,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	        Datetime sysTime = System.Now().addSeconds(30);
 	        String chron_exp = '' + sysTime.second() + ' ' + sysTime.minute() + ' ' + sysTime.hour() + ' ' + sysTime.day() + ' ' + sysTime.month() + ' ? ' + sysTime.year();
 	        GW_BATCH_CampaignEngagementRollup batch = new GW_BATCH_CampaignEngagementRollup();  
-	        System.schedule('GW Engage Campaign Rollup ' + sysTime.getTime(), chron_exp, batch);               
+	        System.schedule('Groundwire Engage Campaign Rollup ' + sysTime.getTime(), chron_exp, batch);               
         }		        
     }
 
@@ -1237,6 +1275,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[24].AccountId = ac1.Id;		// put one con in the account, and flag to inherit account's gifts
         TestCons[24].Award_Engagement_Levels_for_Org_Giving__c = true;
         TestCons[26].Email = 'algore@internet.com';			// Al Gore going incognito!
+        dlog.debug ('first con for insert: ' + TestCons[0]);
         insert TestCons;
 
 		// have to update some fields after insert in order to spoof existing history of engagement changes
@@ -1502,7 +1541,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
 			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Engagement_Level__c,First_Engagement_Level_Date__c
-			// temp disabled for security review ,Engagement_Level_One_Year_Ago__c	 
+			,Engagement_Level_One_Year_Ago__c	 
             FROM Contact WHERE Id IN :ConIDs]);
         dlog.debug('conP:' + conP);
         
@@ -1547,7 +1586,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.Assert (chgs.size()==3);
         system.Assert (chgs[0].d < system.today());      
         system.Assert (chgs[2].d == system.today());
-        // temp disabled for security review	system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
+        system.AssertEquals (2,con1p.Engagement_Level_One_Year_Ago__c);   		// based on change log
         
         // both years, last yr greater
         Contact con2P = conP.get(TestCons[2].Id);
@@ -1558,7 +1597,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // these should still be the same as before the batch
         System.AssertEquals(1,con2P.First_Engagement_Level__c); 
         System.AssertEquals(startDateOld.addMonths(-3),con2P.First_Engagement_Level_Date__c); 
-        // temp disabled for security review	system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
+        system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
         
         // only peak, nothing recent
         Contact con3P = conP.get(TestCons[3].Id);
@@ -1813,6 +1852,38 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         system.assertEquals (null,CloneConP.Last_Engagement_Lvl_Chg_Datestamp__c);
         system.assertEquals (null,CloneConP.First_Action_Date_Curr_Level__c);
     }
+
+
+	public static testmethod void testValidationErrHandling() {
+		setSettingsForTests();	
+		
+		// create a few contacts
+		Contact[] TestCons = ONEN_UnitTestData.CreateMultipleTestContacts(3);
+		insert TestCons;
+		
+		GW_BATCH_EngagementRollup engRollup = new GW_BATCH_EngagementRollup (true);
+		
+		// now spoof engagement levels, and give one an invalid email addy
+		TestCons[0].Engagement_Level__c = settings.Level_1_Name__c;
+		TestCons[1].Engagement_Level__c = settings.Level_2_Name__c;
+		TestCons[2].Engagement_Level__c = settings.Level_2_Name__c;
+		TestCons[2].Email = 'nota valid email';
+		
+		// now call the batch's update method, and make sure that two of the cons are updated, while the 3rd fails gracefully
+		// it's ok that we didn't actually execute the batch, since we're just testing the update methods ability to deal w/ validation errs
+		engRollup.updateContacts(TestCons);
+		
+		map<Id,Contact> consMap = new map<Id,Contact> ( [SELECT Id,Name,Engagement_Level__c,Email FROM Contact WHERE Id IN :TestCons]);
+		Contact con0 = consMap.get(TestCons[0].Id);
+		Contact con1 = consMap.get(TestCons[1].Id);
+		Contact con2 = consMap.get(TestCons[2].Id);
+		system.assertEquals (settings.Level_1_Name__c,con0.Engagement_Level__c,'valid record not updated con0');
+		system.assert (settings.Level_1_Name__c != null && settings.Level_1_Name__c != '','level names not set correctly in test');
+		system.assertEquals (settings.Level_2_Name__c,con1.Engagement_Level__c,'valid record not updated con1');
+		system.assertEquals (null,con2.Engagement_Level__c,'invalid con updated even though should fail validation');
+		system.assertEquals (null,con2.Email,'invalid con updated even though should fail validation');
+	}
+
     
 	@isTest (SeeAllData=true)
     public static void testCampaignDefaults() { 

@@ -175,6 +175,46 @@ public class GW_GWEngageUtilities {
 	}
 
 
+	public static list<Opportunity> insertTestOppsForContactList (list<Contact> Cons, id CampId, string Stage, date Close, double Amt, string rectype, string oppType, boolean spoofConversion) {
+
+		// for tests, insert opps & conroles
+		// calls the method on UnitTestData to build the opps
+		// but also inserts them, and creates conroles as needed if we're not in gwbase or NPSP
+
+		List<Opportunity> opps = ONEN_UnitTestData.OppsForContactList(Cons, CampId, Stage, Close, Amt, rectype, oppType);
+		
+		// if we're spoofing conversion, just pick some levels, and make it list growth too
+		if (spoofConversion) {
+			for (Opportunity opp : opps) {
+				opp.Engagement_Conversion__c = true;
+				opp.Engagement_List_Growth__c = true;
+        		opp.Engagement_Conversion_From_Level__c = 0;
+        		opp.Engagement_Conversion_To_Level__c = 2;
+        		opp.Engagement_Conversion_Type__c = 'New';
+			}
+		}
+		insert opps;
+
+		// if we're not in GWBase or NPSP, then add conroles by hand..
+		// tbd this doesn't do households 
+		if (! GW_GWEngageUtilities.IsNPSPHHInstalled && ! GW_GWEngageUtilities.IsGWBaseInstalled) {
+			list<OpportunityContactRole> conroles = new list<OpportunityContactRole>();
+			integer i=0; 
+			for (Opportunity opp:opps) {
+				OpportunityContactRole conrole = new OpportunityContactRole (
+					OpportunityId = opp.Id,
+					ContactId = Cons[i].Id,
+					IsPrimary = true 
+				);
+				conroles.add(conrole);
+				i++;
+			}
+			if (conroles.size() > 0) insert conroles;
+		}
+		
+		return opps;
+	}
+
     /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
     
 	// methods called from triggers
@@ -230,5 +270,74 @@ public class GW_GWEngageUtilities {
             }
         }
     }	
+
+
+
+    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+    
+	// ERROR HANDLING
+	
+	public class contactValidationErr {
+		public Database.SaveResult saveResult;
+		public string conName;
+		public id conId;
+	}
+	
+	 public static void sendValidationErrEmail (List<contactValidationErr> errList){
+
+		// if we got validation errs while attempting to write to contacts, send an email to notify
+		// currently this sends one email per batch 
+
+     	datetime thisDay = system.now();
+        
+		Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setToAddresses(new String[] {'matthew@groundwire.org'});		// tbd get from setting
+        // mail.setReplyTo('batch@mycompany.com');
+        //mail.setSenderDisplayName('Groundwire Engage');
+        mail.setSubject('Groundwire Engage - Contact Validation Error');
+		string msg = 'Groundwire Engage encountered one or more errors attempting to save changes to Contact record. ' + 
+						'Generally this is due to existing data that does not meet custom validation rules or custom required fields. ' +
+						'Please correct any invalid data on the following records:<BR/><BR/>';
+		for (contactValidationErr err : errList) {
+			string conURL = URL.getSalesforceBaseUrl().toExternalForm() + '/' + err.conId;
+			string errDescrip = err.saveResult.getErrors()[0].getMessage();
+			msg += 'Contact: <a href="' + conURL + '">' + err.conName + '</a>  Error: ' + errDescrip + '<BR/>';	
+		}
+		mail.setHTMLBody(msg);
+
+		debugLogger dlog = new debugLogger();
+		dlog.debug('validation err email msg: ' + msg);
+
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        /*
+        ore.Name = objid + '-' + thisDay.month() + thisDay.day() + thisDay.hour() + thisDay.minute() + thisDay.second();
+        ore.Error_Datetime__c = thisDay;
+        ore.Error_Object_Type__c = objecttype;
+      
+        string recordURL = URL.getSalesforceBaseUrl().toExternalForm() + '/' + objid;
+        if (recordURL.startsWith('http:')){
+            recordURL = recordURL.replaceFirst('http:', 'https:');
+        }
+        ore.Error_Record_Link__c = recordURL;
+         
+        if (s.getErrors()[0].getStatusCode() == system.Statuscode.REQUIRED_FIELD_MISSING){
+            ore.Error_Type__c = 'Required Field Missing';
+        }
+        else if (s.getErrors()[0].getStatusCode() == system.Statuscode.FIELD_CUSTOM_VALIDATION_EXCEPTION){
+            ore.Error_Type__c = 'Custom Validation Rule Failed';
+        }
+        else{
+            ore.Error_Type__c = 'Other';
+        }
+                 
+        //trim error message
+        if (s.getErrors()[0].getMessage().length() > 255)
+            ore.Error_Message__c = s.getErrors()[0].getMessage().substring(0, 254);
+        else
+            ore.Error_Message__c = s.getErrors()[0].getMessage();
+     return ore;
+     */
+    }
 	
 }

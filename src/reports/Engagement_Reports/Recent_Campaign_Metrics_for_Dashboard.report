@@ -23,7 +23,7 @@
         <datatype>number</datatype>
         <description># of newly engaged contacts, renamed</description>
         <developerName>FORMULA3</developerName>
-        <isActive>true</isActive>
+        <isActive>false</isActive>
         <masterLabel>Newly Engaged</masterLabel>
         <scale>0</scale>
     </aggregates>
@@ -33,11 +33,11 @@
         <backgroundFadeDir>Diagonal</backgroundFadeDir>
         <chartSummaries>
             <axisBinding>y</axisBinding>
-            <column>FORMULA2</column>
+            <column>FORMULA1</column>
         </chartSummaries>
         <chartSummaries>
             <axisBinding>y</axisBinding>
-            <column>FORMULA3</column>
+            <column>FORMULA2</column>
         </chartSummaries>
         <chartType>VerticalColumn</chartType>
         <enableHoverLabels>false</enableHoverLabels>
@@ -49,7 +49,7 @@
         <showPercentage>false</showPercentage>
         <showTotal>false</showTotal>
         <showValues>false</showValues>
-        <size>Medium</size>
+        <size>Small</size>
         <summaryAxisRange>Auto</summaryAxisRange>
         <textColor>#000000</textColor>
         <textSize>12</textSize>
@@ -65,15 +65,37 @@
     <columns>
         <field>Campaign.Leadership_Level__c</field>
     </columns>
+    <description>compares response &amp; conversion rates for campaigns in the last 90 days</description>
     <filter>
+        <booleanFilter>(1 OR 2) AND (3 OR 4) AND (5 OR 6)</booleanFilter>
+        <criteriaItems>
+            <column>Campaign.Engagement_Response_Rate__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Campaign.Engagement_Conversion_Rate__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>START_DATE</column>
+            <operator>lessOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>greaterOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
         <criteriaItems>
             <column>START_DATE</column>
             <operator>equals</operator>
-            <value>LAST_N_MONTHS:6</value>
+            <value>LAST_90_DAYS</value>
         </criteriaItems>
         <criteriaItems>
-            <column>Campaign.Leadership_Level__c</column>
-            <operator>notEqual</operator>
+            <column>END_DATE</column>
+            <operator>equals</operator>
             <value></value>
         </criteriaItems>
     </filter>

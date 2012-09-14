@@ -2,28 +2,28 @@
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <buckets>
         <bucketType>number</bucketType>
-        <developerName>BucketField_68290751</developerName>
-        <masterLabel>Enagement Levels Below Peak</masterLabel>
+        <developerName>BucketField_94300705</developerName>
+        <masterLabel>Previous Level</masterLabel>
         <nullTreatment>z</nullTreatment>
-        <sourceColumnName>Contact.Engagement_Levels_Below_Peak__c</sourceColumnName>
+        <sourceColumnName>Contact.Former_Engagement_Level_Numeric__c</sourceColumnName>
         <values>
             <sourceValues>
-                <to>-2</to>
+                <to>0</to>
             </sourceValues>
-            <value>2+ Levels Below Peak</value>
+            <value>0 - Not Engaged</value>
         </values>
         <values>
             <sourceValues>
-                <from>-2</from>
-                <to>-1</to>
+                <from>0</from>
+                <to>1</to>
             </sourceValues>
-            <value>1 Level Below Peak</value>
+            <value>Level 1</value>
         </values>
         <values>
             <sourceValues>
-                <from>-1</from>
+                <from>1</from>
             </sourceValues>
-            <value>At Peak</value>
+            <value>Level 2 or Higher</value>
         </values>
     </buckets>
     <chart>
@@ -34,13 +34,12 @@
             <axisBinding>y</axisBinding>
             <column>RowCount</column>
         </chartSummaries>
-        <chartType>VerticalColumnStacked</chartType>
-        <enableHoverLabels>true</enableHoverLabels>
-        <expandOthers>true</expandOthers>
-        <groupingColumn>Contact.Engagement_Level__c</groupingColumn>
+        <chartType>Donut</chartType>
+        <enableHoverLabels>false</enableHoverLabels>
+        <expandOthers>false</expandOthers>
+        <groupingColumn>BucketField_94300705</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_TOP</location>
-        <secondaryGroupingColumn>BucketField_68290751</secondaryGroupingColumn>
         <showAxisLabels>true</showAxisLabels>
         <showPercentage>false</showPercentage>
         <showTotal>false</showTotal>
@@ -49,13 +48,9 @@
         <summaryAxisRange>Auto</summaryAxisRange>
         <textColor>#000000</textColor>
         <textSize>12</textSize>
-        <title>Fall from Peak</title>
         <titleColor>#000000</titleColor>
         <titleSize>18</titleSize>
     </chart>
-    <columns>
-        <field>SALUTATION</field>
-    </columns>
     <columns>
         <field>FIRST_NAME</field>
     </columns>
@@ -63,10 +58,16 @@
         <field>LAST_NAME</field>
     </columns>
     <columns>
+        <field>Contact.Engagement_Level__c</field>
+    </columns>
+    <columns>
+        <field>ACCOUNT.NAME</field>
+    </columns>
+    <columns>
         <field>TITLE</field>
     </columns>
     <columns>
-        <field>ADDRESS2_STREET</field>
+        <field>EMAIL</field>
     </columns>
     <columns>
         <field>ADDRESS2_CITY</field>
@@ -74,54 +75,30 @@
     <columns>
         <field>ADDRESS2_STATE</field>
     </columns>
-    <columns>
-        <field>ADDRESS2_ZIP</field>
-    </columns>
-    <columns>
-        <field>ADDRESS2_COUNTRY</field>
-    </columns>
-    <columns>
-        <field>PHONE1</field>
-    </columns>
-    <columns>
-        <field>PHONE3</field>
-    </columns>
-    <columns>
-        <field>PHONE2</field>
-    </columns>
-    <columns>
-        <field>EMAIL</field>
-    </columns>
-    <columns>
-        <field>OWNER_FULL_NAME</field>
-    </columns>
-    <columns>
-        <field>ACCOUNT.NAME</field>
-    </columns>
-    <columns>
-        <field>Contact.Days_Since_First_Action_at_Level__c</field>
-    </columns>
+    <description>for contacts who moved up a level in the last 90 days, what was their level prior to their most recent jump</description>
+    <filter>
+        <criteriaItems>
+            <column>Contact.Last_Engagement_Change__c</column>
+            <operator>greaterThan</operator>
+            <value>0</value>
+        </criteriaItems>
+    </filter>
     <format>Matrix</format>
-    <groupingsAcross>
-        <dateGranularity>Day</dateGranularity>
-        <field>BucketField_68290751</field>
-        <sortOrder>Asc</sortOrder>
-    </groupingsAcross>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>Contact.Engagement_Level__c</field>
+        <field>BucketField_94300705</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Fall from Peak by Current Level</name>
+    <name>Recent Conversions by Previous Level</name>
     <params>
         <name>co</name>
         <value>1</value>
     </params>
     <reportType>ContactList</reportType>
     <scope>organization</scope>
-    <showDetails>false</showDetails>
+    <showDetails>true</showDetails>
     <timeFrameFilter>
-        <dateColumn>LAST_ACTIVITY</dateColumn>
-        <interval>INTERVAL_CUSTOM</interval>
+        <dateColumn>Contact.Last_Engagement_Lvl_Chg_Datestamp__c</dateColumn>
+        <interval>INTERVAL_LAST90</interval>
     </timeFrameFilter>
 </Report>

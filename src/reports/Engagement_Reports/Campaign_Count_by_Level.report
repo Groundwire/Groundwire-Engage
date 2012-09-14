@@ -5,6 +5,7 @@
     </columns>
     <description>Number of campaigns in last 90 days at each engagement level</description>
     <filter>
+        <booleanFilter>1 AND 2 AND (3 OR 4)</booleanFilter>
         <criteriaItems>
             <column>Campaign.Leadership_Level__c</column>
             <operator>notEqual</operator>
@@ -12,16 +13,21 @@
         </criteriaItems>
         <criteriaItems>
             <column>START_DATE</column>
-            <operator>equals</operator>
+            <operator>lessOrEqual</operator>
             <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>greaterOrEqual</operator>
+            <value>LAST_90_DAYS</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>END_DATE</column>
+            <operator>equals</operator>
+            <value></value>
         </criteriaItems>
     </filter>
     <format>Matrix</format>
-    <groupingsAcross>
-        <dateGranularity>Month</dateGranularity>
-        <field>START_DATE</field>
-        <sortOrder>Asc</sortOrder>
-    </groupingsAcross>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
         <field>Campaign.Leadership_Level__c</field>

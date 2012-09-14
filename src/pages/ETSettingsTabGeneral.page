@@ -23,6 +23,7 @@
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Timeframe_Recent__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Override_Default_Duration__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Batch_Size__c.InlineHelpText}</p>
+				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Send_Error_Emails_To__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Send_Error_Emails_To__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Default__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Opp_Rectype_For_Tests_Member__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.InlineHelpText}</p>
@@ -51,11 +52,14 @@
 		      		<apex:inputField value="{!etSettings.Batch_Size__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
 		      		<apex:outputField value="{!etSettings.Batch_Size__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
 		      		
-		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
-		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />
+		      		<apex:inputField value="{!etSettings.Send_Error_Emails_To__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbxWide" />
+		      		<apex:outputField value="{!etSettings.Send_Error_Emails_To__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbxWide" />
+		      		
+		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbxWide" />
+		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Default__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbxWide" />
 
-		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbx" />
-		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbx" />		      		
+		      		<apex:inputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!ctabGeneral.isEditingTab}" styleClass="cssTbxWide" />
+		      		<apex:outputField value="{!etSettings.Opp_Rectype_For_Tests_Member__c}" rendered="{!NOT(ctabGeneral.isEditingTab)}" styleClass="cssTbxWide" />		      		
 
 	        		<apex:pageBlockSectionItem >
 	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.Gratitude_Machine_Minumum_Level__c.Label}" />
