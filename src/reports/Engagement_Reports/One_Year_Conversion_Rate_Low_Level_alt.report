@@ -8,10 +8,10 @@
         <sourceColumnName>Contact.Engagement_Level__c</sourceColumnName>
         <values>
             <sourceValues>
-                <sourceValue>1 - Observing</sourceValue>
+                <sourceValue>1 - Following</sourceValue>
             </sourceValues>
             <sourceValues>
-                <sourceValue>2 - Following</sourceValue>
+                <sourceValue>2 - Endorsing</sourceValue>
             </sourceValues>
             <value>Still Low Level (2 or lower)</value>
         </values>
