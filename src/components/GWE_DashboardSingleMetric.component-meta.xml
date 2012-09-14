@@ -3,4 +3,14 @@
     <apiVersion>24.0</apiVersion>
     <description>This is a generic template for Visualforce Component.  With this template, you may adjust the default elements and values and add new elements and values.</description>
     <label>GWE_DashboardSingleMetric</label>
+    <packageVersions>
+        <majorNumber>2</majorNumber>
+        <minorNumber>1</minorNumber>
+        <namespace>npe01</namespace>
+    </packageVersions>
+    <packageVersions>
+        <majorNumber>2</majorNumber>
+        <minorNumber>4</minorNumber>
+        <namespace>npo02</namespace>
+    </packageVersions>
 </ApexComponent>
