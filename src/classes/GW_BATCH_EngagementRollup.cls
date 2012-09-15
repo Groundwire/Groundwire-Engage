@@ -1624,14 +1624,16 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(startDateRecent,con6P.Last_Leadership_Action_Date__c);  
             System.AssertEquals(startDateRecent,con6P.First_Action_Date_Curr_Level__c);
             
-            if (GW_GWEngageUtilities.IsNPSPHHInstalled) {
-            	// while we're at it, also check that the Donor? flag was set by trigger (NPSP only) - used in reports
+            if (GW_GWEngageUtilities.IsNPSPHHInstalled || GW_GWEngageUtilities.IsGWBaseInstalled) {
+            	// while we're at it, also check that the Donor? flag and First Donation Date were set - used in reports
             	string donorFieldname = GW_GWEngageUtilities.addNSPrefixET('IsDonor__c',true,false);
+            	string firstDateFieldname = GW_GWEngageUtilities.addNSPrefixET('First_Donation_Date__c',true,false);
             	Id con6PId = con6P.Id;
-            	string soql = 'SELECT Id,' + donorFieldname + ' FROM Contact WHERE Id =:con6PId';
+            	string soql = 'SELECT Id,' + donorFieldname + ',' + firstDateFieldname + ' FROM Contact WHERE Id =:con6PId';
             	SObject[] results = database.query(soql);
             	contact con6PP = (Contact) results[0];
             	system.assert (con6PP.get(donorFieldname)==true);  
+            	system.assertEquals (startDateRecent, (date) con6PP.get(firstDateFieldname));  
             }
     
             // recent small donation & maj donation (should work out to donor tier 3) 
