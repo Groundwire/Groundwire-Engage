@@ -400,7 +400,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	private void calcFrequencyLevels() {
         // now check "repeated action" rules (separate SOQL for each one!)
         for (EngagementFrequencySettings__c fqset : freqSettingsMap.values() ) {
-            if (fqset.Campaign_Type__c != null || fqset.Campaign_Sub_Type__c != null || fqset.Campaign_Record_Type__c != null ) {
+            if (fqset.Campaign_Type__c != null || fqset.Campaign_Sub_Type__c != null || fqset.Campaign_Record_Type__c != null || fqset.Level_Required__c != null) {
                 string qstr = 'SELECT ContactId,Calendar_Year(Effective_Action_Date__c) yr,COUNT_DISTINCT(Id) CountCMs, ';
                 qstr +=         ' GROUPING(ContactId) subtCon  ';
                 qstr +=         ' FROM CampaignMember WHERE ContactId IN :conIDs AND Campaign.Leadership_Level__c!=Null ';
