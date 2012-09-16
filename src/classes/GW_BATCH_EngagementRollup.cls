@@ -421,8 +421,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 	qstr +=  ' AND Campaign.Type = :camptype ';
                 }
                 // this one is for GWBase only, will throw an err if set & gwbase not installed
-                //  TBD trap this err?
-                if (fqset.Campaign_Sub_Type__c != null) {
+                if (GW_GWEngageUtilities.IsGWBaseInstalled && fqset.Campaign_Sub_Type__c != null) {
                 	campsubtype = fqset.Campaign_Sub_Type__c;
                 	qstr += ' AND ' + GW_GWEngageUtilities.addNSPrefixET('Campaign.Campaign_Sub_Type__c',false,false) + ' = :campsubtype ';
                 }
@@ -430,6 +429,12 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 	camprectype = fqset.Campaign_Record_Type__c;
                 	qstr += ' AND Campaign.RecordType.Name = :camprectype ';
                 }
+
+				// set filter based on required campaign level
+				if (fqset.Level_Required__c != null) {
+					integer reqlvl = fqset.Level_Required__c.intvalue(); 
+					qstr += ' AND ' + GW_GWEngageUtilities.addNSPrefixET('Campaign.Engagement_Level_Numeric__c',true,false) + ' = :reqlvl '; 
+				}
                 
                 qstr +=         GW_GWEngageUtilities.addAllNSPrefixET(' GROUP BY ROLLUP ( ContactId, Calendar_Year(Effective_Action_Date__c) )' , true, false);
                 dlog.debug('frequency setting for rule: ' + fqset);
