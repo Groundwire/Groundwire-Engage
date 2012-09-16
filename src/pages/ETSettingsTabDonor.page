@@ -15,15 +15,29 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Donation Settings</div>
-   			<div class="cssTabSubTitle">Specify the Engagement Level given for tiers of donation totals.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpDonor" onclick="document.getElementById('linkHelpDonor').hide();
-				document.getElementById('divHelpDonor').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">Specify the Engagement Level given for tiers of donation totals.<br/><br/></div>
+   			<div class="cssTabHelpLink" id="linkHelpDonor">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpDonor').hide(); document.getElementById('divHelpDonor').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpDonor" class="cssHelpText" style="display:none" >
-				<p><b>Calculate Engagement Levels based on Donations</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
-				<p><b>Calculate Engagement Levels based on Household Donation Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
+	   			<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpDonor').hide();document.getElementById('linkHelpDonor').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  
+				<p>
+				The donor tiers you set up here will determine what Engagement Level a donor is eligible for, based on their total giving in the Engagement Timeframe (see General tab).
+				You can define any number of tiers.  See the Installation Guide for more info on this feature.
+				</p>
+				<p><b>Enable Engagement Levels based on Donations</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Opps__c.InlineHelpText}</p>
+				<p><b>Enable Engagement Levels based on Household Donation Totals</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Householded_Donor_Levels__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Lower_Limit__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.Label}</b> - {!$ObjectType.Engagement_Donor_Level_Settings__c.Fields.Level__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpDonor').hide();document.getElementById('linkHelpDonor').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>
@@ -36,11 +50,11 @@
         <apex:panelGrid columns="2" columnClasses="cssPanelGridColumn1,cssPanelGridColumn2" >
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsDonor" >
-		      		<apex:inputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!ctabDonor.isEditingTab}"  />
-		      		<apex:outputField label="Calculate Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+		      		<apex:inputField label="Enable Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Enable Engagement Levels based on Donations" value="{!etSettings.Include_Opps__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
 	        	
-		      		<apex:inputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!ctabDonor.isEditingTab}"  />
-		      		<apex:outputField label="Calculate Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
+		      		<apex:inputField label="Enable Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!ctabDonor.isEditingTab}"  />
+		      		<apex:outputField label="Enable Engagement Levels based on Household Donation Totals" value="{!etSettings.Householded_Donor_Levels__c}" rendered="{!NOT(ctabDonor.isEditingTab)}" />
 
 					<apex:pageBlockSectionItem />
 					

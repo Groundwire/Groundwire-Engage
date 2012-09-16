@@ -9,7 +9,7 @@
         <fullName>Campaign_Record_Type__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Record Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <inlineHelpText>(optional) If set, all campaigns must have this Record Type.</inlineHelpText>
         <label>Campaign Record Type</label>
         <length>255</length>
         <required>false</required>
@@ -20,7 +20,7 @@
         <fullName>Campaign_Sub_Type__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Sub Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <inlineHelpText>(optional)  If set, all campaigns must have this sub-type.</inlineHelpText>
         <label>Campaign Sub Type</label>
         <length>255</length>
         <required>false</required>
@@ -31,7 +31,7 @@
         <fullName>Campaign_Type__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Type of the Campaign to set an Engagement Level for. This field is optional.</inlineHelpText>
+        <inlineHelpText>(optional) If set, all campaigns must be of this Type.</inlineHelpText>
         <label>Campaign Type</label>
         <length>255</length>
         <required>false</required>
@@ -64,7 +64,7 @@
         <fullName>Level_Required__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>if populated, requires that all qualifying actions be of this level (in addition to any field requirements, if any)</inlineHelpText>
+        <inlineHelpText>(optional) If set, all campaigns must be of this level.</inlineHelpText>
         <label>Level Required</label>
         <precision>2</precision>
         <required>false</required>
@@ -76,7 +76,7 @@
         <fullName>Level_To_Assign__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The Engagement Level to set.</inlineHelpText>
+        <inlineHelpText>(required)  The Engagement Level they are eligible for if all conditions are met.</inlineHelpText>
         <label>Engagement Level</label>
         <precision>2</precision>
         <required>true</required>
@@ -88,7 +88,7 @@
         <fullName>Number_of_Actions_Required__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>only assigns the level if this many actions of the required specification have been taken during the usual timeframe</inlineHelpText>
+        <inlineHelpText>(required)  The Contact must have this many Campaign Memberships within the usual timeframe to qualify.</inlineHelpText>
         <label>Number of Actions Required</label>
         <precision>2</precision>
         <required>true</required>

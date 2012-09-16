@@ -15,10 +15,26 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Repeated Actions</div>
-   			<div class="cssTabSubTitle">Specify the Engagement Level to give based on the frequency of a Contact's participation in a type of Campaign.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpFrequency" onclick="document.getElementById('linkHelpFrequency').hide();
-				document.getElementById('divHelpFrequency').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">Specify the Engagement Level to give based on the frequency of a Contact's participation in a type of Campaign.<br/><br/></div>
+   			<div class="cssTabHelpLink" id="linkHelpFrequency">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpFrequency').hide(); document.getElementById('divHelpFrequency').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpFrequency" class="cssHelpText" style="display:none" >
+	   			<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpFrequency').hide();document.getElementById('linkHelpFrequency').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  
+				<p>
+				If you wish to bump up a contact's Engagement Level once they have taken a particular type of action a specified number of times, then you want to use Repeated Actions. 
+				Repeated Actions lets you specify how many Campaigns of particular types a contact must participate in, in order to move up to another level.<BR/>
+				Each of the columns that specify attributes of the Campaign are optional, but you must include at least one of them. 
+				</p>
 				<p><b>When Campaign Engagement Level is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_Required__c.InlineHelpText}</p>
 	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
 					<p><b>And Campaign Record Type is</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Campaign_Record_Type__c.InlineHelpText}</p>
@@ -29,7 +45,6 @@
 				</apex:outputText>
 				<p><b>And Contact Participates ___ Times</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Number_of_Actions_Required__c.InlineHelpText}</p>
 				<p><b>Set Contact's Engagement Level to</b> - {!$ObjectType.EngagementFrequencySettings__c.Fields.Level_To_Assign__c.InlineHelpText}</p>	       			
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpFrequency').hide();document.getElementById('linkHelpFrequency').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

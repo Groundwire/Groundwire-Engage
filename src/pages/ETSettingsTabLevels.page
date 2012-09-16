@@ -16,17 +16,30 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Level Settings</div>
-   			<div class="cssTabSubTitle">Set a name for each of your Engagement Levels.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpLevels" onclick="document.getElementById('linkHelpLevels').hide();
-				document.getElementById('divHelpLevels').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">
+   				Set a name for each of your Engagement Levels.
+   				<br/><br/>
+ 			</div>
+ 			<div class="cssTabHelpLink" id="linkHelpLevels">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpLevels').hide(); document.getElementById('divHelpLevels').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpLevels" class="cssHelpText" style="display:none" >
+	       		<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpLevels').hide();document.getElementById('linkHelpLevels').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  	   		
 				<p>You can define between one and eight Engagement Levels for your organization, where Level 1 is the least engaged level.
 				Engagement Levels relate to your organization’s Engagement Pyramid - see the Groundwire Engage Strategy Guide.   
 				These level names are used extensively in pick lists and reports. 
 				Level names must start with the level number.  </p>		  				
 		  		<p><i>Groundwire Engage relies on the <b>same levels</b> being defined in this settings page, as well as on
 		  				several picklist fields on Contact and Campaign.  Refer to the Installation Guide for more info.</i></p>
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpLevels').hide();document.getElementById('linkHelpLevels').show();"><br/>Hide</a>  
 	  		</div>
    		</apex:outputPanel>
 

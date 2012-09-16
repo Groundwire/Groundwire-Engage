@@ -15,14 +15,28 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Membership Settings</div>
-   			<div class="cssTabSubTitle">Specify how membership determines a Contact's Engagement Level.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpMember" onclick="document.getElementById('linkHelpMember').hide();
-				document.getElementById('divHelpMember').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">Specify how membership determines a Contact's Engagement Level.<br/><br/></div>
+   			<div class="cssTabHelpLink" id="linkHelpMember">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpMember').hide(); document.getElementById('divHelpMember').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpMember" class="cssHelpText" style="display:none" >
-				<p><b>Calculate Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
+	   			<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpMember').hide();document.getElementById('linkHelpMember').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  
+				<p>
+				If the "enable" box is checked, this allows you to award Engagement Levels to new or renewing members.  This is independent of what level they may get based on their total giving (see Donations tab).  
+				The levels for new vs. renewing members can be the same, or different.  See Installation Guide for more info. 
+				</p>
+				<p><b>Enable Engagement Levels based on Membership</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Include_Membership__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Renewing_Member_Level__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpMember').hide();document.getElementById('linkHelpMember').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>
@@ -35,8 +49,8 @@
         <apex:panelGrid columns="1" columnClasses="cssPanelGridColumn1" > 
         	<apex:panelGroup >
 	        	<apex:pageBlockSection columns="1" id="pbsMember" >
-		      		<apex:inputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!ctabMember.isEditingTab}"  />
-		      		<apex:outputField label="Calculate Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!NOT(ctabMember.isEditingTab)}" />
+		      		<apex:inputField label="Enable Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!ctabMember.isEditingTab}"  />
+		      		<apex:outputField label="Enable Engagement Levels based on Membership" value="{!etSettings.Include_Membership__c}" rendered="{!NOT(ctabMember.isEditingTab)}" />
 	        		<apex:pageBlockSectionItem >
 	        			<apex:outputLabel value="{!$ObjectType.EngagementTrackerSettings__c.Fields.New_Member_Level__c.Label}" />
 				    	<apex:selectList value="{!etSettings.New_Member_Level__c}" size="1" disabled="{!NOT(ctabMember.isEditingTab)}" >			    			

@@ -22,7 +22,7 @@
         <defaultValue>365</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>Exclude contacts in the Gratitude Machine that have already been on a Gratitude Machine campaign within this number of days.</inlineHelpText>
+        <inlineHelpText>Contacts will not be included in new Gratitude Machine lists if they have already been included in a Gratitude Machine list within this number of days.</inlineHelpText>
         <label>Gratitude Machine Days To Exclude</label>
         <precision>4</precision>
         <required>false</required>
@@ -48,7 +48,7 @@
         <defaultValue>3</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The minum Engagement Level of contacts to include in the Gratitude Machine.</inlineHelpText>
+        <inlineHelpText>The minimum Engagement Level of contacts to include in the Gratitude Machine.</inlineHelpText>
         <label>Gratitude Machine Minimum Level</label>
         <precision>2</precision>
         <required>false</required>
@@ -58,10 +58,10 @@
     </fields>
     <fields>
         <fullName>Gratitude_Machine_Recent_Activity_Days__c</fullName>
-        <defaultValue>365</defaultValue>
+        <defaultValue>180</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>For &quot;Old Steadies&quot; the number of days they must have done some engagement related action in.</inlineHelpText>
+        <inlineHelpText>Gratitude Machine &quot;Old Steadies&quot; must have taken some engagement-related action (campaign, donation) within this many days to be included.</inlineHelpText>
         <label>Gratitude Machine Recent Activity Days</label>
         <precision>4</precision>
         <required>false</required>
@@ -83,7 +83,7 @@
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>Specifies whether the Contact&apos;s membership should count toward engagement level. Current members are given an engagement level based on New Member Level and Renewing Member Level settings below.</inlineHelpText>
+        <inlineHelpText>Will only award Engagement Levels based on membership status if checked.</inlineHelpText>
         <label>Include Membership</label>
         <type>Checkbox</type>
     </fields>
@@ -92,7 +92,7 @@
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>If checked, will consider Donation history as part of engagement rating.</inlineHelpText>
+        <inlineHelpText>If checked, will assign engagement level to donors based on their total giving and your custom donor tiers.</inlineHelpText>
         <label>Include Donations</label>
         <type>Checkbox</type>
     </fields>
@@ -197,7 +197,7 @@
         <fullName>New_Member_Level__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>Level to assign to active members with a Last Membership Origin of New.</inlineHelpText>
+        <inlineHelpText>Level to assign to new current members.</inlineHelpText>
         <label>New Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
@@ -246,7 +246,7 @@
         <fullName>Renewing_Member_Level__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>Level to assign to active members with Last Membership Origin of Renewal.</inlineHelpText>
+        <inlineHelpText>Level to assign to current renewing members (Last Membership Origin of Renewal.)</inlineHelpText>
         <label>Renewing Member Engagement Level</label>
         <precision>2</precision>
         <required>false</required>
@@ -291,7 +291,7 @@
         <defaultValue>12</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>The length of time in months that Campaign actions earn an Engagement Level.</inlineHelpText>
+        <inlineHelpText>Groundwire Engage looks at activities going back this many months from today, in order to determine a supporter&apos;s current Engagement Level.  Activity older than this will still affect Peak Engagement Level.</inlineHelpText>
         <label>Engagement Timeframe (Months)</label>
         <precision>3</precision>
         <required>true</required>

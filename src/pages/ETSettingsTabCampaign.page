@@ -14,14 +14,29 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Campaign Defaults</div>
-   			<div class="cssTabSubTitle">Automatically set a Campaign's Engagement Level when the Campaign is created.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpCampaign" onclick="document.getElementById('linkHelpCampaign').hide();
-				document.getElementById('divHelpCampaign').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">
+   				Automatically set a Campaign's Engagement Level when the Campaign is created.
+   				<br/><br/>
+   			</div>
+   			<div class="cssTabHelpLink" id="linkHelpCampaign">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpCampaign').hide(); document.getElementById('divHelpCampaign').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpCampaign" class="cssHelpText" style="display:none" >
+	       		<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  
 	   			<p>
-	   			By setting Campaign defaults here, your Campaigns can be autmoatically tagged with the proper Engagement Level upon creation.  
+	   			By setting Campaign defaults here, your Campaigns can be automatically tagged with the proper Engagement Level upon creation.  
 	   			Note that this will only set the level on new Campaigns, it will not assign levels to existing ones. 
-	   			Note also that you will not see the level appear on the new Campaign until you click Save.
+	   			Note also that you will not see the level appear on the new Campaign until you click Save.  You should always still check after saving 
+	   			to be sure that each Campaign you create has the proper Engagement Level. 
 	   			</p>
 	   			<!-- 
 	       		<apex:outputText rendered="{!hasCampaignRecordTypes}" >
@@ -34,8 +49,7 @@
 				 -->
 	       		<p><b>{!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.Label}</b> - {!$ObjectType.EngagementCampaignSettings__c.Fields.Engagement_Level__c.InlineHelpText}</p>
 	       			       			
-	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>	       			
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpCampaign').hide();document.getElementById('linkHelpCampaign').show();"><br/>Hide</a>  
+	       		<p><b>{!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.Label}</b> - {!$ObjectType.EngagementTrackerSettings__c.Fields.Levels_Don_t_Require_Responded__c.InlineHelpText}</p>
 	  		</div>
    			<br/>
    		</apex:outputPanel>

@@ -15,10 +15,21 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Contact Field Settings</div>
-   			<div class="cssTabSubTitle">Determine a Contact's Engagement Level based on the value of a Contact record field.</div>
-			<a class="cssTabHelpLink helpLink" id="linkHelpContact" onclick="document.getElementById('linkHelpContact').hide();
-				document.getElementById('divHelpContact').show();"><br/>Help <img src="/s.gif" alt="" class="helpIcon" title=""/></a>   		
+   			<div class="cssTabSubTitle">Determine a Contact's Engagement Level based on the value of a Contact record field.<br/><br/></div>
+   			<div class="cssTabHelpLink" id="linkHelpContact">
+	  			<a class="helpLink"  onclick="document.getElementById('linkHelpContact').hide(); document.getElementById('divHelpContact').show();">
+					<img src="/img/arrowRight.gif" />
+					Show Help 
+					<img src="/s.gif" alt="" class="helpIcon" title=""/>
+				</a>
+			</div>
 	   		<div id="divHelpContact" class="cssHelpText" style="display:none" >
+	   			<div class="hideHelpLink">	       			
+					<a class="helpLink" onclick="document.getElementById('divHelpContact').hide();document.getElementById('linkHelpContact').show();">
+						<img src="/img/arrowDown.gif" />
+						Hide
+					</a>
+				</div>  
 	   			<p>
 	   			This feature allows you to award Engagement Levels to Contacts if they have particular field values.  
 	   			You can use this to assign levels based on activity or attributes that aren't easily tracked using Campaigns or Opportunities.
@@ -27,7 +38,6 @@
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Fieldname__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Field_Value__c.InlineHelpText}</p>
 				<p><b>{!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.Label}</b> - {!$ObjectType.EngagementContactFieldSettings__c.Fields.Level_Value__c.InlineHelpText}</p>
-				<a class="cssTabHelpLink helpLink" onclick="document.getElementById('divHelpContact').hide();document.getElementById('linkHelpContact').show();"><br/>Hide</a>  
 	  		</div>
    			<br/>
    		</apex:outputPanel>

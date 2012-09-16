@@ -83,16 +83,55 @@
 			font-size: 100%;
 		}
 		.cssTabHelpLink {
-			cursor: pointer; 
+			cursor: pointer;
+			border-style: solid;
+			border-radius: 4px;
+			border-width: 1px;
+			border-color: #DEEFF5;
+			width: 110px;
+			height: 22px; 
+			color: black;
+			display: table-cell;
+			vertical-align: middle;
+			text-align: center;
+			background-color: #FCFFFE;
 		}
+		
+		.cssTabHelpLink .helpLink {
+			text-decoration: none;
+			color: black;
+			font-size: 105%;
+		}
+
+		.hideHelpLink {
+			cursor: pointer;
+			color: black;
+		}
+		
+		.hideHelpLink .helpLink {
+			color: grey;
+			text-decoration: none;
+		}
+		
+		/*
+		.cssTabHelpLink p {
+			// workaround to vertically center the text
+			margin: 0;
+			line-height: 25px;		
+		}
+		*/
+		
 		.cssHelpText {
 			background-color: mintcream;
 			border-style: solid;
 			border-width: 1px;
 			border-color: lightBlue;
 			border-radius: 10px;
-			padding: 10px;		
-			margin-top: 10px;
+			padding-top: 5px;	
+			padding-bottom: 10px;
+			padding-left: 10px;
+			padding-right: 10px;	
+			// margin-top: 10px;
 			margin-bottom: 10px;
 		}
 		.cssTabInfo {	

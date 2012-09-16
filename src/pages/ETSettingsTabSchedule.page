@@ -15,12 +15,16 @@
    		<apex:outputPanel layout="block" styleClass="cssTabInfo" >
    			<br/>
    			<div class="cssTabTitle" >Scheduling Engagement Rollup</div>
-   			<div class="cssTabSubTitle"><p>Engagement Rollup is the recalculation of every contact's Engagement Level based on current donation, 
-		       				campaign and custom contact field information.  Clicking the Schedule button below will add Engagement Rollup to run 
-		       				nightly at 2:00 am. If it is already scheduled you will receive an error message. 
-		       				To view all schedule jobs go to the&nbsp;
+   			<div class="cssTabSubTitle"><p>Clicking the Schedule button below will schedule the Engagement Rollup to run 
+		       				nightly at 2:00 am. If it is already scheduled you will receive an error message.
+		       				<br/><br/>
+		       				The Engagement Rollup is the recalculation of every contact's Engagement Level based on current donation, 
+		       				campaign and custom contact field information.  It will also calculate Campaign-based engagement metrics.
+		       				<br/><br/>
+		       				To view all already-scheduled jobs go to the 
 		       				<a  href='/08e?setupid=ScheduledJobs'>Scheduled Jobs page.</a>
-		       				You can also start Engagement Rollup manually via the Engagement Rollup tab above.</p></div>
+		       				<br/><br/>
+		       				You can also start the Engagement Rollup manually via the Engagement Rollup tab.</p></div>
    			<br/>
    		</apex:outputPanel>
 		<apex:outputPanel layout="block" styleClass="cssTabInfo" > 
@@ -31,8 +35,8 @@
 		       		<apex:pageMessage severity="info" strength="1" title="Scheduled" escape="false" rendered="{!ctabSchedule.jobId != null}" 
 		       			summary="<p>Engagement Rollup has been successfully scheduled.</p>" />	       					
 		       		<apex:pageMessage severity="warning" strength="1" title="Note" escape="false" rendered="{!ctabSchedule.jobId == null}"
-		       			summary="<p><i>We strongly recommend that you avoid running Engagement Rollup manually or scheduling it to run until you 
-		       				have completely set up your engagement settings and have imported all of your data into Salesforce.   
+		       			summary="<p><i>We strongly recommend that you avoid scheduling the Engagement Rollup (or running it manually) until you 
+		       				have completely configured your engagement settings and have imported or entered any missing data into Salesforce.   
 		       				This will ensure engagement metrics are calculated accurately.</i></p>
 		       					" />	       					
 		       	</apex:panelGroup>
