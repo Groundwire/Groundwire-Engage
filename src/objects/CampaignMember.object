@@ -138,7 +138,7 @@ Returning = Was at this level or higher in the past, but had since dropped to a 
         <deprecated>false</deprecated>
         <description>if checked indicates that this campaign membership was responsible for giving the contact their very first level above 0</description>
         <externalId>false</externalId>
-        <label>Engagement List Growth</label>
+        <label>New Supporter</label>
         <type>Checkbox</type>
     </fields>
     <fields>

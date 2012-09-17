@@ -55,8 +55,8 @@
         <fullName>Engagement_Response_Rate__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <inlineHelpText>includes sub-campaigns in hierarchy that have same or higher engagement level</inlineHelpText>
-        <label>Engagement Response Rate</label>
+        <inlineHelpText>(Groundwire Engage) Response Rate gives % of total campaign members who have a Responded-type status.  Will be blank unless the Campaign has an Engagement Level.  Includes any sub-campaigns that have same or higher Engagement Level.</inlineHelpText>
+        <label>Response Rate</label>
         <precision>4</precision>
         <required>false</required>
         <scale>1</scale>
