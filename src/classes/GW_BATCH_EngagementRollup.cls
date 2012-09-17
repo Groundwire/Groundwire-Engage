@@ -618,15 +618,19 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             string peakStr = lvlNameMap.get(cw.PeakLvl);
 
 			// update our year ago level from the log of changes
-			updateYearAgoLevelFromLog(cw);
+			cw.YearAgoLvl = YearAgoLevelFromLog(cw);
 
 			// see if we need to update fields we're copying from NPSP/GWBase fields (to avoid dependent pkg)
 			boolean copiedFieldMod = false;
+			boolean needUpdateLvlBeforeFirstGift = false;
 			if (GW_GWEngageUtilities.IsGWBaseInstalled || GW_GWEngageUtilities.IsNPSPHHInstalled) {
 				date conFirstCloseDate = (date) con.get(GW_GWEngageUtilities.addNSPrefixET('FirstCloseDate__c',false,true));
 				if (conFirstCloseDate != con.First_Donation_Date__c) {
 					con.First_Donation_Date__c = conFirstCloseDate;
 					copiedFieldMod = true;
+					// also flag that we need to update the "level before first donation" field, but don't do it now
+					// b/c we want to do that after updating the chg log
+					needUpdateLvlBeforeFirstGift = true;
 				}
 				decimal conLifetimeOppTtl = (decimal) con.get(GW_GWEngageUtilities.addNSPrefixET('TotalOppAmount__c',false,true));
 				if (conLifetimeOppTtl > 0 && con.IsDonor__c==false) {
@@ -643,15 +647,14 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                 peakStr!=con.Engagement_Peak__c || cw.LastActionDate!=con.Last_Leadership_Action_Date__c 
                 || cw.YearAgoLvl != con.Engagement_Level_One_Year_Ago__c
                 || copiedFieldMod 
+                || con.Engagement_Level_Change_Log__c == null
                 ) 
                 {
 	                // first, if curr level changed, log the date and former level in contact fields (for use in calculating conversion later, etc.)
-	                // and add to our JSON changelog
                     if (cw.CurrLvl != cw.OrigLvl) {
                     	con.Last_Engagement_Lvl_Chg_Datestamp__c = system.now();
                     	con.Former_Engagement_Level_Numeric__c = con.Engagement_Level_Numeric__c;
                     	con.First_Action_Date_Curr_Level__c = system.today();
-                    	updateLevelChangeLog(cw);
                     	
                     	// capture first level if that's what this is
                     	if (cw.OrigLvl==0 && cw.OrigPeakLvl==0) {
@@ -684,6 +687,13 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     		}
                     	}
                     }
+
+					// if either the level changed or the log is empty, update the JSON changelog
+					// so the first time the contact gets calced, it should insert something in the log, even if only a lvl zero
+					if (cw.CurrLvl != cw.OrigLvl || con.Engagement_Level_Change_Log__c == null) {
+	                	updateLevelChangeLog(cw);
+					}
+					
                     
                     // then update other metrics
                     con.Engagement_Level_Numeric__c = cw.CurrLvl;
@@ -692,6 +702,18 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
                     con.Engagement_Peak__c = peakStr; 
                     con.Last_Leadership_Action_Date__c = cw.lastActionDate;
                     con.Engagement_Level_One_Year_Ago__c = cw.YearAgoLvl;
+
+                	// also update the "level before first donation" field, if flagged
+                	if (needUpdateLvlBeforeFirstGift) {
+                		string strLvl;
+                		integer lvl = this.levelAtDateFromLog(cw, con.First_Donation_Date__c);
+                		if (lvl==0) {
+                			strLvl = '0 - Not Engaged';
+                		} else {
+                			strLvl = lvlNameMap.get(lvl);
+                		} 
+                		con.Engagement_Level_Before_First_Donation__c = strLvl;
+                	}
                     
                     // finally, for testing only, cause one to fail validation by inserting a bogus email addy
                     // this is so we can test that our allornothing=false update is working
@@ -719,6 +741,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 	private void updateLevelChangeLog(engTrackConWrapper cw) {
 		
 		// first deserialize our JSON to a list of objects
+		final integer FIELD_MAX_LENGTH = 10000;
 		integer len = 0;
 		list<DateIntegerPair> changes;
 		if (cw.con.Engagement_Level_Change_Log__c != null) {
@@ -729,31 +752,44 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
 		}
 		
 		// add our new change to the log 
-		// TBD take out any older than 13 months, and/or police the total char length
-		// TBD replace any existing entries w/ same date
+		// TBD replace any existing entries w/ same date?
+		// if we're getting close to the char limit of the field, take out the oldest entry before adding the new one
+		// TBD write test for handling long field
+		if (FIELD_MAX_LENGTH - len < 50) {
+			changes.remove(0);
+		}
 		DateIntegerPair thisChg = new DateIntegerPair(system.today(),cw.CurrLvl);
 		changes.add(thisChg);
 		cw.con.Engagement_Level_Change_Log__c = JSON.serialize (changes);
 	}
 	
-	private void updateYearAgoLevelFromLog (engTrackConWrapper cw) {
-		// date loopDate;
+	
+	private integer yearAgoLevelFromLog (engTrackConWrapper cw) {
 		date yrAgo = system.today().addYears(-1);
+		return levelAtDateFromLog (cw,yrAgo);
+	}
+	
+	
+	private integer levelAtDateFromLog (engTrackConWrapper cw, date asOfDate) {
+		// date loopDate;
+		// date yrAgo = system.today().addYears(-1);
 		integer lvl;
 		if (cw.con.Engagement_Level_Change_Log__c != null) {
 			list<DateIntegerPair> changes = (list<DateIntegerPair>) JSON.deserialize(cw.con.Engagement_Level_Change_Log__c, list<DateIntegerPair>.class);
 			// loop through until we pass our target date; the last chg before the target is the one we want
 			for (DateIntegerPair chg : changes) {
-				if (chg.d < yrAgo) {
+				if (chg.d <= asOfDate) {
 					// loopDate = chg.d;
 					lvl = chg.i;
 				} else {
 					break;
 				}
 			}
-			cw.YearAgoLvl = lvl;
+			// cw.YearAgoLvl = lvl;
+			return lvl;
 		} else {
-			cw.YearAgoLvl = null;
+			// cw.YearAgoLvl = null;
+			return null;
 		}
 	}
 
@@ -1297,10 +1333,33 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         TestCons[2].Engagement_Peak_Numeric__c = 1;
         TestCons[2].Last_Engagement_Lvl_Chg_Datestamp__c = startDateOld.addMonths(-3);   
         TestCons[2].First_Engagement_Level__c = 1;   
-        TestCons[2].First_Engagement_Level_Date__c = startDateOld.addMonths(-3);   
+        TestCons[2].First_Engagement_Level_Date__c = startDateOld.addMonths(-3);
+        TestCons[7].Engagement_Level__c = settings.Level_1_Name__c;   
+        TestCons[7].Engagement_Level_Numeric__c = 1; 
+        // for con 7 also put in an existing level chg log
+        DateIntegerPair chg71 = new DateIntegerPair (startDateOld,1);   
+        list<DateIntegerPair> chgs7 = new list<DateIntegerPair> {chg71};
+        TestCons[7].Engagement_Level_Change_Log__c = JSON.serialize(chgs7);            
         TestCons[10].Engagement_Level_Numeric__c = 1;  
         TestCons[10].Engagement_Peak_Numeric__c = 1;  
         TestCons[11].Engagement_Peak_Numeric__c = 5;
+        TestCons[27].Engagement_Level_Numeric__c = 3;
+        TestCons[27].Engagement_Peak_Numeric__c = 3;
+        // for con 27 also put in an existing lvl chg log
+        // for con 7 also put in an existing level chg log
+        DateIntegerPair chg271 = new DateIntegerPair (startDateOld,3);   
+        list<DateIntegerPair> chgs27 = new list<DateIntegerPair> {chg271};
+        TestCons[27].Engagement_Level_Change_Log__c = JSON.serialize(chgs27);  
+        
+        // give all the others a chglog w/ just a lvl zero (except con 22)
+        for (Contact con:TestCons) {
+        	if (con.Engagement_Level_Change_Log__c == null && con.Id != TestCons[22].Id) {
+		        DateIntegerPair chg0 = new DateIntegerPair (startDateOld.addYears(-1),0);   
+		        list<DateIntegerPair> chgs0 = new list<DateIntegerPair> {chg0};
+		        con.Engagement_Level_Change_Log__c = JSON.serialize(chgs0);  
+        	}
+        }
+        
         update TestCons;  
         
         // now add 2 new contacts who are in existing households
@@ -1460,6 +1519,11 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             ContactId = TestCons[25].Id,
             Status = 'Responded'
         );
+        CampaignMember cm27 = new CampaignMember (
+            CampaignId = camp1.Id,
+            ContactId = TestCons[27].Id,
+            Status = 'Responded'
+        );
         CampaignMember[] onlineCMs = new CampaignMember[0]; 
         for (Campaign c : onlineCamps) {
             CampaignMember cm = new CampaignMember (
@@ -1470,7 +1534,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             onlineCMs.add (cm);      
         }      
 
-        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19,cm23,cm25};
+        CampaignMember[] cms = new CampaignMember[]{cm0,cm02,cm1,cm2,cm22,cm3,cm4,cm42,cm43,cm5,cm8,cm9,cm11,cm112,cm14,cm15,cm19,cm23,cm25,cm27};
         cms.AddAll(onlineCMs); 
         insert cms;
         dlog.debug ('cms inserted: ' + cms);
@@ -1546,7 +1610,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         map<Id,Contact> conP = new map<Id,Contact> ([SELECT Id,Name,FirstName,LastName,Engagement_Level__c,Engagement_Level_Numeric__c,Engagement_Peak__c,Engagement_Peak_Numeric__c,
             Last_Leadership_Action_Date__c,First_Action_Date_Curr_Level__c,Engagement_Level_Override__c,Engagement_Level_Override_Numeric__c,Engagement_Override_End_Date__c,
 			Last_Engagement_Lvl_Chg_Datestamp__c,Former_Engagement_Level_Numeric__c,Engagement_Level_Change_Log__c,First_Engagement_Level__c,First_Engagement_Level_Date__c
-			,Engagement_Level_One_Year_Ago__c	 
+			,Engagement_Level_One_Year_Ago__c,Engagement_Level_Before_First_Donation__c,First_Donation_Date__c
             FROM Contact WHERE Id IN :ConIDs]);
         dlog.debug('conP:' + conP);
         
@@ -1569,9 +1633,9 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(3,con0P.First_Engagement_Level__c);
         System.AssertEquals(startDateRecent,con0P.First_Engagement_Level_Date__c);
         chgs = (list<DateIntegerPair>) JSON.deserialize(con0p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
-        system.Assert (chgs.size()==1);
-        system.Assert (chgs[0].d == system.today());      
-        system.Assert (chgs[0].i == 3);      
+        system.AssertEquals (2,chgs.size());
+        system.Assert (chgs[1].d == system.today());      
+        system.Assert (chgs[1].i == 3);      
 
         // only last yr
         Contact con1P = conP.get(TestCons[1].Id);
@@ -1602,7 +1666,7 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         // these should still be the same as before the batch
         System.AssertEquals(1,con2P.First_Engagement_Level__c); 
         System.AssertEquals(startDateOld.addMonths(-3),con2P.First_Engagement_Level_Date__c); 
-        system.AssertEquals (null,con2p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log 
+        system.AssertEquals (0,con2p.Engagement_Level_One_Year_Ago__c); 
         
         // only peak, nothing recent
         Contact con3P = conP.get(TestCons[3].Id);
@@ -1619,6 +1683,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         System.AssertEquals(6,con5P.Engagement_Peak_Numeric__c);
         System.AssertEquals(startDateRecent,con5P.Last_Leadership_Action_Date__c);  // this doesn't care about the lvl
         System.AssertEquals(system.today(),con5P.First_Action_Date_Curr_Level__c);  // b/c no actions, just chkbox
+        System.AssertEquals(null,con5P.First_Donation_Date__c);
+        System.AssertEquals(null,con5P.Engagement_Level_Before_First_Donation__c);
 
         if (INCOPPS) {
             // recent small donation only
@@ -1628,6 +1694,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(lvlNameMapTest.get(DONORLVL1),con6P.Engagement_Peak__c);
             System.AssertEquals(startDateRecent,con6P.Last_Leadership_Action_Date__c);  
             System.AssertEquals(startDateRecent,con6P.First_Action_Date_Curr_Level__c);
+            System.AssertEquals(startDateRecent,con6P.First_Donation_Date__c);
+            System.AssertEquals('0 - Not Engaged',con6P.Engagement_Level_Before_First_Donation__c);
             
             if (GW_GWEngageUtilities.IsNPSPHHInstalled || GW_GWEngageUtilities.IsGWBaseInstalled) {
             	// while we're at it, also check that the Donor? flag and First Donation Date were set - used in reports
@@ -1648,6 +1716,8 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
             System.AssertEquals(DONORLVL2+1,con7P.Engagement_Peak_Numeric__c);
             System.AssertEquals(startDateRecent,con7P.Last_Leadership_Action_Date__c);  
             System.AssertEquals(startDateRecent,con7P.First_Action_Date_Curr_Level__c);
+            System.AssertEquals(startDateRecent,con7P.First_Donation_Date__c);
+            System.AssertEquals(settings.Level_1_Name__c,con7P.Engagement_Level_Before_First_Donation__c);
     
             // historical maj gift, recent small gift & campaign
             Contact con8P = conP.get(TestCons[8].Id);
@@ -1769,10 +1839,26 @@ global virtual class GW_BATCH_EngagementRollup implements Database.Batchable<Sob
         Contact con26P = conP.get(TestCons[26].Id);
         System.AssertEquals(2,con26P.Engagement_Level_Numeric__c);        
         System.AssertEquals(null,con26P.Last_Leadership_Action_Date__c);
+
+        // this guy had a campaign, but was already level 3 -- make sure JSON log didn't chg
+        Contact con27P = conP.get(TestCons[27].Id);
+        System.AssertEquals(3,con27P.Engagement_Level_Numeric__c);
+        dlog.debug (con27p.Engagement_Level_Change_Log__c);        
+        chgs = (list<DateIntegerPair>) JSON.deserialize(con27p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
+        system.AssertEquals (1,chgs.size());
+        system.Assert (chgs[0].d < system.today());      
+        system.AssertEquals (3,chgs[0].i);   
                  
         // and one that has nothing!
         Contact con22P = conP.get(TestCons[22].Id);
-        System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);     
+        System.AssertEquals(0,con22P.Engagement_Level_Numeric__c);
+        system.AssertEquals (null,con22p.Engagement_Level_One_Year_Ago__c);		// b/c lacking change log           
+        // but should still get an entry in the log at zero
+        system.assert (con22p.Engagement_Level_Change_Log__c != null,'change log wasnt created on first calc for contact at lvl zero');
+        chgs = (list<DateIntegerPair>) JSON.deserialize(con22p.Engagement_Level_Change_Log__c , list<DateIntegerPair>.class);
+        system.Assert (chgs.size()==1);
+        system.Assert (chgs[0].d == system.today());      
+        system.Assert (chgs[0].i == 0);   
 
         // #25 should also have nothing, since we're causing it to fail validation on the insert
         // in fact, it should be null, since it was never processed

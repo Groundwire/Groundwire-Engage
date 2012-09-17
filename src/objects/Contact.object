@@ -249,7 +249,7 @@
         <description>Used by engagement metrics to compare year-over-year levels for a contact.  Should be hidden from end users.  Serialized JSON of a list of apex objects w/ two properties.  Date of change, and value changed to.</description>
         <externalId>false</externalId>
         <label>Engagement Level Change Log</label>
-        <length>5000</length>
+        <length>10000</length>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>LongTextArea</type>
