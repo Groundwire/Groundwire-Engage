@@ -39,7 +39,7 @@
     <columns>
         <field>Contact.First_Engagement_Level__c</field>
     </columns>
-    <description>Count of newly engaged contacts by quarter</description>
+    <description>Count of contacts who entered the engagement pyramid for the first time at level 1 or higher, per calendar quarter</description>
     <filter>
         <criteriaItems>
             <column>Contact.First_Engagement_Level__c</column>
@@ -53,7 +53,7 @@
         <field>Contact.First_Engagement_Level_Date__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Newly Engaged Contacts Per Quarter</name>
+    <name>New Supporters per Quarter</name>
     <params>
         <name>co</name>
         <value>1</value>

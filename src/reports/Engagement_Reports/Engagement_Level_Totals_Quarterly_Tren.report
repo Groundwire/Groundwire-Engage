@@ -31,9 +31,10 @@
         <aggregateTypes>Sum</aggregateTypes>
         <field>Engagement_Totals__c.Number_of_Contacts__c</field>
     </columns>
+    <description>gives total number of contacts in each Engagement Level, as of the beginning of each calendar quarter</description>
     <filter>
         <criteriaItems>
-            <column>Engagement_Totals__c.First_of_Month__c</column>
+            <column>Engagement_Totals__c.First_of_Quarter__c</column>
             <operator>equals</operator>
             <value>True</value>
         </criteriaItems>
@@ -49,7 +50,7 @@
         <field>Engagement_Totals__c.Engagement_Level__c</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
-    <name>Engagement Level Totals - Quarterly Tren</name>
+    <name>Engagement Level Totals Quarterly Trend</name>
     <params>
         <name>co</name>
         <value>0</value>

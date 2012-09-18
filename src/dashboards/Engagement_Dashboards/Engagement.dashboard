@@ -1,35 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
-    <backgroundEndColor>#DDDDDD</backgroundEndColor>
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
     <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
     <backgroundStartColor>#FFFFFF</backgroundStartColor>
     <dashboardType>LoggedInUser</dashboardType>
-    <description>&gt;&gt;&gt;   Where you stand now with your engagement, and progress over the last 90 days.</description>
+    <description>Engagement metrics based on current snapshots, and data from the last 90 days.</description>
     <leftSection>
         <columnSize>Wide</columnSize>
         <components>
             <componentType>VisualforcePage</componentType>
             <footer>How many people do we have at each level?</footer>
-            <header>People</header>
+            <header>Supporters &amp; Levels</header>
             <page>engPyramidDash</page>
             <pageHeightInPixels>325</pageHeightInPixels>
-        </components>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Pie</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>true</enableHover>
-            <expandOthers>false</expandOthers>
-            <footer>Highest level ever reached by contacts in the pyramid</footer>
-            <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Engagement_Peak</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Peak Engagement Level</title>
-            <useReportChart>false</useReportChart>
         </components>
         <components>
             <chartAxisRange>Auto</chartAxisRange>
@@ -54,9 +37,9 @@
             <displayUnits>Auto</displayUnits>
             <drillEnabled>false</drillEnabled>
             <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>true</enableHover>
+            <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>How long are people staying in their level?</footer>
+            <footer>How long are people staying in their level?  Is there a lot of movement, or are people getting &quot;stuck&quot; in one level?</footer>
             <legendPosition>Bottom</legendPosition>
             <report>Engagement_Reports/Time_in_Level</report>
             <showPercentage>false</showPercentage>
@@ -69,46 +52,64 @@
     <middleSection>
         <columnSize>Wide</columnSize>
         <components>
+            <componentType>VisualforcePage</componentType>
+            <footer>Are we bringing new people into the bottom of the pyramid?  How many new supporters have we brought in to engagement levels 1 and 2 recently?</footer>
+            <header>Conversions &amp; List Growth  (Last 90 Days)</header>
+            <page>GWEDash_ListGrowthRecent</page>
+            <pageHeightInPixels>135</pageHeightInPixels>
+        </components>
+        <components>
+            <componentType>VisualforcePage</componentType>
+            <footer>Are we moving people up the pyramid?  How many people moved up a level due to donations or campaign participation?</footer>
+            <page>GWEDash_Conversions</page>
+            <pageHeightInPixels>135</pageHeightInPixels>
+        </components>
+        <components>
+            <componentType>VisualforcePage</componentType>
+            <footer>Are we bringing new donors in the door?  These include brand-new supporters as well as people who were already engaged non-donors.</footer>
+            <page>GWEDash_NewDonors</page>
+            <pageHeightInPixels>135</pageHeightInPixels>
+        </components>
+    </middleSection>
+    <rightSection>
+        <columnSize>Wide</columnSize>
+        <components>
             <chartAxisRange>Auto</chartAxisRange>
-            <componentType>ColumnGrouped</componentType>
-            <displayUnits>Auto</displayUnits>
+            <componentType>Column</componentType>
+            <displayUnits>Integer</displayUnits>
             <drillEnabled>false</drillEnabled>
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>true</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>What campaigns are we running at each engagement level?</footer>
-            <header>Campaigns</header>
+            <footer>Are we providing opportunities to engage at each engagement level?</footer>
+            <header>Campaigns  (Last 90 Days)</header>
             <legendPosition>Bottom</legendPosition>
             <report>Engagement_Reports/Campaign_Count_by_Level</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Recent Campaigns</title>
+            <title>Recent Campaigns by Engagement Level</title>
             <useReportChart>false</useReportChart>
         </components>
         <components>
             <componentType>Table</componentType>
+            <dashboardTableColumn>
+                <column>CAMPAIGN_NAME</column>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
+                <column>FORMULA4</column>
+                <showTotal>false</showTotal>
+                <sortBy>RowValueDescending</sortBy>
+            </dashboardTableColumn>
             <displayUnits>Auto</displayUnits>
-            <footer>What recent campaigns have done the best job at moving people up the pyramid?</footer>
+            <footer>Which campaigns have moved the most people up the pyramid?</footer>
             <indicatorHighColor>#54C254</indicatorHighColor>
             <indicatorLowColor>#C25454</indicatorLowColor>
             <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <maxValuesDisplayed>5</maxValuesDisplayed>
             <report>Engagement_Reports/Top_5_Campaigns_Conversions</report>
-            <showPicturesOnTables>false</showPicturesOnTables>
-            <sortBy>RowValueDescending</sortBy>
-            <title>Top 5 Campaigns - Conversions</title>
-        </components>
-        <components>
-            <componentType>Table</componentType>
-            <displayUnits>Auto</displayUnits>
-            <footer>What recent campaigns have brought in the most new people?</footer>
-            <indicatorHighColor>#54C254</indicatorHighColor>
-            <indicatorLowColor>#C25454</indicatorLowColor>
-            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-            <report>Engagement_Reports/Top_5_Recent_Campaigns_New_Supporters</report>
             <showPicturesOnTables>true</showPicturesOnTables>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Top 5 Campaigns - New Supporters</title>
+            <title>Campaign Leaderboard - Conversions</title>
         </components>
         <components>
             <componentType>Table</componentType>
@@ -117,8 +118,28 @@
                 <sortBy>RowLabelAscending</sortBy>
             </dashboardTableColumn>
             <dashboardTableColumn>
+                <column>FORMULA3</column>
+                <showTotal>false</showTotal>
+            </dashboardTableColumn>
+            <displayUnits>Auto</displayUnits>
+            <footer>Which campaigns have brought in the greatest number of new supporters to the engagement pyramid?</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <maxValuesDisplayed>5</maxValuesDisplayed>
+            <report>Engagement_Reports/Top_Recent_Campaigns_New_Supporters</report>
+            <showPicturesOnTables>true</showPicturesOnTables>
+            <title>Campaign Leaderboard - New Supporters</title>
+        </components>
+        <components>
+            <componentType>Table</componentType>
+            <dashboardTableColumn>
+                <column>CAMPAIGN_NAME</column>
+            </dashboardTableColumn>
+            <dashboardTableColumn>
                 <column>FORMULA1</column>
                 <showTotal>false</showTotal>
+                <sortBy>RowValueDescending</sortBy>
             </dashboardTableColumn>
             <dashboardTableColumn>
                 <column>FORMULA2</column>
@@ -129,65 +150,14 @@
                 <showTotal>false</showTotal>
             </dashboardTableColumn>
             <displayUnits>Auto</displayUnits>
-            <footer>How are recent campaigns doing at engaging our people (including sub-campaigns)?</footer>
+            <footer>(Last 90 Days) How are recent campaigns doing at engaging our people?</footer>
             <indicatorHighColor>#54C254</indicatorHighColor>
             <indicatorLowColor>#C25454</indicatorLowColor>
             <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-            <maxValuesDisplayed>8</maxValuesDisplayed>
+            <maxValuesDisplayed>10</maxValuesDisplayed>
             <report>Engagement_Reports/Recent_Campaign_Metrics_for_Dashboard</report>
             <showPicturesOnTables>false</showPicturesOnTables>
             <title>Recent Campaign Comparison</title>
-        </components>
-    </middleSection>
-    <rightSection>
-        <columnSize>Wide</columnSize>
-        <components>
-            <componentType>Metric</componentType>
-            <displayUnits>Auto</displayUnits>
-            <footer>Contacts who received an low engagement level for the first time.</footer>
-            <header>Conversions &amp; List Growth</header>
-            <indicatorHighColor>#54C254</indicatorHighColor>
-            <indicatorLowColor>#C25454</indicatorLowColor>
-            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-            <metricLabel>NEW LOW-LEVEL SUPPORTERS</metricLabel>
-            <report>Engagement_Reports/Newly_Engaged_Contacts_This_Quarter</report>
-        </components>
-        <components>
-            <componentType>Metric</componentType>
-            <displayUnits>Auto</displayUnits>
-            <footer>people who rose in level by participating in a campaign</footer>
-            <indicatorHighColor>#54C254</indicatorHighColor>
-            <indicatorLowColor>#C25454</indicatorLowColor>
-            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-            <metricLabel>CAMPAIGN CONVERSIONS</metricLabel>
-            <report>Engagement_Reports/Campaign_Engagement_Conversions_by_Level</report>
-        </components>
-        <components>
-            <componentType>Metric</componentType>
-            <displayUnits>Auto</displayUnits>
-            <footer>people who rose in level by giving a donation</footer>
-            <indicatorHighColor>#54C254</indicatorHighColor>
-            <indicatorLowColor>#C25454</indicatorLowColor>
-            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-            <metricLabel>DONATION CONVERSIONS</metricLabel>
-            <report>Engagement_Reports/Opp_Engagement_Conversions_by_Level</report>
-        </components>
-        <components>
-            <chartAxisRange>Auto</chartAxisRange>
-            <componentType>Column</componentType>
-            <displayUnits>Auto</displayUnits>
-            <drillEnabled>false</drillEnabled>
-            <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>false</enableHover>
-            <expandOthers>false</expandOthers>
-            <footer>people who rose in level by participating in a campaign</footer>
-            <legendPosition>Right</legendPosition>
-            <report>Engagement_Reports/Campaign_Engagement_Conversions_by_Level</report>
-            <showPercentage>false</showPercentage>
-            <showValues>false</showValues>
-            <sortBy>RowLabelAscending</sortBy>
-            <title>Recent Conversions - Campaign</title>
-            <useReportChart>true</useReportChart>
         </components>
     </rightSection>
     <runningUser>matthew+gwe@groundwire.org</runningUser>

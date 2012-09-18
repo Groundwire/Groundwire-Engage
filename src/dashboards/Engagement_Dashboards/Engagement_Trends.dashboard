@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
-    <backgroundEndColor>#DDDDDD</backgroundEndColor>
-    <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundFadeDirection>LeftToRight</backgroundFadeDirection>
     <backgroundStartColor>#FFFFFF</backgroundStartColor>
     <dashboardType>SpecifiedUser</dashboardType>
-    <description>Longer-term engagement metrics</description>
     <leftSection>
         <columnSize>Wide</columnSize>
         <components>
@@ -15,10 +14,10 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>true</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>Track growth of each level</footer>
-            <header>People</header>
+            <footer>Are each of our engagement levels seeing growth?  Or are some levels growing while others are shrinking?</footer>
+            <header>Supporters &amp; Campaigns</header>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Engagement_Level_Totals_Trend</report>
+            <report>Engagement_Reports/Engagement_Level_Totals_Quarterly_Tren</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
@@ -31,20 +30,17 @@
             <displayUnits>Auto</displayUnits>
             <drillEnabled>false</drillEnabled>
             <drillToDetailEnabled>false</drillToDetailEnabled>
-            <enableHover>true</enableHover>
+            <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>Are people getting stuck in particular levels?</footer>
+            <footer>Are we consistently offering campaigns at each engagement level?</footer>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Time_in_Level</report>
+            <report>Engagement_Reports/Campaigns_per_Level_per_Quarter</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Time in Level</title>
+            <title>Campaigns by Level</title>
             <useReportChart>true</useReportChart>
         </components>
-    </leftSection>
-    <middleSection>
-        <columnSize>Wide</columnSize>
         <components>
             <chartAxisRange>Auto</chartAxisRange>
             <componentType>Column</componentType>
@@ -53,14 +49,108 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>false</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>Do more chances to take action lead to more action?</footer>
-            <header>Campaigns</header>
+            <footer>Are we consistently getting people to participate in our campaigns at each level?</footer>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Campaign_Opportunities_vs_Actions</report>
+            <report>Engagement_Reports/Campaign_Actions_by_Quarter</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Campaigns &amp; Total Actions</title>
+            <title>Campaign Participation by Level</title>
+            <useReportChart>true</useReportChart>
+        </components>
+        <components>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Column</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>true</enableHover>
+            <expandOthers>false</expandOthers>
+            <legendPosition>Bottom</legendPosition>
+            <report>Engagement_Reports/Fall_from_Peak_by_Current_Level</report>
+            <showPercentage>false</showPercentage>
+            <showValues>false</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Current vs Peak Level</title>
+            <useReportChart>true</useReportChart>
+        </components>
+    </leftSection>
+    <middleSection>
+        <columnSize>Wide</columnSize>
+        <components>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Donut</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>true</enableHover>
+            <expandOthers>true</expandOthers>
+            <footer>Are we moving our low level consituents up the pyramid?  Includes constituents who were low level (levels 1 and 2) one year ago.</footer>
+            <header>Conversion &amp; Retention</header>
+            <legendPosition>Right</legendPosition>
+            <report>Engagement_Reports/Long_Term_Conversion_Rate_Low_Level</report>
+            <showPercentage>true</showPercentage>
+            <showTotal>true</showTotal>
+            <showValues>false</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Conversion from Low Level</title>
+            <useReportChart>true</useReportChart>
+        </components>
+        <components>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Donut</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>true</enableHover>
+            <expandOthers>true</expandOthers>
+            <footer>Are our most highly engaged constituents staying engaged at a high level?  Includes consituents who were high level (4 and higher) one year ago.</footer>
+            <legendPosition>Right</legendPosition>
+            <report>Engagement_Reports/Retention_Rate_Highly_Engaged</report>
+            <showPercentage>true</showPercentage>
+            <showTotal>true</showTotal>
+            <showValues>false</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Retention - Highly Engaged</title>
+            <useReportChart>true</useReportChart>
+        </components>
+        <components>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Column</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>false</enableHover>
+            <expandOthers>false</expandOthers>
+            <footer>How many new contacts are we engaging over time?  Gives count of contacts who were added to the pyramid for the first time in each quarter.</footer>
+            <legendPosition>Bottom</legendPosition>
+            <report>Engagement_Reports/Newly_Engaged_Contacts_Per_Quarter</report>
+            <showPercentage>false</showPercentage>
+            <showValues>false</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>New Supporters</title>
+            <useReportChart>true</useReportChart>
+        </components>
+    </middleSection>
+    <rightSection>
+        <columnSize>Wide</columnSize>
+        <components>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Donut</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>true</enableHover>
+            <expandOthers>true</expandOthers>
+            <footer>How engaged were our new donors before becoming donors?   What are our best audiences for new donors?</footer>
+            <header>Donors</header>
+            <legendPosition>Right</legendPosition>
+            <report>Engagement_Reports/New_Donors_Level_Before_First_Donation</report>
+            <showPercentage>true</showPercentage>
+            <showTotal>true</showTotal>
+            <showValues>false</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>New Donors - Level Converted From</title>
             <useReportChart>true</useReportChart>
         </components>
         <components>
@@ -71,22 +161,19 @@
             <drillToDetailEnabled>false</drillToDetailEnabled>
             <enableHover>true</enableHover>
             <expandOthers>false</expandOthers>
-            <footer>Are we getting better at converting and engaging people with our campaigns?</footer>
+            <footer>Are we getting better over time at engaging new donors?</footer>
             <legendPosition>Bottom</legendPosition>
-            <report>Engagement_Reports/Yearly_Campaign_Response_Conversion_Rate</report>
+            <report>Engagement_Reports/New_Donor_Conversions_by_Quarter</report>
             <showPercentage>false</showPercentage>
             <showValues>false</showValues>
             <sortBy>RowLabelAscending</sortBy>
-            <title>Change in Response/Conversion Rates</title>
+            <title>New Donor Conversions</title>
             <useReportChart>true</useReportChart>
         </components>
-    </middleSection>
-    <rightSection>
-        <columnSize>Wide</columnSize>
     </rightSection>
     <runningUser>matthew+gwe@groundwire.org</runningUser>
     <textColor>#000000</textColor>
     <title>Engagement Trends</title>
     <titleColor>#000000</titleColor>
-    <titleSize>14</titleSize>
+    <titleSize>12</titleSize>
 </Dashboard>

@@ -70,6 +70,19 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>First_of_Quarter__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF ( DAY(As_of_Date__c ) = 1 &amp;&amp; 
+ ( MONTH(As_of_Date__c ) = 1 || MONTH(As_of_Date__c ) = 4 || MONTH(As_of_Date__c ) = 7 || MONTH(As_of_Date__c ) = 10 )
+  , &quot;True&quot; , &quot;False&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>First of Quarter</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Number_of_Contacts__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
