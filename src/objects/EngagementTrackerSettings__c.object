@@ -256,6 +256,7 @@
     </fields>
     <fields>
         <fullName>Send_Error_Emails_To__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>Error notifications will be sent to the email address entered here.  Currently, this is only for notifications about validation problems on contact records.</inlineHelpText>
         <label>Send Error Emails To</label>

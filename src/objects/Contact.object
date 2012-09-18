@@ -233,6 +233,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_Before_First_Donation__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>If this contact is a donor (and became a donor while Groundwire Engage was in use) this field will give the Engagement Level they had before becoming a donor.</inlineHelpText>
         <label>Engagement Level Before First Donation</label>
@@ -285,6 +286,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Level_One_Year_Ago__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>The contact&apos;s numeric engagement level one year ago, used in metrics for comparing change over time.</inlineHelpText>
         <label>Engagement Level One Year Ago</label>
@@ -404,6 +406,7 @@
     </fields>
     <fields>
         <fullName>Engagement_Lvl_Before_1st_Gift_Numeric__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>VALUE ( LEFT ( Engagement_Level_Before_First_Donation__c , 1 ) )</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
@@ -493,6 +496,7 @@ NOTE: This does not take into account any past overrides or formerly-checked che
     </fields>
     <fields>
         <fullName>First_Donation_Date__c</fullName>
+        <deprecated>false</deprecated>
         <externalId>false</externalId>
         <inlineHelpText>This field is used by Groundwire Engage to identify new donors.  If you are using Non Profit Starter Pack or GWBase, this value is obtained from one of those systems.</inlineHelpText>
         <label>First Donation Date</label>
@@ -1634,12 +1638,6 @@ if(ISPICKVAL(npe01__Secondary_Address_Type__c,&quot;Work&quot;),
         </filters>
         <label>New This Week</label>
     </listViews>
-    <validationRules>
-        <fullName>TEST_TEST_rule_no_fail_in_name</fullName>
-        <active>true</active>
-        <errorConditionFormula>LastName = &apos;Fail&apos;</errorConditionFormula>
-        <errorMessage>last name can&apos;t be Fail</errorMessage>
-    </validationRules>
     <webLinks>
         <fullName>npo02__Copy_Address_to_Household</fullName>
         <availability>online</availability>

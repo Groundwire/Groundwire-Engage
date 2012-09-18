@@ -217,15 +217,6 @@
         <type>Picklist</type>
     </fields>
     <fields>
-        <fullName>Won_Since_Last_Engagement_Change__c</fullName>
-        <defaultValue>false</defaultValue>
-        <description>will be checked via trigger if this opp was set to won (via insert or update) since the last time this contact&apos;s engagement level was changed</description>
-        <externalId>false</externalId>
-        <label>Won Since Last Engagement Change</label>
-        <trackFeedHistory>false</trackFeedHistory>
-        <type>Checkbox</type>
-    </fields>
-    <fields>
         <fullName>npe01__Amount_Outstanding__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
