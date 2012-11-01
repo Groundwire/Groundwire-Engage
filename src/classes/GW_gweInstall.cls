@@ -17,7 +17,7 @@ global class GW_gweInstall implements InstallHandler{
 		this.icontext = context; 
 
 		defaultSettingsRec();
-		defaultErrEmailAddy();
+		// defaultErrEmailAddy();   // called by the method above
 	}
 	
 	
@@ -26,18 +26,12 @@ global class GW_gweInstall implements InstallHandler{
 		id orgId = UserInfo.getOrganizationId();
 		if (EngagementTrackerSettings__c.getValues(orgId) == null) {
 			EngagementTrackerSettings__c settings = new EngagementTrackerSettings__c();
-			
-			// set default levels
-			// for now, use settings wiz controllers to fetch levels from the picklists
-			// GW_CTRL_ETSettingsWizard wiz = new GW_CTRL_ETSettingsWizard();
-			
-			/* commented out for now - testing just using defaults for the levels instead of inspecting picklists
-			GW_CTRL_ETSettingsTabLevels lvlsCTRL = new GW_CTRL_ETSettingsTabLevels();
-			settings = lvlsCTRL.setDefaultLevels(settings);
-
-			*/
-
-			insert settings;			
+			try {
+				insert settings;
+				defaultErrEmailAddy();
+			} catch (exception e){
+				// nothing for now, just don't want install to fail
+			}			
 
 		}		
 	} 
